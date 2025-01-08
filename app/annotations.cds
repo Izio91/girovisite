@@ -177,7 +177,7 @@ annotate girovisiteSrv.Detail with {
   werks @title: 'WERKS';
   driver1 @title: 'DRIVER1';
   kunnr @title: 'KUNNR';
-  datar @title: 'DATAB';
+  datab @title: 'DATAB';
   datbi @title: 'DATBI';
   inactive @title: 'INACTIVE';
   kunwe @title: 'KUNWE';
@@ -207,7 +207,7 @@ annotate girovisiteSrv.Detail with @UI.LineItem: [
     { $Type: 'UI.DataField', Value: werks },
     { $Type: 'UI.DataField', Value: driver1 },
     { $Type: 'UI.DataField', Value: kunnr },
-    { $Type: 'UI.DataField', Value: datar },
+    { $Type: 'UI.DataField', Value: datab },
     { $Type: 'UI.DataField', Value: datbi },
     { $Type: 'UI.DataField', Value: inactive },
     { $Type: 'UI.DataField', Value: kunwe },
@@ -239,7 +239,7 @@ annotate girovisiteSrv.Detail with @UI.FieldGroup #Main: {
     { $Type: 'UI.DataField', Value: werks },
     { $Type: 'UI.DataField', Value: driver1 },
     { $Type: 'UI.DataField', Value: kunnr },
-    { $Type: 'UI.DataField', Value: datar },
+    { $Type: 'UI.DataField', Value: datab },
     { $Type: 'UI.DataField', Value: datbi },
     { $Type: 'UI.DataField', Value: inactive },
     { $Type: 'UI.DataField', Value: kunwe },

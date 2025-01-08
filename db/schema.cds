@@ -40,7 +40,7 @@ entity Detail {
     key werks     : String(4);
         driver1   : String(10);
         kunnr     : String(10);
-        datar     : Date;
+        datab     : Date;
         datbi     : Date;
         inactive  : String(1);
         kunwe     : String(10);

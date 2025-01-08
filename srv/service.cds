@@ -1,10 +1,11 @@
-using { girovisite as my } from '../db/schema.cds';
+using {girovisite as my} from '../db/schema.cds';
 
-@path: '/service/girovisite'
+@path    : '/service/girovisite'
 @requires: 'authenticated-user'
 service girovisiteSrv {
-  @odata.draft.enabled
+  @readonly
   entity Header as projection on my.Header;
-  @odata.draft.enabled
+
+  @readonly
   entity Detail as projection on my.Detail;
 }
