@@ -1,0 +1,23 @@
+{
+  "i18n/i18n.properties": 1740500464099,
+  "Component.js": 1740048052959,
+  "controller/Main.controller.js": 1740497809811,
+  "controller/App.controller.js": 1740048052971,
+  "manifest.json": 1740500695175,
+  "model/models.js": 1740048052967,
+  "controller/App-dbg.controller.js": 1740048052971,
+  "controller/App.controller.js.map": 1740500695353,
+  "controller/Main-dbg.controller.js": 1740497809811,
+  "controller/Main.controller.js.map": 1740500695374,
+  "Component-dbg.js": 1740048052959,
+  "Component.js.map": 1740500695354,
+  "model/models-dbg.js": 1740048052967,
+  "model/models.js.map": 1740500695344,
+  "Component-preload.js": 1740500695454,
+  "Component-preload.js.map": 1740500695454,
+  "view/fragments/BusyDialog.fragment.xml": 1740392175664,
+  "view/Main.view.xml": 1740048052975,
+  "view/App.view.xml": 1740048052975,
+  "css/style.css": 1740048052971,
+  "index.html": 1740389043682
+}

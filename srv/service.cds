@@ -1,11 +1,11 @@
 using {girovisite as my} from '../db/schema.cds';
 
-@path    : '/service/girovisite'
-@requires: 'authenticated-user'
-service girovisiteSrv {
-  @readonly
-  entity Header as projection on my.Header;
 
-  @readonly
+
+service girovisiteService 
+// @(requires: 'authenticated-user')
+@(path    : '/girovisiteService')
+ {
+  entity Header as projection on my.Header;
   entity Detail as projection on my.Detail;
 }

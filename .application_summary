@@ -1,5 +1,0 @@
-{
-  "ProjectOverviewURL": "https://centrale-del-latte-di-roma-dev-8gjclzs8.launchpad.cfapps.eu10.hana.ondemand.com/lcapgirovisite.girovisiteLaunchpad-1.0.0/",
-  "DeployedUTCTime": "2024-11-29T09:42:12.506Z",
-  "ApplicationLogURL": "https://logs.cf.eu10-004.hana.ondemand.com/app/dashboards#/view/Overview?_g=(filters:!((query:(match_phrase:(component_name:girovisite-srv)))))"
-}

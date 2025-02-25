@@ -33,7 +33,6 @@ mta_archives/
 # @cap-js/cds-typer
 @cds-models
 
-# LCAP
 build/ui-deployer/
 build/dist/
 env/
@@ -228,3 +227,6 @@ gen/db/node_modules/async/README.md
 gen/db/node_modules/async/dist/async.js
 gen/db/node_modules/async/dist/async.min.js
 gen/db/node_modules/async/dist/async.mjs
+
+# auto generated wildcard
+db/.env

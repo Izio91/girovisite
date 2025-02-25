@@ -17,7 +17,7 @@
       "preLaunchTask": "PreLaunchTask for Run girovisite",
       "envFile": "${workspaceFolder}/env/.env1",
       "env": {
-        "run.config": "{\"handlerId\":\"lcap_run_config_handler_id\",\"runnableId\":\"{\\\"projectPath\\\":\\\"/home/user/projects/girovisite\\\",\\\"profileName\\\":\\\"\\\"}\"}"
+        "run.config": "{\"handlerId\":\"run_config_handler_id\",\"runnableId\":\"{\\\"projectPath\\\":\\\"/home/user/projects/girovisite\\\",\\\"profileName\\\":\\\"\\\"}\"}"
       }
     }
   ]
