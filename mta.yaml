@@ -72,9 +72,9 @@ modules:
     requires:
     - artifacts:
       - girovisitefrontend.zip
-      name: girovisitefrontend
+      name: frontend
       target-path: resources/
-- name: girovisitefrontend
+- name: frontend
   type: html5
   path: frontend
   build-parameters:

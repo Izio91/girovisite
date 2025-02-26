@@ -8,7 +8,8 @@ default-*.json
 gen/
 node_modules/
 target/
-
+resources/
+frontend/dist/
 # Web IDE, App Studio
 .che/
 .gen/
@@ -230,3 +231,4 @@ gen/db/node_modules/async/dist/async.mjs
 
 # auto generated wildcard
 db/.env
+resources/girovisitefrontend.zip
