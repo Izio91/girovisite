@@ -1,0 +1,8 @@
+<mvc:View controllerName="frontend.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.uxap"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m">
+    <ObjectPageLayout id="ObjectPageLayout">
+    </ObjectPageLayout>
+</mvc:View>

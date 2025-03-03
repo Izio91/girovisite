@@ -72,3 +72,30 @@ annotate Detail with @assert.unique: {uniqueKey: [
     vppos,
     werks
 ]};
+
+view HeaderWithDetails as
+    select distinct
+        key t1.vpid,
+        t1.vctext,
+        key t1.werks,
+        t1.vkorg,
+        t1.vtweg,
+        t1.spart,
+        t1.driver1,
+        t1.termCode,
+        t1.datfr,
+        t1.datto,
+        t1.active,
+        t1.loevm,
+        t1.erdat,
+        t1.erzet,
+        t1.ernam,
+        t1.aedat,
+        t1.aezet,
+        t1.aenam,
+        t2.kunnr,
+        t2.kunwe
+    from Header as t1
+    left outer join Detail as t2
+        on  t1.vpid  = t2.vpid
+        and t1.werks = t2.werks;

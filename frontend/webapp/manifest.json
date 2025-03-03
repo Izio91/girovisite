@@ -81,6 +81,8 @@
         "preload": true,
         "settings": {
           "operationMode": "Server",
+          "groupId": "$auto",
+          "updateGroupId": "entitiesUpdate",
           "autoExpandSelect": true,
           "earlyRequests": true
         }
@@ -105,17 +107,28 @@
       },
       "routes": [
         {
-          "name": "RouteMain",
+          "name": "main",
           "pattern": ":?query:",
           "target": [
-            "TargetMain"
+            "main"
+          ]
+        },
+        {
+          "name": "detail",
+          "pattern": "detail/{vpid}/{vctext}/{werks}/{vkorg}/{vtweg}/{spart}",
+          "target": [
+            "detail"
           ]
         }
       ],
       "targets": {
-        "TargetMain": {
-          "id": "Main",
+        "main": {
+          "id": "main",
           "name": "Main"
+        },
+        "detail": {
+          "id": "detail",
+          "name": "Detail"
         }
       }
     },

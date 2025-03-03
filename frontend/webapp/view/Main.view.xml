@@ -1,6 +1,224 @@
 <mvc:View controllerName="frontend.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-    </Page>
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:dnd="sap.ui.core.dnd"
+    xmlns:columnmenu="sap.m.table.columnmenu"
+    xmlns="sap.m"
+    xmlns:sap.ui.fl="sap.ui.fl"
+    xmlns:sap.ui.dt="sap.ui.dt"
+    xmlns:vm="sap.ui.fl.variants"
+    xmlns:plugins="sap.m.plugins">
+    <f:DynamicPage>
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <!-- Filter Bar for search and filters -->
+                    <fb:FilterBar id="filterbar" reset="onReset" search="onGoPress" useToolbar="false" showGoOnFB="true" showClearOnFB="true" clear="onClearFilterBar" showFilterConfiguration="false">
+                        <fb:filterGroupItems>
+
+                            <!-- <fb:FilterGroupItem groupName="DefaultGroup" name="B" label="{i18n>DocumentStatus}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox id="idSelectDocStatus" items="{path: 'prmodel>/filterProps/DocumentStatus'}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="C" label="{i18n>ExtractionStatus}" visible="false" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Select id="idSelectExtractionStatus" forceSelection="false" items="{prmodel>/filterProps/ExtractionStatus}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="{i18n>VendorName}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idSentByInp" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="{i18n>VATRegistrationNumber}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idVATRegistrationNumber" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="{i18n>AssignedTo}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="idAssignedToInp" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="{i18n>DocumentCategory}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Select id="idSelectDocumentCategory" forceSelection="false" items="{prmodel>/filterProps/DocumentCategory}">
+                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="H" label="{i18n>ReceivedBetween}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DateRangeSelection id="idSentOn" displayFormat="long" />
+                                </fb:control>
+                            </fb:FilterGroupItem> -->
+
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table id="mainTable" items="{
+                    path: 'masterModel>/HeaderWithDetails'
+                }"
+                autoPopinMode="true" 
+                sticky="ColumnHeaders,HeaderToolbar" 
+                popinLayout="GridSmall"
+                growing="true"
+                growingScrollToLoad="true"
+                growingThreshold="50"
+                updateFinished="onTableGrowing"
+                ariaLabelledBy="title" 
+                fixedLayout="Strict">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer/>
+                        <Button icon="sap-icon://action-settings" press="openPersonalizationDialog" tooltip="Settings"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <infoToolbar>
+                    <OverflowToolbar id="filterInfo" visible="false" design="Info" active="true" press="onFilterInfoPress" >
+                        <Text id="filterInfoText" wrapping="false" text="Table filter active" />
+                        <ToolbarSpacer />
+                        <Button tooltip="Remove All Filters" icon="sap-icon://decline" type="Transparent" press="onClearFilterPress" />
+                    </OverflowToolbar>
+                </infoToolbar>
+                <dependents>
+                    <plugins:ColumnResizer columnResize="onColumnResize"/>
+                    <columnmenu:Menu id="menu" beforeOpen="beforeOpenColumnMenu">
+                        <columnmenu:QuickSort change="onSort">
+                            <columnmenu:items>
+                                <columnmenu:QuickSortItem></columnmenu:QuickSortItem>
+                            </columnmenu:items>
+                        </columnmenu:QuickSort>
+                        <columnmenu:QuickGroup change="onGroup">
+                            <columnmenu:items>
+                                <columnmenu:QuickGroupItem></columnmenu:QuickGroupItem>
+                            </columnmenu:items>
+                        </columnmenu:QuickGroup>
+                        <columnmenu:items>
+                            <columnmenu:ActionItem icon="sap-icon://sort" label="Sort" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://group-2" label="Group" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://filter" label="Filter" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://table-column" label="Columns" press="onColumnHeaderItemPress"/>
+                        </columnmenu:items>
+                    </columnmenu:Menu>
+                </dependents>
+
+                <dragDropConfig>
+                    <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop="onColumnMove"/>
+                </dragDropConfig>
+
+                <noData>
+                    <IllustratedMessage/>
+                </noData>
+
+                <columns>
+                    <Column app:p13nKey="vpid_col" headerMenu="menu">
+                        <header>
+                            <Text text="{i18n>vpid}"/>
+                        </header>
+                    </Column>
+                    <Column app:p13nKey="vctext_col" headerMenu="menu">
+                        <Text text="{i18n>vctext}"/>
+                    </Column>
+                    <Column app:p13nKey="werks_col" headerMenu="menu">
+                        <Text text="{i18n>werks}"/>
+                    </Column>
+                    <Column app:p13nKey="vkorg_col" headerMenu="menu">
+                        <Text text="{i18n>vkorg}"/>
+                    </Column>
+                    <Column app:p13nKey="vtweg_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>vtweg}"/>
+                    </Column>
+                    <Column app:p13nKey="spart_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>spart}"/>
+                    </Column>
+                    <Column app:p13nKey="driver1_col" headerMenu="menu">
+                        <Text text="{i18n>driver1}"/>
+                    </Column>
+                    <Column app:p13nKey="termCode_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>termCode}"/>
+                    </Column>
+                    <Column app:p13nKey="datfr_col" headerMenu="menu">
+                        <Text text="{i18n>datfr}"/>
+                    </Column>
+                    <Column app:p13nKey="datto_col" headerMenu="menu">
+                        <Text text="{i18n>datto}"/>
+                    </Column>
+                    <Column app:p13nKey="kunnr_col" headerMenu="menu">
+                        <Text text="{i18n>kunnr}"/>
+                    </Column>
+                    <Column app:p13nKey="active_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>active}"/>
+                    </Column>
+                    <Column app:p13nKey="loevm_col" headerMenu="menu">
+                        <Text text="{i18n>loevm}"/>
+                    </Column>
+                    <Column app:p13nKey="erdat_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>erdat}"/>
+                    </Column>
+                    <Column app:p13nKey="erzet_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>erzet}"/>
+                    </Column>
+                    <Column app:p13nKey="ernam_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>ernam}"/>
+                    </Column>
+                    <Column app:p13nKey="aedat_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aedat}"/>
+                    </Column>
+                    <Column app:p13nKey="aezet_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aezet}"/>
+                    </Column>
+                    <Column app:p13nKey="aenam_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aenam}"/>
+                    </Column>
+                    <Column app:p13nKey="kunwe_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>kunwe}"/>
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem
+                        type="Navigation"
+                        press="onListItemPress">
+                        <Text text="{masterModel>vpid}"/>
+                        <Text text="{masterModel>vctext}"/>
+                        <Text text="{masterModel>werks}"/>
+                        <Text text="{masterModel>vkorg}"/>
+                        <Text text="{masterModel>vtweg}"/>
+                        <Text text="{masterModel>spart}"/>
+                        <Text text="{masterModel>driver1}"/>
+                        <Text text="{masterModel>termCode}"/>
+                        <Text text="{masterModel>datfr}"/>
+                        <Text text="{masterModel>datto}"/>
+                        <Text text="{masterModel>kunnr}"/>
+                        <Text text="{masterModel>active}"/>
+                        <Text text="{masterModel>loevm}"/>
+                        <Text text="{masterModel>erdat}"/>
+                        <Text text="{masterModel>erzet}"/>
+                        <Text text="{masterModel>ernam}"/>
+                        <Text text="{masterModel>aedat}"/>
+                        <Text text="{masterModel>aezet}"/>
+                        <Text text="{masterModel>aenam}"/>
+                        <Text text="{masterModel>kunwe}"/>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
 </mvc:View>
