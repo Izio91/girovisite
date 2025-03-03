@@ -12,10 +12,11 @@ sap.ui.define([
     'sap/ui/model/Sorter',
     'sap/m/ColumnListItem',
     'sap/m/Text',
+    'sap/m/ObjectIdentifier',
     'sap/ui/core/library',
     'sap/m/table/ColumnWidthController',
     'sap/ui/model/Filter'
-], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, coreLibrary, ColumnWidthController, Filter) => {
+], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter) => {
     "use strict";
 
     var baseManifestUrl;
@@ -202,6 +203,11 @@ sap.ui.define([
             const aSorter = this.createSorters(oState, aGroups);
 
             const aCells = oState.Columns.map(function (oColumnState) {
+                if (oColumnState.key === 'vpid_col') {
+                    return new ObjectIdentifier({
+                        title: "{masterModel>" + this.oMetadataHelper.getProperty(oColumnState.key).path + "}"
+                    });
+                }
                 return new Text({
                     text: "{masterModel>" + this.oMetadataHelper.getProperty(oColumnState.key).path + "}"
                 });
@@ -491,17 +497,156 @@ sap.ui.define([
                     });
                 });
         },
+        
         /**
-         * Helper method to build the query URL with the given parameters.
+         * Constructs the filter query URL for the service request.
+         * This method builds the query string dynamically based on the applied filters.
+         * 
+         * @returns {string} The complete URL with filters and pagination parameters.
          */
         _buildFilterQuery: function () {
-            var sUrl = baseManifestUrl + '/girovisiteService/HeaderWithDetails?';
-            var aParams = [];
+            var sUrl = baseManifestUrl + '/girovisiteService/HeaderWithDetails?',
+                aParams = ["$orderby=vpid"],
+                aFilters = [];
 
+            // Add pagination parameters
             aParams.push("$top=" + this._iTop);
             aParams.push("$skip=" + this._iSkip);
 
+            // Retrieve applied filters
+            aFilters = this._getFilters();
+
+            // Append filters if any exist
+            if (aFilters.length > 0) {
+                aParams.push("$filter=" + aFilters.join(" and "));
+            }
+
+            // Construct and return the final URL
             return sUrl + aParams.join("&");
+        },
+
+        /**
+         * Retrieves all applied filters from the UI controls and formats them into OData filter expressions.
+         * 
+         * @returns {Array} An array of filter conditions to be used in the query.
+         */
+        _getFilters : function () {
+            var aFilters = [];
+
+            /**
+             * Helper function to extract values from UI controls and format them into filter conditions.
+             * 
+             * @param {string} sField - The OData field name.
+             * @param {string} sControlId - The ID of the UI control to get the value from.
+             * @param {string} bIsDate - True if the UI control is a DatePicker, false otherwise. 
+             */
+            function addFilter (sField, sControlId, bIsDate = false) {
+                var sValue = this.getControlValue(this.getView().byId(sControlId));
+
+                // Append filter condition if a value is present
+                if (sField === 'active' || sField === 'loevm') {
+                    if (sValue !== null && sValue !== 'default') {
+                        aFilters.push(`${sField} eq '${sValue}'`);
+                    }
+                } else {
+                    if (sValue !== null && sValue !== '') {
+                        // Convert to the format  if is a date
+                        if (bIsDate) {
+                            sValue = sValue.toISOString().split("T")[0];
+                        }
+                        aFilters.push(`${sField} eq '${sValue}'`);
+                    }
+                }
+            }
+
+            addFilter.call(this,"vpid","inputVpid");
+            addFilter.call(this,"werks","inputWeks");
+            addFilter.call(this,"vkorg","inputVkorg");
+            addFilter.call(this,"vtweg","inputVtweg");
+            addFilter.call(this,"driver1","inputDriver1");
+            addFilter.call(this,"kunnr","inputKunnr");
+            addFilter.call(this,"kunwe","inputKunwe");
+            addFilter.call(this,"datfr","datePickerDatfr",true);
+            addFilter.call(this,"datto","datePickerDatto",true);
+            addFilter.call(this,"active","comboBoxActive");
+            addFilter.call(this,"loevm","comboBoxLoevm");
+            addFilter.call(this,"spart","inputSpart");
+            addFilter.call(this,"termCode","inputTermCode");
+            addFilter.call(this,"erdat","datePickerErdat",true);
+            addFilter.call(this,"erzet","timePickerErzet");
+            addFilter.call(this,"ernam","inputErnam");
+            addFilter.call(this,"aedat","datePickerAedat",true);
+            addFilter.call(this,"aezet","timePickerAezet");
+            addFilter.call(this,"aenam","inputAenam");
+
+            return aFilters;
+        },
+
+
+        /**
+         * Clears all filter input fields in the filter bar.
+         * This method resets input values, date selections, and drop-down selections.
+         */
+        onClearFilterBar: function () {
+            /**
+             * Helper function to reset text input fields.
+             * @param {string} sControlId - The ID of the input field to reset.
+             */
+            function resetValue (sControlId) {
+                this.getView().byId(sControlId).setValue(null);
+            };
+
+            /**
+             * Helper function to reset date picker values.
+             * @param {string} sControlId - The ID of the date picker to reset.
+             */
+            function resetDateValue (sControlId) {
+                this.getView().byId(sControlId).setDateValue(null);
+            };
+
+            /**
+             * Helper function to reset checkbox or selection fields.
+             * @param {string} sControlId - The ID of the selection control to reset.
+             */
+            function resetSelected (sControlId) {
+                this.getView().byId(sControlId).setSelectedItem(null);
+            };
+
+            /**
+             * Helper function to reset drop-down selection.
+             * @param {string} sControlId - The ID of the drop-down control to reset.
+             */
+            function resetSelectedItem (sControlId) {
+                this.getView().byId(sControlId).setSelectedItem(null);
+            };
+
+            /**
+             * Helper function to reset drop-down selected key.
+             * @param {string} sControlId - The ID of the drop-down control to reset.
+             */
+            function resetSelectedKey (sControlId) {
+                this.getView().byId(sControlId).setSelectedKey('default');
+            };
+
+            resetValue.call(this, "inputVpid");
+            resetValue.call(this, "inputWeks");
+            resetValue.call(this, "inputVkorg");
+            resetValue.call(this, "inputVtweg");
+            resetValue.call(this, "inputDriver1");
+            resetValue.call(this, "inputKunnr");
+            resetValue.call(this, "inputKunwe");
+            resetDateValue.call(this, "datePickerDatfr");
+            resetDateValue.call(this, "datePickerDatto");
+            resetSelectedKey.call(this, "comboBoxActive");
+            resetSelectedKey.call(this, "comboBoxLoevm");
+            resetValue.call(this, "inputSpart");
+            resetValue.call(this, "inputTermCode");
+            resetDateValue.call(this, "datePickerErdat");
+            resetValue.call(this, "timePickerErzet");
+            resetValue.call(this, "inputErnam");
+            resetDateValue.call(this, "datePickerAedat");
+            resetValue.call(this, "timePickerAezet");
+            resetValue.call(this, "inputAenam");
         },
 
         /**

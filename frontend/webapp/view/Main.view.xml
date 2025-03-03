@@ -6,66 +6,134 @@
     xmlns:dnd="sap.ui.core.dnd"
     xmlns:columnmenu="sap.m.table.columnmenu"
     xmlns="sap.m"
+    xmlns:core="sap.ui.core"
     xmlns:sap.ui.fl="sap.ui.fl"
     xmlns:sap.ui.dt="sap.ui.dt"
     xmlns:vm="sap.ui.fl.variants"
     xmlns:plugins="sap.m.plugins">
-    <f:DynamicPage>
+    <f:DynamicPage toggleHeaderOnTitleClick="true" headerExpanded="true" >
+        
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>DynamicPageTitle}" textAlign="Center" />
+                </f:heading>
+                <f:actions>
+                    <!-- Add any actions like buttons if needed -->
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
                     <!-- Filter Bar for search and filters -->
-                    <fb:FilterBar id="filterbar" reset="onReset" search="onGoPress" useToolbar="false" showGoOnFB="true" showClearOnFB="true" clear="onClearFilterBar" showFilterConfiguration="false">
+                    <fb:FilterBar id="filterbar" reset="onReset" search="onGoPress" useToolbar="false" showGoOnFB="true" showClearOnFB="true" clear="onClearFilterBar" >
                         <fb:filterGroupItems>
-
-                            <!-- <fb:FilterGroupItem groupName="DefaultGroup" name="B" label="{i18n>DocumentStatus}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vpid" label="{i18n>vpid}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <MultiComboBox id="idSelectDocStatus" items="{path: 'prmodel>/filterProps/DocumentStatus'}">
-                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
-                                    </MultiComboBox>
+                                    <Input id="inputVpid" maxLength="10" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="C" label="{i18n>ExtractionStatus}" visible="false" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="werks" label="{i18n>werks}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Select id="idSelectExtractionStatus" forceSelection="false" items="{prmodel>/filterProps/ExtractionStatus}">
-                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
-                                    </Select>
+                                    <Input id="inputWeks" maxLength="4" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="D" label="{i18n>VendorName}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vkorg" label="{i18n>vkorg}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="idSentByInp" />
+                                    <Input id="inputVkorg" maxLength="4" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="E" label="{i18n>VATRegistrationNumber}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vtweg" label="{i18n>vtweg}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="idVATRegistrationNumber" />
+                                    <Input id="inputVtweg" maxLength="2" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="F" label="{i18n>AssignedTo}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="driver1" label="{i18n>driver1}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="idAssignedToInp" />
+                                    <Input id="inputDriver1" maxLength="10" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="G" label="{i18n>DocumentCategory}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="kunnr" label="{i18n>kunnr}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Select id="idSelectDocumentCategory" forceSelection="false" items="{prmodel>/filterProps/DocumentCategory}">
-                                        <core:Item key="{prmodel>id}" text="{prmodel>status}" />
-                                    </Select>
+                                    <Input id="inputKunnr" maxLength="10" />
                                 </fb:control>
                             </fb:FilterGroupItem>
-
-                            <fb:FilterGroupItem groupName="DefaultGroup" name="H" label="{i18n>ReceivedBetween}" visibleInFilterBar="true">
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="kunwe" label="{i18n>kunwe}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <DateRangeSelection id="idSentOn" displayFormat="long" />
+                                    <Input id="inputKunwe" maxLength="10" />
                                 </fb:control>
-                            </fb:FilterGroupItem> -->
-
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="datfr" label="{i18n>datfr}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DatePicker id="datePickerDatfr" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="datto" label="{i18n>datto}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DatePicker id="datePickerDatto" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="active" label="{i18n>active}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox id="comboBoxActive" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyActive}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="loevm" label="{i18n>loevm}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox id="comboBoxLoevm" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyCancelled}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotCancelled}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="spart" label="{i18n>spart}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputSpart" maxLength="2" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="termCode" label="{i18n>termCode}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputTermCode" maxLength="3" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="erdat" label="{i18n>erdat}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <DatePicker id="datePickerErdat" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="erzet" label="{i18n>erzet}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <TimePicker id="timePickerErzet" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="ernam" label="{i18n>ernam}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputErnam" maxLength="12" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aedat" label="{i18n>aedat}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <DatePicker id="datePickerAedat" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aezet" label="{i18n>aezet}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <TimePicker id="timePickerAezet" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aenam" label="{i18n>aenam}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputAenam" maxLength="12" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
                         </fb:filterGroupItems>
                     </fb:FilterBar>
                 </f:content>
@@ -196,7 +264,7 @@
                     <ColumnListItem
                         type="Navigation"
                         press="onListItemPress">
-                        <Text text="{masterModel>vpid}"/>
+                        <ObjectIdentifier title="{masterModel>vpid}"/>
                         <Text text="{masterModel>vctext}"/>
                         <Text text="{masterModel>werks}"/>
                         <Text text="{masterModel>vkorg}"/>
