@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idWerksDialog_VH" 
+		noDataText="{i18n>NoWerksFound}"
+		items="{path: 'masterModel>/valuehelps/werks'}"
+		title="{i18n>TitleSearchWerks}"
+		search="onSearchWerks"
+		confirm="onConfirmWerks">
+		<StandardListItem 
+			title="{masterModel>Plant}" 
+			description="{masterModel>PlantName}"/>	
+	</SelectDialog>
+</core:FragmentDefinition>

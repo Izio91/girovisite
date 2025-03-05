@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idDriverDialog_VH" 
+		noDataText="{i18n>NoDriverFound}"
+		items="{path: 'masterModel>/valuehelps/driver'}"
+		title="{i18n>TitleSearchDriver}"
+		search="onSearchDriver"
+		confirm="onConfirmDriver">
+		<StandardListItem 
+			title="{masterModel>Customer}"
+			description="{masterModel>CustomerName}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

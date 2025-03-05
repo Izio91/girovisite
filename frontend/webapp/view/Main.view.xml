@@ -38,12 +38,12 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="werks" label="{i18n>werks}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputWeks" maxLength="4" />
+                                    <Input id="inputWerks" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="vkorg" label="{i18n>vkorg}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputVkorg" maxLength="4" />
+                                    <Input id="inputVkorg" maxLength="4" showValueHelp="true" valueHelpRequest="onVkorgVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="vtweg" label="{i18n>vtweg}" visibleInFilterBar="true">
@@ -53,17 +53,17 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="driver1" label="{i18n>driver1}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputDriver1" maxLength="10" />
+                                    <Input id="inputDriver1" maxLength="10"  showValueHelp="true" valueHelpRequest="onDriverVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="kunnr" label="{i18n>kunnr}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputKunnr" maxLength="10" />
+                                    <Input id="inputKunnr" maxLength="10"  showValueHelp="true" valueHelpRequest="onKunnrVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="kunwe" label="{i18n>kunwe}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputKunwe" maxLength="10" />
+                                    <Input id="inputKunwe" maxLength="10"  showValueHelp="true" valueHelpRequest="onKunweVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="datfr" label="{i18n>datfr}" visibleInFilterBar="true">

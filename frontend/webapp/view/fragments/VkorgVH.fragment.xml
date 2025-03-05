@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idVkorgDialog_VH" 
+		noDataText="{i18n>NoVkorgFound}"
+		items="{path: 'masterModel>/valuehelps/vkorg'}"
+		title="{i18n>TitleSearchVkorg}"
+		search="onSearchVkorg"
+		confirm="onConfirmVkorg">
+		<StandardListItem 
+			title="{masterModel>SalesOrganization}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

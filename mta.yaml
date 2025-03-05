@@ -8,6 +8,12 @@ modules:
   path: gen/srv
   properties:
     OPTIMIZE_MEMORY: "true"
+    Path_API_WERKS: "/sap/opu/odata/sap/YY1_GIRI_WERKS_CDS/YY1_GIRI_WERKS?$format=json"
+    Path_API_VKORG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json"
+    Path_API_DRIVER: "/sap/opu/odata/sap/YY1_GIRI_VAN_CDS/YY1_GIRI_VAN?$format=json"
+    Path_API_KUNNR: "/sap/opu/odata/sap/YY1_GIRI_AGENTE_CDS/YY1_GIRI_AGENTE?$format=json"
+    Path_API_KUNWE: "/sap/opu/odata/sap/YY1_GIRI_PDV_CDS/YY1_GIRI_PDV?$format=json"
+    Destination_OData_S4HANA: "odataS4_V2"
   requires:
   - name: girovisite-db
   - name: girovisite-destination-service

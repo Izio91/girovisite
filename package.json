@@ -35,8 +35,16 @@
   },
   "cds": {
     "requires": {
-      "auth": "dummy",
-      "db": "hana"
+      "auth": "xsuaa",
+      "db": "hana",
+      "odataS4_V2": {
+        "kind": "odata-v2",
+        "csrf": true,
+        "csrfInBatch": true,
+        "credentials": {
+          "destination": "S4_HANA"
+        }
+      }
     },
     "hana": {
       "deploy-format": "hdbtable"

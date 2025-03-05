@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idKunweDialog_VH" 
+		noDataText="{i18n>NoKunweFound}"
+		items="{path: 'masterModel>/valuehelps/kunwe'}"
+		title="{i18n>TitleSearchKunwe}"
+		search="onSearchKunwe"
+		confirm="onConfirmKunwe">
+		<StandardListItem 
+			title="{masterModel>Customer}"
+			description="{masterModel>CustomerName} | {masterModel>StreetName} {masterModel>CityName} {masterModel>Region} {masterModel>PostalCode}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

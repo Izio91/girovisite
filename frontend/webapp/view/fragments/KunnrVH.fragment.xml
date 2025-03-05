@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idKunnrDialog_VH" 
+		noDataText="{i18n>NoKunnrFound}"
+		items="{path: 'masterModel>/valuehelps/kunnr'}"
+		title="{i18n>TitleSearchKunnr}"
+		search="onSearchKunnr"
+		confirm="onConfirmKunnr">
+		<StandardListItem 
+			title="{masterModel>Customer}"
+			description="{masterModel>CustomerName}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

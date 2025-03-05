@@ -15,8 +15,9 @@ sap.ui.define([
     'sap/m/ObjectIdentifier',
     'sap/ui/core/library',
     'sap/m/table/ColumnWidthController',
-    'sap/ui/model/Filter'
-], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter) => {
+    'sap/ui/model/Filter',
+    'sap/ui/model/FilterOperator'
+], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator) => {
     "use strict";
 
     var baseManifestUrl;
@@ -186,7 +187,7 @@ sap.ui.define([
             return oControl.data("p13nKey");
         },
 
-        handleStateChange: function (oEvt) {
+        handleStateChange: async function (oEvt) {
             const oTable = this.byId("mainTable");
             const oState = oEvt.getParameter("state");
 
@@ -198,9 +199,14 @@ sap.ui.define([
             this.updateColumns(oState);
 
             //Create Filters & Sorters
-            const aFilter = this.createFilters(oState);
+            // var aFilter = this.createFilters(oState);
+            
+            // var aSorter = this.createSorters(oState, aGroups);
+            
+            this.getView().getModel("masterModel").setProperty("/HeaderWithDetails", []);
+            await this._fetchData();
+            // Create groups if any
             const aGroups = this.createGroups(oState);
-            const aSorter = this.createSorters(oState, aGroups);
 
             const aCells = oState.Columns.map(function (oColumnState) {
                 if (oColumnState.key === 'vpid_col') {
@@ -217,8 +223,7 @@ sap.ui.define([
             oTable.bindItems({
                 templateShareable: false,
                 path: 'masterModel>/HeaderWithDetails',
-                sorter: aSorter.concat(aGroups),
-                filters: aFilter,
+                sorter: aGroups,
                 template: new ColumnListItem({
                     cells: aCells,
                     type: "Navigation",
@@ -231,10 +236,17 @@ sap.ui.define([
         createFilters: function (oState) {
             const aFilter = [];
             Object.keys(oState.Filter).forEach((sFilterKey) => {
-                const filterPath = this.oMetadataHelper.getProperty(sFilterKey).path;
+                var sFilterPath = this.oMetadataHelper.getProperty(sFilterKey).path;
 
                 oState.Filter[sFilterKey].forEach(function (oConditon) {
-                    aFilter.push(new Filter(filterPath, oConditon.operator, oConditon.values[0]));
+                    var bIsDate = false;
+                    if (sFilterPath === 'datePickerDatfr' || sFilterPath === 'datePickerDatto' || sFilterPath === 'datePickerErdat' || sFilterPath === 'datePickerAedat') {
+                        bIsDate = true;
+                    }
+                    var sFilter = this._getFilterAsString(sFilterPath, oConditon.values[0], bIsDate);
+                    if (sFilter !== null) {
+                        aFilter.push(sFilter);
+                    }
                 });
             });
 
@@ -243,18 +255,11 @@ sap.ui.define([
             return aFilter;
         },
 
-        createSorters: function (oState, aExistingSorter) {
-            const aSorter = aExistingSorter || [];
+        createSorters: function (oState) {
+            var aSorter = [];
             oState.Sorter.forEach(function (oSorter) {
-                const oExistingSorter = aSorter.find(function (oSort) {
-                    return oSort.sPath === this.oMetadataHelper.getProperty(oSorter.key).path;
-                }.bind(this));
-
-                if (oExistingSorter) {
-                    oExistingSorter.bDescending = !!oSorter.descending;
-                } else {
-                    aSorter.push(new Sorter(this.oMetadataHelper.getProperty(oSorter.key).path, oSorter.descending));
-                }
+                var sOrder = oSorter.descending ? 'desc' : 'asc';
+                aSorter.push(`${this.oMetadataHelper.getProperty(oSorter.key).path} ${sOrder}`);
             }.bind(this));
 
             oState.Sorter.forEach((oSorter) => {
@@ -269,8 +274,14 @@ sap.ui.define([
 
         createGroups: function (oState) {
             const aGroupings = [];
+            var oKeysDescending = {};
+
+            if (oState.Sorter) {
+                oState.Sorter.forEach(({key, descending}) => ( oKeysDescending[key] = descending ));
+            }
+
             oState.Groups.forEach(function (oGroup) {
-                aGroupings.push(new Sorter(this.oMetadataHelper.getProperty(oGroup.key).path, false, true));
+                aGroupings.push(new Sorter(this.oMetadataHelper.getProperty(oGroup.key).path, Object.keys(oKeysDescending).includes(oGroup.key) ? oKeysDescending[oGroup.key] : false, true));
             }.bind(this));
 
             oState.Groups.forEach((oSorter) => {
@@ -456,7 +467,14 @@ sap.ui.define([
          */
         defineModelForCurrentPage: function () {
             var oModel = {
-                "HeaderWithDetails": []
+                "HeaderWithDetails": [],
+                "valuehelps": {
+                    "werks": [],
+                    "vkorg": [],
+                    "driver": [],
+                    "kunnr": [],
+                    "kunwe": []
+                }
             };
             this.getView().setModel(new JSONModel(oModel), "masterModel");
         },
@@ -476,110 +494,183 @@ sap.ui.define([
          * Fetch data with current filters and pagination parameters.
          * It constructs the query parameters from the input fields and sends an AJAX request to the backend.
          */
-        _fetchData: function () {
-            var sUrl = this._buildFilterQuery(),
-                oMasterModel = this.getView().getModel("masterModel"),
+        _fetchData: async function () {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 that = this;
-            sap.ui.core.BusyIndicator.show();  
-            this.executeRequest(sUrl, 'GET')    
-                .then(function (oData) {
-                    console.log("Data fetched: ", oData);
-                    var aPreviousData = oMasterModel.getProperty("/HeaderWithDetails"),
-                        aNewData = aPreviousData.concat(oData.value);
-                    oMasterModel.setProperty("/HeaderWithDetails", aNewData);
-                    sap.ui.core.BusyIndicator.hide();
-                })  
-                .catch(function (error) {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                        title: "Error",
-                        details: error
-                    });
+
+            try {
+                sap.ui.core.BusyIndicator.show();  
+                
+                // Wait for the query URL to be fully built
+                var sUrl = await this._buildFilterQuery();
+                
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'GET');
+                console.log("Data fetched: ", oData);
+
+                var aPreviousData = oMasterModel.getProperty("/HeaderWithDetails") || [],
+                    aNewData = aPreviousData.concat(oData.value);
+
+                oMasterModel.setProperty("/HeaderWithDetails", aNewData);
+            } catch (error) {
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
                 });
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
         },
         
         /**
          * Constructs the filter query URL for the service request.
-         * This method builds the query string dynamically based on the applied filters.
          * 
-         * @returns {string} The complete URL with filters and pagination parameters.
+         * @returns {Promise<string>} A Promise that resolves to the complete URL with filters and pagination parameters.
          */
-        _buildFilterQuery: function () {
-            var sUrl = baseManifestUrl + '/girovisiteService/HeaderWithDetails?',
-                aParams = ["$orderby=vpid"],
-                aFilters = [];
+        _buildFilterQuery: async function () {
+            var sUrl = baseManifestUrl + "/girovisiteService/HeaderWithDetails?",
+                aParams = [];
 
             // Add pagination parameters
             aParams.push("$top=" + this._iTop);
             aParams.push("$skip=" + this._iSkip);
 
-            // Retrieve applied filters
-            aFilters = this._getFilters();
+            // Retrieve filters and sorters
+            var [aFilters, aSorters] = await Promise.all([this._getFilters(), this._getSorters()]);
 
-            // Append filters if any exist
+            if (aSorters.length === 0) {
+                aSorters.push("vpid asc");
+            }
+            aParams.push("$orderby=" + aSorters.join(","));
+
             if (aFilters.length > 0) {
                 aParams.push("$filter=" + aFilters.join(" and "));
             }
 
-            // Construct and return the final URL
             return sUrl + aParams.join("&");
+        },
+
+        /**
+         * Constructs a filter condition string based on the provided field, value, and date status.
+         * 
+         * @param {string} sField - The OData field name to filter on.
+         * @param {string} sValue - The value to filter by.
+         * @param {boolean} [bIsDate=false] - Indicates whether the value is a date.
+         * @returns {string|null} The filter condition as a string, or null if no valid condition can be created.
+         */
+        _getFilterAsString : function (sField, sValue, bIsDate = false) {
+            // Check if the field is one of the special cases ('active' or 'loevm') and if a valid value is provided
+            if (sField === 'active' || sField === 'loevm') {
+                if (sValue !== null && sValue !== 'default') {
+                    return `${sField} eq '${sValue}'`;
+                }
+            } else {
+                // For other fields, check if a valid value is provided
+                if (sValue !== null && sValue !== '') {
+                    // If the field is a date, convert the value to the appropriate format
+                    if (bIsDate) {
+                        sValue = sValue.toISOString().split("T")[0]; // Convert date to YYYY-MM-DD format
+                        // Return the appropriate filter condition based on the field type
+                        if (sField === 'datfr') {
+                            return `${sField} ge '${sValue}'`;
+                        } else if (sField === 'datto') {
+                            return `${sField} le '${sValue}'`;
+                        } else {
+                            return `${sField} eq '${sValue}'`; // Equality for other fields
+                        }  
+                    } else {
+                        // For non-date fields, return an equality filter condition
+                        return `${sField} eq '${sValue}'`;
+                    }
+                }
+            }
+            // Return null if no valid condition can be constructed
+            return null;
         },
 
         /**
          * Retrieves all applied filters from the UI controls and formats them into OData filter expressions.
          * 
-         * @returns {Array} An array of filter conditions to be used in the query.
+         * @returns {Promise<Array>} A Promise that resolves to an array of filter conditions to be used in the query.
          */
         _getFilters : function () {
-            var aFilters = [];
+            var aFilters = [],
+                oView = this.getView(),
+                that = this;
 
             /**
              * Helper function to extract values from UI controls and format them into filter conditions.
              * 
              * @param {string} sField - The OData field name.
-             * @param {string} sControlId - The ID of the UI control to get the value from.
+             * @param {string} sValue - The value to filter by.
              * @param {string} bIsDate - True if the UI control is a DatePicker, false otherwise. 
              */
-            function addFilter (sField, sControlId, bIsDate = false) {
-                var sValue = this.getControlValue(this.getView().byId(sControlId));
+            function addFilter (sField, sValue, bIsDate) {
+                var sFilterAsString = that._getFilterAsString(sField, sValue, bIsDate);
 
-                // Append filter condition if a value is present
-                if (sField === 'active' || sField === 'loevm') {
-                    if (sValue !== null && sValue !== 'default') {
-                        aFilters.push(`${sField} eq '${sValue}'`);
-                    }
-                } else {
-                    if (sValue !== null && sValue !== '') {
-                        // Convert to the format  if is a date
-                        if (bIsDate) {
-                            sValue = sValue.toISOString().split("T")[0];
-                        }
-                        aFilters.push(`${sField} eq '${sValue}'`);
-                    }
+                if (sFilterAsString !== null) {
+                    aFilters.push(sFilterAsString);
                 }
             }
 
-            addFilter.call(this,"vpid","inputVpid");
-            addFilter.call(this,"werks","inputWeks");
-            addFilter.call(this,"vkorg","inputVkorg");
-            addFilter.call(this,"vtweg","inputVtweg");
-            addFilter.call(this,"driver1","inputDriver1");
-            addFilter.call(this,"kunnr","inputKunnr");
-            addFilter.call(this,"kunwe","inputKunwe");
-            addFilter.call(this,"datfr","datePickerDatfr",true);
-            addFilter.call(this,"datto","datePickerDatto",true);
-            addFilter.call(this,"active","comboBoxActive");
-            addFilter.call(this,"loevm","comboBoxLoevm");
-            addFilter.call(this,"spart","inputSpart");
-            addFilter.call(this,"termCode","inputTermCode");
-            addFilter.call(this,"erdat","datePickerErdat",true);
-            addFilter.call(this,"erzet","timePickerErzet");
-            addFilter.call(this,"ernam","inputErnam");
-            addFilter.call(this,"aedat","datePickerAedat",true);
-            addFilter.call(this,"aezet","timePickerAezet");
-            addFilter.call(this,"aenam","inputAenam");
+            [
+                ["vpid", "inputVpid", false],
+                ["werks", "inputWerks", false],
+                ["vkorg", "inputVkorg", false],
+                ["vtweg", "inputVtweg", false],
+                ["driver1", "inputDriver1", false],
+                ["kunnr", "inputKunnr", false],
+                ["kunwe", "inputKunwe", false],
+                ["datfr", "datePickerDatfr", true],
+                ["datto", "datePickerDatto", true],
+                ["active", "comboBoxActive", false],
+                ["loevm", "comboBoxLoevm", false],
+                ["spart", "inputSpart", false],
+                ["termCode", "inputTermCode", false],
+                ["erdat", "datePickerErdat", true],
+                ["erzet", "timePickerErzet", false],
+                ["ernam", "inputErnam", false],
+                ["aedat", "datePickerAedat", true],
+                ["aezet", "timePickerAezet", false],
+                ["aenam", "inputAenam", false]
+            ].forEach(([field, control, isDate]) => addFilter(field, that.getControlValue(oView.byId(control)), isDate));
 
-            return aFilters;
+            return Engine.getInstance().retrieveState(oView.byId("mainTable")).then((oState) => {
+                Object.keys(oState.Filter).forEach((sFilterKey) => {
+                    var sFilterPath = that.oMetadataHelper.getProperty(sFilterKey).path;
+                    oState.Filter[sFilterKey].forEach(function (oCondition) {
+                        var bIsDate = ["datePickerDatfr", "datePickerDatto", "datePickerErdat", "datePickerAedat"].includes(sFilterPath);
+                        addFilter(sFilterPath, oCondition.values[0], bIsDate);
+                    });
+                });
+                return aFilters;
+            });
+        },
+
+        /**
+         * Retrieves sorting conditions from the state engine.
+         * 
+         * @returns {Promise<Array>} A Promise that resolves to an array of sorting conditions.
+         */
+        _getSorters: function () {
+            var that = this;
+            return Engine.getInstance().retrieveState(this.getView().byId("mainTable")).then((oState) => {
+                var aSorters = [];
+                if (oState.Sorter) {
+                    oState.Sorter.forEach(function (oSorter) {
+                        var sOrder = oSorter.descending ? "desc" : "asc";
+                        aSorters.push(`${that.oMetadataHelper.getProperty(oSorter.key).path} ${sOrder}`);
+                    });
+
+                    oState.Sorter.forEach((oSorter) => {
+                        const oCol = that.byId("mainTable").getColumns().find((oColumn) => oColumn.data("p13nKey") === oSorter.key);
+                        if (oSorter.sorted !== false) {
+                            oCol.setSortIndicator(oSorter.descending ? coreLibrary.SortOrder.Descending : coreLibrary.SortOrder.Ascending);
+                        }
+                    });
+                }
+                return aSorters;
+            });
         },
 
 
@@ -629,7 +720,7 @@ sap.ui.define([
             };
 
             resetValue.call(this, "inputVpid");
-            resetValue.call(this, "inputWeks");
+            resetValue.call(this, "inputWerks");
             resetValue.call(this, "inputVkorg");
             resetValue.call(this, "inputVtweg");
             resetValue.call(this, "inputDriver1");
@@ -658,6 +749,238 @@ sap.ui.define([
                 this._iSkip += this._iTop;
                 this._fetchData();
             }
+        },
+
+        // Werks value help
+        onWerksVH : function (oEvent) {
+            this.oInput = oEvent.getSource();
+            var that = this,
+                oView = this.getView(),
+                sUrl = baseManifestUrl + '/girovisiteService/getWerks()',
+                oMasterModel =this.getView().getModel("masterModel");
+            sap.ui.core.BusyIndicator.show(); 
+            
+            this.executeRequest(sUrl, 'GET')    
+            .then(function (oData) {
+                console.log("Data fetched: ", oData);
+                oMasterModel.setProperty("/valuehelps/werks", oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+                that.openFragment("idWerksDialog_VH", "frontend.view.fragments.WerksVH", oView, that)
+            })  
+            .catch(function (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            });
+        },
+
+        onSearchWerks: function (oEvent) {
+          var sValue = oEvent.getParameter("value");
+          if (sValue) {
+            var sFilter = new Filter({
+              filters: [
+                new Filter("Plant", FilterOperator.Contains, sValue),
+                new Filter("PlantName", FilterOperator.Contains, sValue)
+              ]
+            });
+          }
+          var oList = this.getView().byId("idWerksDialog_VH");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(sFilter);
+        },
+
+        onConfirmWerks: function (oEvent) {
+          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
+          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Plant");
+          this.getView().byId("inputWerks").setValue(sPlant);
+        },
+
+        // Vkorg value help
+        onVkorgVH : function (oEvent) {
+            this.oInput = oEvent.getSource();
+            var that = this,
+                oView = this.getView(),
+                sUrl = baseManifestUrl + '/girovisiteService/getVkorg()',
+                oMasterModel =this.getView().getModel("masterModel");
+            sap.ui.core.BusyIndicator.show(); 
+            
+            this.executeRequest(sUrl, 'GET')    
+            .then(function (oData) {
+                console.log("Data fetched: ", oData);
+                oMasterModel.setProperty("/valuehelps/vkorg", oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+                that.openFragment("idVkorgDialog_VH", "frontend.view.fragments.VkorgVH", oView, that)
+            })  
+            .catch(function (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            });
+        },
+
+        onSearchVkorg: function (oEvent) {
+          var sValue = oEvent.getParameter("value");
+          if (sValue) {
+            var sFilter = new Filter({
+              filters: [
+                new Filter("SalesOrganization", FilterOperator.Contains, sValue)
+              ]
+            });
+          }
+          var oList = this.getView().byId("idVkorgDialog_VH");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(sFilter);
+        },
+
+        onConfirmVkorg: function (oEvent) {
+          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
+          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/SalesOrganization");
+          this.getView().byId("inputVkorg").setValue(sPlant);
+        },
+
+        // Driver value help
+        onDriverVH : function (oEvent) {
+            this.oInput = oEvent.getSource();
+            var that = this,
+                oView = this.getView(),
+                sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
+                oMasterModel =this.getView().getModel("masterModel");
+            sap.ui.core.BusyIndicator.show(); 
+            
+            this.executeRequest(sUrl, 'GET')    
+            .then(function (oData) {
+                console.log("Data fetched: ", oData);
+                oMasterModel.setProperty("/valuehelps/driver", oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+                that.openFragment("idDriverDialog_VH", "frontend.view.fragments.DriverVH", oView, that)
+            })  
+            .catch(function (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            });
+        },
+
+        onSearchDriver: function (oEvent) {
+          var sValue = oEvent.getParameter("value");
+          if (sValue) {
+            var sFilter = new Filter({
+              filters: [
+                new Filter("Customer", FilterOperator.Contains, sValue),
+                new Filter("CustomerName", FilterOperator.Contains, sValue)
+              ]
+            });
+          }
+          var oList = this.getView().byId("idDriverDialog_VH");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(sFilter);
+        },
+
+        onConfirmDriver: function (oEvent) {
+          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
+          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
+          this.getView().byId("inputDriver1").setValue(sPlant);
+        },
+
+        // Kunnr value help
+        onKunnrVH : function (oEvent) {
+            this.oInput = oEvent.getSource();
+            var that = this,
+                oView = this.getView(),
+                sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
+                oMasterModel =this.getView().getModel("masterModel");
+            sap.ui.core.BusyIndicator.show(); 
+            
+            this.executeRequest(sUrl, 'GET')    
+            .then(function (oData) {
+                console.log("Data fetched: ", oData);
+                oMasterModel.setProperty("/valuehelps/kunnr", oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+                that.openFragment("idKunnrDialog_VH", "frontend.view.fragments.KunnrVH", oView, that)
+            })  
+            .catch(function (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            });
+        },
+
+        onSearchKunnr: function (oEvent) {
+          var sValue = oEvent.getParameter("value");
+          if (sValue) {
+            var sFilter = new Filter({
+              filters: [
+                new Filter("Customer", FilterOperator.Contains, sValue),
+                new Filter("CustomerName", FilterOperator.Contains, sValue)
+              ]
+            });
+          }
+          var oList = this.getView().byId("idKunnrDialog_VH");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(sFilter);
+        },
+
+        onConfirmKunnr: function (oEvent) {
+          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
+          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
+          this.getView().byId("inputKunnr").setValue(sPlant);
+        },
+
+        // Kunwe value help
+        onKunweVH : function (oEvent) {
+            this.oInput = oEvent.getSource();
+            var that = this,
+                oView = this.getView(),
+                sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
+                oMasterModel =this.getView().getModel("masterModel");
+            sap.ui.core.BusyIndicator.show(); 
+            
+            this.executeRequest(sUrl, 'GET')    
+            .then(function (oData) {
+                console.log("Data fetched: ", oData);
+                oMasterModel.setProperty("/valuehelps/kunwe", oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+                that.openFragment("idKunweDialog_VH", "frontend.view.fragments.KunweVH", oView, that)
+            })  
+            .catch(function (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            });
+        },
+
+        onSearchKunwe: function (oEvent) {
+          var sValue = oEvent.getParameter("value");
+          if (sValue) {
+            var sFilter = new Filter({
+              filters: [
+                new Filter("Customer", FilterOperator.Contains, sValue),
+                new Filter("StreetName", FilterOperator.Contains, sValue),
+                new Filter("CityName", FilterOperator.Contains, sValue),
+                new Filter("Region", FilterOperator.Contains, sValue),
+                new Filter("PostalCode", FilterOperator.Contains, sValue)
+              ]
+            });
+          }
+          var oList = this.getView().byId("idKunweDialog_VH");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(sFilter);
+        },
+
+        onConfirmKunwe: function (oEvent) {
+          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
+          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
+          this.getView().byId("inputKunwe").setValue(sPlant);
         }
     });
 });

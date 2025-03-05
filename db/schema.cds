@@ -1,7 +1,7 @@
 namespace girovisite;
 
 entity Header {
-    key vpid     : String(10);
+    key vpid     : Integer;
     key vctext   : String(30);
     key werks    : String(4);
     key vkorg    : String(4);

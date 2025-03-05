@@ -1,10 +1,11 @@
 sap.ui.define([
 
-    "sap/ui/core/mvc/Controller"
-], function (Controller) {
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/core/Fragment"
+], function (Controller, Fragment) {
     "use strict";
 
-    return Controller.extend("vim_ui.controller.BaseController", {
+    return Controller.extend("frontend.controller.BaseController", {
         executeRequest: function (sUrl, sMethod, oBody = undefined) {
             return new Promise(function (resolve, reject) {
                 $.ajax({
@@ -68,6 +69,35 @@ sap.ui.define([
 
                 default:
                     return null;
+            }
+        },
+
+
+        /**
+         * Opens a fragment dialog in a SAP Fiori application.
+         * 
+         * @param {string} sIdControl - The ID of the control to check if the fragment already exists.
+         * @param {string} sFragmentName - The name of the fragment to be loaded.
+         * @param {sap.ui.core.mvc.View} oView - The view where the fragment will be added.
+         * @param {sap.ui.core.mvc.Controller} oController - The controller associated with the fragment.
+         */
+        openFragment: function (sIdControl, sFragmentName, oView, oController) {
+            // Check if the fragment is already created
+            if (!oView.byId(sIdControl)) {
+                // Load the fragment dynamically
+                Fragment.load({
+                    id: oView.getId(), // Assign the fragment ID based on the view
+                    name: sFragmentName, // Specify the fragment name to be loaded
+                    controller: oController // Pass the controller to handle fragment events
+                }).then(function (oDialog) {
+                    // Add the fragment as a dependent of the view
+                    oView.addDependent(oDialog);
+                    // Open the fragment dialog
+                    oDialog.open();
+                });
+            } else {
+                // If the fragment already exists, open it directly
+                oView.byId(sIdControl).open();
             }
         }
 

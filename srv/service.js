@@ -31,13 +31,23 @@ async function performRequest(srv, request, path) {
 }
 
 module.exports = function (srv) {
-    srv.on('actiontest', '*', async request => {
-        await performRequest(srv, request, './func/actiontest');
+    srv.on('getWerks', '*', async request => {
+        await performRequest(srv, request, './func/getWerks');
     });
-    srv.on('functiontest', '*', async request => {
-        await performRequest(srv, request, './func/functiontest');
+
+    srv.on('getVkorg', '*', async request => {
+        await performRequest(srv, request, './func/getVkorg');
     });
-    srv.on('functionlisttest', '*', async request => {
-        await performRequest(srv, request, './func/functionlisttest');
+
+    srv.on('getDriver', '*', async request => {
+        await performRequest(srv, request, './func/getDriver');
+    });
+
+    srv.on('getKunnr', '*', async request => {
+        await performRequest(srv, request, './func/getKunnr');
+    });
+
+    srv.on('getKunwe', '*', async request => {
+        await performRequest(srv, request, './func/getKunwe');
     });
 }
