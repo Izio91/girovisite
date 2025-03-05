@@ -96,6 +96,7 @@ sap.ui.define([
                     oDialog.open();
                 });
             } else {
+                oView.byId(sIdControl).getBinding("items").filter([]);
                 // If the fragment already exists, open it directly
                 oView.byId(sIdControl).open();
             }

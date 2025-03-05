@@ -197,11 +197,6 @@ sap.ui.define([
 
             //Update the columns per selection in the state
             this.updateColumns(oState);
-
-            //Create Filters & Sorters
-            // var aFilter = this.createFilters(oState);
-            
-            // var aSorter = this.createSorters(oState, aGroups);
             
             this.getView().getModel("masterModel").setProperty("/HeaderWithDetails", []);
             await this._fetchData();
@@ -231,45 +226,6 @@ sap.ui.define([
                 })
             });
 
-        },
-
-        createFilters: function (oState) {
-            const aFilter = [];
-            Object.keys(oState.Filter).forEach((sFilterKey) => {
-                var sFilterPath = this.oMetadataHelper.getProperty(sFilterKey).path;
-
-                oState.Filter[sFilterKey].forEach(function (oConditon) {
-                    var bIsDate = false;
-                    if (sFilterPath === 'datePickerDatfr' || sFilterPath === 'datePickerDatto' || sFilterPath === 'datePickerErdat' || sFilterPath === 'datePickerAedat') {
-                        bIsDate = true;
-                    }
-                    var sFilter = this._getFilterAsString(sFilterPath, oConditon.values[0], bIsDate);
-                    if (sFilter !== null) {
-                        aFilter.push(sFilter);
-                    }
-                });
-            });
-
-            this.byId("filterInfo").setVisible(aFilter.length > 0);
-
-            return aFilter;
-        },
-
-        createSorters: function (oState) {
-            var aSorter = [];
-            oState.Sorter.forEach(function (oSorter) {
-                var sOrder = oSorter.descending ? 'desc' : 'asc';
-                aSorter.push(`${this.oMetadataHelper.getProperty(oSorter.key).path} ${sOrder}`);
-            }.bind(this));
-
-            oState.Sorter.forEach((oSorter) => {
-                const oCol = this.byId("mainTable").getColumns().find((oColumn) => oColumn.data("p13nKey") === oSorter.key);
-                if (oSorter.sorted !== false) {
-                    oCol.setSortIndicator(oSorter.descending ? coreLibrary.SortOrder.Descending : coreLibrary.SortOrder.Ascending);
-                }
-            });
-
-            return aSorter;
         },
 
         createGroups: function (oState) {
