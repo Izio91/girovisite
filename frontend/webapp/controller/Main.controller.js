@@ -937,6 +937,10 @@ sap.ui.define([
           var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
           var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
           this.getView().byId("inputKunwe").setValue(sPlant);
+        },
+
+        onCreateDetail: function () {
+            this.getOwnerComponent().getRouter().navTo("create");
         }
     });
 });

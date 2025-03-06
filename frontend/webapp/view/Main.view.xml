@@ -20,7 +20,7 @@
                     <Title text="{i18n>DynamicPageTitle}" textAlign="Center" />
                 </f:heading>
                 <f:actions>
-                    <!-- Add any actions like buttons if needed -->
+                    <Button text="{i18n>createDetail}" press="onCreateDetail" />
                 </f:actions>
             </f:DynamicPageTitle>
         </f:title>

@@ -1,7 +1,7 @@
 sap.ui.define([
     "./BaseController",
-    "sap/ui/core/mvc/Controller"
-], (BaseController) => {
+    "sap/ui/model/json/JSONModel"
+], (BaseController, JSONModel) => {
     "use strict";
 
     var baseManifestUrl;
@@ -26,28 +26,60 @@ sap.ui.define([
             this._vtweg = oEvent.getParameter("arguments").vtweg;
             this._spart = oEvent.getParameter("arguments").spart;
 
+            let sSubTitle = oBundle.getText("vpid")+": "+ this._vpid;
+            this.getView().byId("subTitleIdExpandedContent").setText(sSubTitle);
+            this.getView().byId("subTitleIdSnappedContent").setText(sSubTitle);
+            this.getView().byId("subTitleIdSnappedTitleOnMobile").setText(sSubTitle);
+
+            this.defineModelForCurrentPage(false);
             this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`)
         },
 
         _onCreateMatched: function (oEvent) {
             console.log("create");
+            this.defineModelForCurrentPage(true);
         },
 
-        _fetchData: function (sUrl) {  
-            var that = this;
-            sap.ui.core.BusyIndicator.show();  
-            this.executeRequest(sUrl, 'GET')    
-                .then(function (oData) {
-                    console.log("Data fetched: ", oData);
-                    sap.ui.core.BusyIndicator.hide();
-                })  
-                .catch(function (error) {
-                    sap.ui.core.BusyIndicator.hide();
-                    MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                        title: "Error",
-                        details: error
-                    });
+
+        /**
+         * Define the model for the current page and attach it to the view.
+         */
+        defineModelForCurrentPage: function (bIsNew) {
+            var oModel = {
+                "isNew": bIsNew,
+                "detail": null
+            };
+            this.getView().setModel(new JSONModel(oModel), "detailModel");
+        },
+
+
+        _fetchData: async function (sUrl) {  
+            var oDetailModel = this.getView().getModel("detailModel"),
+                that = this;
+
+            try {
+                sap.ui.core.BusyIndicator.show();  
+                
+                // Wait for the query URL to be fully built
+                var sUrl = await this._buildFilterQuery();
+                
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'GET');
+                console.log("Data fetched: ", oData);
+
+                oDetailModel.setProperty("/detail", oData);
+            } catch (error) {
+                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
                 });
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        onGoBack: function () {
+            this.getOwnerComponent().getRouter().navTo("main");
         }
 
         
