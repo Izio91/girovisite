@@ -119,6 +119,13 @@
           "target": [
             "detail"
           ]
+        },
+        {
+          "name": "create",
+          "pattern": "create",
+          "target": [
+            "detail"
+          ]
         }
       ],
       "targets": {
