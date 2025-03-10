@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idVtwegDialog_VH" 
+		noDataText="{i18n>NoVtwegFound}"
+		items="{path: '/valuehelps/vtweg'}"
+		title="{i18n>TitleSearchVtweg}"
+		search="onSearchVtweg"
+		confirm="onConfirmVtweg">
+		<StandardListItem 
+			title="{DistributionChannel}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

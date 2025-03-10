@@ -429,6 +429,7 @@ sap.ui.define([
                 "valuehelps": {
                     "werks": [],
                     "vkorg": [],
+                    "vtweg": [],
                     "driver": [],
                     "kunnr": [],
                     "kunwe": []
@@ -743,6 +744,24 @@ sap.ui.define([
 
         onConfirmVkorg: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/SalesOrganization", "inputVkorg");
+        },
+
+        // Vtweg value help
+        onVtwegVH : function (oEvent) {
+            var oMasterModel= this.getView().getModel("masterModel"),
+                sUrl = baseManifestUrl + '/girovisiteService/getVtweg()',
+                sPropertyPath = "/valuehelps/vtweg",
+                sIdControl = "idVtwegDialog_VH",
+                sFragmentName = "frontend.view.fragments.VtwegVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+        },
+
+        onSearchVtweg: function (oEvent) {
+            this._onSearchValueHelp(oEvent, this.getView(), ["DistributionChannel"], "idVtwegDialog_VH");
+        },
+
+        onConfirmVtweg: function (oEvent) {
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/DistributionChannel", "inputVtweg");
         },
 
         // Driver value help

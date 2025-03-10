@@ -60,6 +60,8 @@ sap.ui.define([
                 "valuehelps": {
                     "werks": [],
                     "vkorg": [],
+                    "vtweg": [],
+                    "spart": [],
                     "driver": [],
                     "kunnr": [],
                     "kunwe": []
@@ -129,6 +131,42 @@ sap.ui.define([
 
         onConfirmVkorg: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/SalesOrganization", "inputVkorgDetail");
+        },
+
+        // Vtweg value help
+        onVtwegVH : function (oEvent) {
+            var oDetailModel= this.getView().getModel("detailModel"),
+                sUrl = baseManifestUrl + '/girovisiteService/getVtweg()',
+                sPropertyPath = "/valuehelps/vtweg",
+                sIdControl = "idVtwegDialog_VH",
+                sFragmentName = "frontend.view.fragments.VtwegVH";
+            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+        },
+
+        onSearchVtweg: function (oEvent) {
+            this._onSearchValueHelp(oEvent, this.getView(), ["DistributionChannel"], "idVtwegDialog_VH");
+        },
+
+        onConfirmVtweg: function (oEvent) {
+            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/DistributionChannel", "inputVtwegDetail");
+        },
+
+        // Spart value help
+        onSpartVH : function (oEvent) {
+            var oDetailModel= this.getView().getModel("detailModel"),
+                sUrl = baseManifestUrl + '/girovisiteService/getSpart()',
+                sPropertyPath = "/valuehelps/spart",
+                sIdControl = "idSpartDialog_VH",
+                sFragmentName = "frontend.view.fragments.SpartVH";
+            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+        },
+
+        onSearchSpart: function (oEvent) {
+            this._onSearchValueHelp(oEvent, this.getView(), ["Division"], "idSpartDialog_VH");
+        },
+
+        onConfirmSpart: function (oEvent) {
+            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Division", "inputSpartDetail");
         },
 
         // Driver value help

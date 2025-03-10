@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+	<SelectDialog 
+		id="idSpartDialog_VH" 
+		noDataText="{i18n>NoSpartFound}"
+		items="{path: '/valuehelps/spart'}"
+		title="{i18n>TitleSearchSpart}"
+		search="onSearchSpart"
+		confirm="onConfirmSpart">
+		<StandardListItem 
+			title="{Division}" />	
+	</SelectDialog>
+</core:FragmentDefinition>

@@ -48,7 +48,7 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="vtweg" label="{i18n>vtweg}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputVtweg" maxLength="2" />
+                                    <Input id="inputVtweg" maxLength="2" showValueHelp="true" valueHelpRequest="onVtwegVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="driver1" label="{i18n>driver1}" visibleInFilterBar="true">

@@ -69,7 +69,7 @@
 								<m:Input id="inputVtwegDetail" value="{detailModel>/detail/vtweg}" maxLength="2" showValueHelp="true" valueHelpRequest="onVtwegVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								
 								<m:Label text="{i18n>spart}" required="true" />
-								<m:Input id="inputSpartDetail" value="{detailModel>/detail/spart}" maxLength="2" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:Input id="inputSpartDetail" value="{detailModel>/detail/spart}" maxLength="2" showValueHelp="true" valueHelpRequest="onSpartVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								
 								<m:Label text="{i18n>driver1}" required="true" />
 								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />

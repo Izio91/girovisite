@@ -39,6 +39,14 @@ module.exports = function (srv) {
         await performRequest(srv, request, './func/getVkorg');
     });
 
+    srv.on('getVtweg', '*', async request => {
+        await performRequest(srv, request, './func/getVtweg');
+    });
+
+    srv.on('getSpart', '*', async request => {
+        await performRequest(srv, request, './func/getSpart');
+    });
+
     srv.on('getDriver', '*', async request => {
         await performRequest(srv, request, './func/getDriver');
     });

@@ -1,0 +1,11 @@
+"use strict";
+
+module.exports = async (request, tx) => {
+    const serviceS4_HANA = await cds.connect.to(process.env['Destination_OData_S4HANA']);
+    const serviceRequestS4_HANA = serviceS4_HANA.tx(request);
+    const oResultVtweg = await serviceRequestS4_HANA.get(process.env['Path_API_VTWEG']);
+    const uniqueDistrCh = [
+        ...new Set(oResultVtweg.map(item => item.DistributionChannel))
+      ].map(distrCh => ({ DistributionChannel: distrCh }));
+    return { status: 200, result: uniqueDistrCh, message: 'Executed' };
+};
