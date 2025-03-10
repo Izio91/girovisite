@@ -255,7 +255,7 @@
                     <Column app:p13nKey="aenam_col" visible="false" headerMenu="menu">
                         <Text text="{i18n>aenam}"/>
                     </Column>
-                    <Column app:p13nKey="kunwe_col" visible="false" headerMenu="menu">
+                    <Column app:p13nKey="kunwe_col" headerMenu="menu">
                         <Text text="{i18n>kunwe}"/>
                     </Column>
                 </columns>
