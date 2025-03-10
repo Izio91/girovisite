@@ -793,7 +793,7 @@ sap.ui.define([
         },
 
         onSearchKunnr: function (oEvent) {
-            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName"], "idKunnrDialog_VH");  
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunnrDialog_VH");  
         },
 
         onConfirmKunnr: function (oEvent) {
@@ -811,7 +811,7 @@ sap.ui.define([
         },
 
         onSearchKunwe: function (oEvent) {
-            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "StreetName", "CityName", "Region", "PostalCode"], "idKunweDialog_VH");
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunweDialog_VH");
         },
 
         onConfirmKunwe: function (oEvent) {

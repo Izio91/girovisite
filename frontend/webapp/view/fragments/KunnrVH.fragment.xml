@@ -8,6 +8,6 @@
 		confirm="onConfirmKunnr">
 		<StandardListItem 
 			title="{Customer}"
-			description="{CustomerName}" />	
+			description="{CustomerName} | {StreetName} {CityName} {Region} {PostalCode}"  />	
 	</SelectDialog>
 </core:FragmentDefinition>

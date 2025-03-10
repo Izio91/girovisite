@@ -10,6 +10,8 @@ service girovisiteService
   // Functions
   function getWerks()  returns array of String;
   function getVkorg()  returns array of String;
+  function getVtweg()  returns array of String;
+  function getSpart()  returns array of String;
   function getDriver() returns array of String;
   function getKunnr()  returns array of String;
   function getKunwe()  returns array of String;

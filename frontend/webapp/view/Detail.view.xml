@@ -62,6 +62,9 @@
 								<m:Label text="{i18n>werks}" required="true" />
 								<m:Input id="inputWerksDetail" value="{detailModel>/detail/werks}" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								
+								<m:Label text="{i18n>werksDescr}" required="true" />
+								<m:Input id="inputWerksDescrDetail" value="{detailModel>/detail/werksDescr}" enabled="false" />
+								
 								<m:Label text="{i18n>vkorg}" required="true" />
 								<m:Input id="inputVkorgDetail" value="{detailModel>/detail/vkorg}" maxLength="4" showValueHelp="true" valueHelpRequest="onVkorgVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								
@@ -73,6 +76,9 @@
 								
 								<m:Label text="{i18n>driver1}" required="true" />
 								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								
+								<m:Label text="{i18n>driverDescr}" required="true" />
+								<m:Input id="inputDriverDescrDetail" value="{detailModel>/detail/driverDescr}" enabled="false" />
 								
 								<m:Label text="{i18n>termCode}" />
 								<m:Input id="inputTermCodeDetail" value="{detailModel>/detail/termCode}" maxLength="3" enabled="false" />
@@ -150,7 +156,7 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunnr}" required="true"/>
 									<table:template>
-										<m:Input value="{detailModel>kunnr}" maxLength="10" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
+										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" > 
@@ -178,7 +184,7 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunwe}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>kunwe}" maxLength="10" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
+										<m:Input value="{detailModel>kunwe}" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >

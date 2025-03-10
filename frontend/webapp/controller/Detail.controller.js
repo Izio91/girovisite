@@ -113,6 +113,7 @@ sap.ui.define([
 
         onConfirmWerks: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Plant", "inputWerksDetail");
+            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/PlantName", "inputWerksDescrDetail");
         },
 
         // Vkorg value help
@@ -185,10 +186,12 @@ sap.ui.define([
 
         onConfirmDriver: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Customer", "inputDriver1Detail");
+            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/CustomerName", "inputDriverDescrDetail");
         },
 
         // Kunnr value help
         onKunnrVH : function (oEvent) {
+            this.oInputKunnr = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
                 sPropertyPath = "/valuehelps/kunnr",
@@ -198,15 +201,24 @@ sap.ui.define([
         },
 
         onSearchKunnr: function (oEvent) {
-            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName"], "idKunnrDialog_VH");  
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunnrDialog_VH");  
         },
 
         onConfirmKunnr: function (oEvent) {
-            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Customer", "inputKunnrDetail");
+            var sPath = oEvent.getParameter("selectedItem").getBindingContextPath(),
+                sCustomerValue = this.getView().getModel("detailModel").getProperty(sPath + "/Customer"),
+                sCustomerNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CustomerName"),
+                sStreetNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/StreetName"),
+                sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
+                sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
+                sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
+                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue; 
+            this.oInputKunnr.setValue(sValue);
         },
 
         // Kunwe value help
         onKunweVH : function (oEvent) {
+            this.oInputKunwe = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
                 sPropertyPath = "/valuehelps/kunwe",
@@ -216,11 +228,19 @@ sap.ui.define([
         },
 
         onSearchKunwe: function (oEvent) {
-            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "StreetName", "CityName", "Region", "PostalCode"], "idKunweDialog_VH");
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunweDialog_VH");
         },
 
         onConfirmKunwe: function (oEvent) {
-            this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Customer", "inputKunweDetail");
+            var sPath = oEvent.getParameter("selectedItem").getBindingContextPath(),
+                sCustomerValue = this.getView().getModel("detailModel").getProperty(sPath + "/Customer"),
+                sCustomerNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CustomerName"),
+                sStreetNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/StreetName"),
+                sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
+                sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
+                sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
+                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue; 
+            this.oInputKunwe.setValue(sValue);
         },
 
         onEditPress: function () {
