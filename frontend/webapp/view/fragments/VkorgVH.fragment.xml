@@ -2,11 +2,11 @@
 	<SelectDialog 
 		id="idVkorgDialog_VH" 
 		noDataText="{i18n>NoVkorgFound}"
-		items="{path: 'masterModel>/valuehelps/vkorg'}"
+		items="{path: '/valuehelps/vkorg'}"
 		title="{i18n>TitleSearchVkorg}"
 		search="onSearchVkorg"
 		confirm="onConfirmVkorg">
 		<StandardListItem 
-			title="{masterModel>SalesOrganization}" />	
+			title="{SalesOrganization}" />	
 	</SelectDialog>
 </core:FragmentDefinition>

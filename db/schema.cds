@@ -22,6 +22,7 @@ entity Header {
         details  : Association to many Detail
                        on  details.vpid  = $self.vpid
                        and details.werks = $self.werks;
+        
 }
 
 annotate Header with @assert.unique: {uniqueKey: [
@@ -35,8 +36,8 @@ annotate Header with @assert.unique: {uniqueKey: [
 
 
 entity Detail {
-    key vpid      : String(10);
-    key vppos     : String(3);
+    key vpid      : Integer;
+    key vppos     : Integer;
     key werks     : String(4);
         driver1   : String(10);
         kunnr     : String(10);

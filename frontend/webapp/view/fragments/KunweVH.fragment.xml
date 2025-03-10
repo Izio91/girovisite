@@ -2,12 +2,12 @@
 	<SelectDialog 
 		id="idKunweDialog_VH" 
 		noDataText="{i18n>NoKunweFound}"
-		items="{path: 'masterModel>/valuehelps/kunwe'}"
+		items="{path: '/valuehelps/kunwe'}"
 		title="{i18n>TitleSearchKunwe}"
 		search="onSearchKunwe"
 		confirm="onConfirmKunwe">
 		<StandardListItem 
-			title="{masterModel>Customer}"
-			description="{masterModel>CustomerName} | {masterModel>StreetName} {masterModel>CityName} {masterModel>Region} {masterModel>PostalCode}" />	
+			title="{Customer}"
+			description="{CustomerName} | {StreetName} {CityName} {Region} {PostalCode}" />	
 	</SelectDialog>
 </core:FragmentDefinition>

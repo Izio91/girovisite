@@ -16,13 +16,15 @@ sap.ui.define([
     'sap/ui/core/library',
     'sap/m/table/ColumnWidthController',
     'sap/ui/model/Filter',
-    'sap/ui/model/FilterOperator'
-], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator) => {
+    'sap/ui/model/FilterOperator',
+    "frontend/utils/formatter"
+], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator, formatter) => {
     "use strict";
 
     var baseManifestUrl;
     var oBundle;
     return BaseController.extend("frontend.controller.Main", {
+        formatter: formatter,
         onInit() {
             baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             // read msg from i18n model
@@ -708,235 +710,93 @@ sap.ui.define([
         },
 
         // Werks value help
-        onWerksVH : function (oEvent) {
-            this.oInput = oEvent.getSource();
-            var that = this,
-                oView = this.getView(),
+        onWerksVH : function () {
+            var oMasterModel= this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getWerks()',
-                oMasterModel =this.getView().getModel("masterModel");
-            sap.ui.core.BusyIndicator.show(); 
-            
-            this.executeRequest(sUrl, 'GET')    
-            .then(function (oData) {
-                console.log("Data fetched: ", oData);
-                oMasterModel.setProperty("/valuehelps/werks", oData.value[0].result);
-                sap.ui.core.BusyIndicator.hide();
-                that.openFragment("idWerksDialog_VH", "frontend.view.fragments.WerksVH", oView, that)
-            })  
-            .catch(function (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                    title: "Error",
-                    details: error
-                });
-            });
+                sPropertyPath = "/valuehelps/werks",
+                sIdControl = "idWerksDialog_VH",
+                sFragmentName = "frontend.view.fragments.WerksVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchWerks: function (oEvent) {
-          var sValue = oEvent.getParameter("value");
-          if (sValue) {
-            var sFilter = new Filter({
-              filters: [
-                new Filter("Plant", FilterOperator.Contains, sValue),
-                new Filter("PlantName", FilterOperator.Contains, sValue)
-              ]
-            });
-          }
-          var oList = this.getView().byId("idWerksDialog_VH");
-          var oBinding = oList.getBinding("items");
-          oBinding.filter(sFilter);
+            this._onSearchValueHelp(oEvent, this.getView(), ["Plant", "PlantName"], "idWerksDialog_VH");
         },
 
         onConfirmWerks: function (oEvent) {
-          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
-          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Plant");
-          this.getView().byId("inputWerks").setValue(sPlant);
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/Plant", "inputWerks");
         },
 
         // Vkorg value help
         onVkorgVH : function (oEvent) {
-            this.oInput = oEvent.getSource();
-            var that = this,
-                oView = this.getView(),
+            var oMasterModel= this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getVkorg()',
-                oMasterModel =this.getView().getModel("masterModel");
-            sap.ui.core.BusyIndicator.show(); 
-            
-            this.executeRequest(sUrl, 'GET')    
-            .then(function (oData) {
-                console.log("Data fetched: ", oData);
-                oMasterModel.setProperty("/valuehelps/vkorg", oData.value[0].result);
-                sap.ui.core.BusyIndicator.hide();
-                that.openFragment("idVkorgDialog_VH", "frontend.view.fragments.VkorgVH", oView, that)
-            })  
-            .catch(function (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                    title: "Error",
-                    details: error
-                });
-            });
+                sPropertyPath = "/valuehelps/vkorg",
+                sIdControl = "idVkorgDialog_VH",
+                sFragmentName = "frontend.view.fragments.VkorgVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchVkorg: function (oEvent) {
-          var sValue = oEvent.getParameter("value");
-          if (sValue) {
-            var sFilter = new Filter({
-              filters: [
-                new Filter("SalesOrganization", FilterOperator.Contains, sValue)
-              ]
-            });
-          }
-          var oList = this.getView().byId("idVkorgDialog_VH");
-          var oBinding = oList.getBinding("items");
-          oBinding.filter(sFilter);
+            this._onSearchValueHelp(oEvent, this.getView(), ["SalesOrganization"], "idVkorgDialog_VH");
         },
 
         onConfirmVkorg: function (oEvent) {
-          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
-          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/SalesOrganization");
-          this.getView().byId("inputVkorg").setValue(sPlant);
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/SalesOrganization", "inputVkorg");
         },
 
         // Driver value help
         onDriverVH : function (oEvent) {
-            this.oInput = oEvent.getSource();
-            var that = this,
-                oView = this.getView(),
+            var oMasterModel= this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
-                oMasterModel =this.getView().getModel("masterModel");
-            sap.ui.core.BusyIndicator.show(); 
-            
-            this.executeRequest(sUrl, 'GET')    
-            .then(function (oData) {
-                console.log("Data fetched: ", oData);
-                oMasterModel.setProperty("/valuehelps/driver", oData.value[0].result);
-                sap.ui.core.BusyIndicator.hide();
-                that.openFragment("idDriverDialog_VH", "frontend.view.fragments.DriverVH", oView, that)
-            })  
-            .catch(function (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                    title: "Error",
-                    details: error
-                });
-            });
+                sPropertyPath = "/valuehelps/driver",
+                sIdControl = "idDriverDialog_VH",
+                sFragmentName = "frontend.view.fragments.DriverVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchDriver: function (oEvent) {
-          var sValue = oEvent.getParameter("value");
-          if (sValue) {
-            var sFilter = new Filter({
-              filters: [
-                new Filter("Customer", FilterOperator.Contains, sValue),
-                new Filter("CustomerName", FilterOperator.Contains, sValue)
-              ]
-            });
-          }
-          var oList = this.getView().byId("idDriverDialog_VH");
-          var oBinding = oList.getBinding("items");
-          oBinding.filter(sFilter);
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName"], "idDriverDialog_VH");
         },
 
         onConfirmDriver: function (oEvent) {
-          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
-          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
-          this.getView().byId("inputDriver1").setValue(sPlant);
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/Customer", "inputDriver1");
         },
 
         // Kunnr value help
         onKunnrVH : function (oEvent) {
-            this.oInput = oEvent.getSource();
-            var that = this,
-                oView = this.getView(),
+            var oMasterModel= this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
-                oMasterModel =this.getView().getModel("masterModel");
-            sap.ui.core.BusyIndicator.show(); 
-            
-            this.executeRequest(sUrl, 'GET')    
-            .then(function (oData) {
-                console.log("Data fetched: ", oData);
-                oMasterModel.setProperty("/valuehelps/kunnr", oData.value[0].result);
-                sap.ui.core.BusyIndicator.hide();
-                that.openFragment("idKunnrDialog_VH", "frontend.view.fragments.KunnrVH", oView, that)
-            })  
-            .catch(function (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                    title: "Error",
-                    details: error
-                });
-            });
+                sPropertyPath = "/valuehelps/kunnr",
+                sIdControl = "idKunnrDialog_VH",
+                sFragmentName = "frontend.view.fragments.KunnrVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunnr: function (oEvent) {
-          var sValue = oEvent.getParameter("value");
-          if (sValue) {
-            var sFilter = new Filter({
-              filters: [
-                new Filter("Customer", FilterOperator.Contains, sValue),
-                new Filter("CustomerName", FilterOperator.Contains, sValue)
-              ]
-            });
-          }
-          var oList = this.getView().byId("idKunnrDialog_VH");
-          var oBinding = oList.getBinding("items");
-          oBinding.filter(sFilter);
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName"], "idKunnrDialog_VH");  
         },
 
         onConfirmKunnr: function (oEvent) {
-          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
-          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
-          this.getView().byId("inputKunnr").setValue(sPlant);
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/Customer", "inputKunnr");
         },
 
         // Kunwe value help
         onKunweVH : function (oEvent) {
-            this.oInput = oEvent.getSource();
-            var that = this,
-                oView = this.getView(),
+            var oMasterModel= this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
-                oMasterModel =this.getView().getModel("masterModel");
-            sap.ui.core.BusyIndicator.show(); 
-            
-            this.executeRequest(sUrl, 'GET')    
-            .then(function (oData) {
-                console.log("Data fetched: ", oData);
-                oMasterModel.setProperty("/valuehelps/kunwe", oData.value[0].result);
-                sap.ui.core.BusyIndicator.hide();
-                that.openFragment("idKunweDialog_VH", "frontend.view.fragments.KunweVH", oView, that)
-            })  
-            .catch(function (error) {
-                sap.ui.core.BusyIndicator.hide();
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
-                    title: "Error",
-                    details: error
-                });
-            });
+                sPropertyPath = "/valuehelps/kunwe",
+                sIdControl = "idKunweDialog_VH",
+                sFragmentName = "frontend.view.fragments.KunweVH";
+            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunwe: function (oEvent) {
-          var sValue = oEvent.getParameter("value");
-          if (sValue) {
-            var sFilter = new Filter({
-              filters: [
-                new Filter("Customer", FilterOperator.Contains, sValue),
-                new Filter("StreetName", FilterOperator.Contains, sValue),
-                new Filter("CityName", FilterOperator.Contains, sValue),
-                new Filter("Region", FilterOperator.Contains, sValue),
-                new Filter("PostalCode", FilterOperator.Contains, sValue)
-              ]
-            });
-          }
-          var oList = this.getView().byId("idKunweDialog_VH");
-          var oBinding = oList.getBinding("items");
-          oBinding.filter(sFilter);
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "StreetName", "CityName", "Region", "PostalCode"], "idKunweDialog_VH");
         },
 
         onConfirmKunwe: function (oEvent) {
-          var sPath = oEvent.getParameter("selectedItem").getBindingContextPath("masterModel");
-          var sPlant = this.getView().getModel("masterModel").getProperty(sPath + "/Customer");
-          this.getView().byId("inputKunwe").setValue(sPlant);
+            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/Customer", "inputKunwe");
         },
 
         onCreateDetail: function () {

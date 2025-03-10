@@ -2,12 +2,12 @@
 	<SelectDialog 
 		id="idKunnrDialog_VH" 
 		noDataText="{i18n>NoKunnrFound}"
-		items="{path: 'masterModel>/valuehelps/kunnr'}"
+		items="{path: '/valuehelps/kunnr'}"
 		title="{i18n>TitleSearchKunnr}"
 		search="onSearchKunnr"
 		confirm="onConfirmKunnr">
 		<StandardListItem 
-			title="{masterModel>Customer}"
-			description="{masterModel>CustomerName}" />	
+			title="{Customer}"
+			description="{CustomerName}" />	
 	</SelectDialog>
 </core:FragmentDefinition>

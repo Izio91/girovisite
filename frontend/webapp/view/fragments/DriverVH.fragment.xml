@@ -2,12 +2,12 @@
 	<SelectDialog 
 		id="idDriverDialog_VH" 
 		noDataText="{i18n>NoDriverFound}"
-		items="{path: 'masterModel>/valuehelps/driver'}"
+		items="{path: '/valuehelps/driver'}"
 		title="{i18n>TitleSearchDriver}"
 		search="onSearchDriver"
 		confirm="onConfirmDriver">
 		<StandardListItem 
-			title="{masterModel>Customer}"
-			description="{masterModel>CustomerName}" />	
+			title="{Customer}"
+			description="{CustomerName}" />	
 	</SelectDialog>
 </core:FragmentDefinition>

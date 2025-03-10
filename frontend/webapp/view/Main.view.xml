@@ -68,12 +68,12 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="datfr" label="{i18n>datfr}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <DatePicker id="datePickerDatfr" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                    <DatePicker id="datePickerDatfr" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="datto" label="{i18n>datto}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <DatePicker id="datePickerDatto" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                    <DatePicker id="datePickerDatto" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="active" label="{i18n>active}" visibleInFilterBar="true">
@@ -106,7 +106,7 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="erdat" label="{i18n>erdat}" visibleInFilterBar="false">
                                 <fb:control>
-                                    <DatePicker id="datePickerErdat" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                    <DatePicker id="datePickerErdat" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="erzet" label="{i18n>erzet}" visibleInFilterBar="false">
@@ -121,7 +121,7 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="aedat" label="{i18n>aedat}" visibleInFilterBar="false">
                                 <fb:control>
-                                    <DatePicker id="datePickerAedat" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" />
+                                    <DatePicker id="datePickerAedat" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="aezet" label="{i18n>aezet}" visibleInFilterBar="false">
@@ -272,15 +272,15 @@
                         <Text text="{masterModel>spart}"/>
                         <Text text="{masterModel>driver1}"/>
                         <Text text="{masterModel>termCode}"/>
-                        <Text text="{masterModel>datfr}"/>
-                        <Text text="{masterModel>datto}"/>
+                        <Text text="{path: 'masterModel>datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
+                        <Text text="{path: 'masterModel>datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
                         <Text text="{masterModel>kunnr}"/>
                         <Text text="{masterModel>active}"/>
                         <Text text="{masterModel>loevm}"/>
-                        <Text text="{masterModel>erdat}"/>
+                        <Text text="{path: 'masterModel>erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
                         <Text text="{masterModel>erzet}"/>
                         <Text text="{masterModel>ernam}"/>
-                        <Text text="{masterModel>aedat}"/>
+                        <Text text="{path: 'masterModel>aedat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
                         <Text text="{masterModel>aezet}"/>
                         <Text text="{masterModel>aenam}"/>
                         <Text text="{masterModel>kunwe}"/>

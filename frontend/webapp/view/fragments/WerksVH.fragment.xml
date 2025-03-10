@@ -2,12 +2,12 @@
 	<SelectDialog 
 		id="idWerksDialog_VH" 
 		noDataText="{i18n>NoWerksFound}"
-		items="{path: 'masterModel>/valuehelps/werks'}"
+		items="{path: '/valuehelps/werks'}"
 		title="{i18n>TitleSearchWerks}"
 		search="onSearchWerks"
 		confirm="onConfirmWerks">
 		<StandardListItem 
-			title="{masterModel>Plant}" 
-			description="{masterModel>PlantName}"/>	
+			title="{Plant}" 
+			description="{PlantName}"/>	
 	</SelectDialog>
 </core:FragmentDefinition>
