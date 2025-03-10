@@ -143,7 +143,6 @@
 										formatter: '.formatter.getI18nTextWithCount'}" level="H2" />
 									<m:ToolbarSpacer />
 									<m:Button text="{i18n>AddButton}" press="onAddRow" visible="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
-									<m:Button id="deleteRowFromTable" text="{i18n>DeleteButton}" press="onDeleteSelectedRows" visible="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								</m:Toolbar>
 							</table:extension>
 							<table:columns>

@@ -8,14 +8,13 @@ sap.ui.define([
 
     var baseManifestUrl;
     var oBundle;
-    var aRemovedLines;
+    
     return BaseController.extend("frontend.controller.Detail", {
         formatter: formatter,
         onInit() {
             baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             // read msg from i18n model
             oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            aRemovedLines = [];
             
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("detail").attachPatternMatched(this._onDetailMatched, this);
@@ -258,7 +257,6 @@ sap.ui.define([
 
         _onEdit: function () {
             this.getView().getModel("detailModel").setProperty("/editMode", true);
-            aRemovedLines = [];
         },
 
         onCancelEditPress: function () {
@@ -279,7 +277,6 @@ sap.ui.define([
             /** Promise must to be replaced by get lock info requests */
             return new Promise(function (resolve, reject) {
                 that.getView().getModel("detailModel").setProperty("/editMode", false); 
-                aRemovedLines = [];
                 resolve();
             });
         },
@@ -292,63 +289,6 @@ sap.ui.define([
 
         },
 
-        /**
-         * Handles caching of removed line details.
-         * Stores details of rows selected for deletion in an array if they exist in the database.
-         * If a row is new (vpid is null), it is not added to the removal list.
-         */
-        _handleRemovedLineDetailCache: function () {
-            var oDetailModel = this.getView().getModel("detailModel"),
-                oTable = this.getView().byId("idDetailTable"),
-                aSelectedIndices = oTable.getSelectedIndices(),
-                selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex));
-    
-            aRemovedLines = selectedContexts.map(oContext => {
-                let sVpid = oDetailModel.getProperty(oContext.sPath + "/vpid"),
-                    sVppos = oDetailModel.getProperty(oContext.sPath + "/vppos"),
-                    sWerks = oDetailModel.getProperty(oContext.sPath + "/werks");
-                if (sVpid) {
-                  return `(vpid='${sVpid}',vppos='${sVppos}',werks='${sWerks}')`;
-                }
-            });
-        },
-
-        /**
-         * Deletes the selected rows from the model.
-         * Determines the difference between currently bound data and selected rows,
-         * then updates the model to reflect the remaining (non-deleted) rows.
-         */
-        _onDeleteSelectedRows: function() {
-            var oDetailModel = this.getView().getModel("detailModel"),
-              oTable = this.getView().byId("idDetailTable"),
-              aSelectedIndices = oTable.getSelectedIndices(),
-              selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex)),
-              oBinding = oTable.getBinding("rows"),
-              aBindingContext = oBinding.getContexts(0, oBinding.getLength());
-      
-            let a = new Set(aBindingContext);
-            let b = new Set(selectedContexts);
-            let diff = new Set([...a].filter(x => !b.has(x)));
-      
-            var aDiff = [...diff];
-      
-            var values = aDiff.map((ctx, index) => {
-              return ctx.getObject();
-            });
-      
-            oDetailModel.setProperty("/detail/details", values);
-        },
-
-        /**
-         * Main function to handle deletion of selected rows.
-         * Calls the cache handler, deletion logic, and updates selection details.
-         */
-        onDeleteSelectedRows: function () {
-          this._handleRemovedLineDetailCache();
-          this._onDeleteSelectedRows();
-          this.onSelectionDetailChange();
-        },
-
         onAddRow: function (oEvent) {
           this._addRow();
         },
@@ -356,7 +296,7 @@ sap.ui.define([
         _addRow: function () {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
-                nVpos = aRows ? aRows.length + 1 : 1;
+                nVppos = aRows ? aRows.length + 1 : 1;
 
             if (!aRows) {
                 aRows = [];
@@ -386,7 +326,7 @@ sap.ui.define([
               "saturday": null,
               "sunday": null,
               "vpid": oDetailModel.getProperty("/detail/vpid"),
-              "vppos": nVpos,
+              "vppos": nVppos,
               "werks": oDetailModel.getProperty("/detail/werks")
             });
             oDetailModel.setProperty("/detail/details", aRows);
