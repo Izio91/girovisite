@@ -35,14 +35,21 @@ sap.ui.define([
             this.getView().byId("subTitleIdExpandedContent").setText(sSubTitle);
             this.getView().byId("subTitleIdSnappedContent").setText(sSubTitle);
             this.getView().byId("subTitleIdSnappedTitleOnMobile").setText(sSubTitle);
+            this.getView().byId("titleExpandedHeading").setText(oBundle.getText("DetailTitle"));
+            this.getView().byId("titleSnappedHeading").setText(oBundle.getText("DetailTitle"));
 
             this.defineModelForCurrentPage(false, false);
-            this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`)
+            this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
         },
 
         _onCreateMatched: function (oEvent) {
             console.log("create");
             this.defineModelForCurrentPage(true, true);
+            this.getView().byId("subTitleIdExpandedContent").setText();
+            this.getView().byId("subTitleIdSnappedContent").setText();
+            this.getView().byId("subTitleIdSnappedTitleOnMobile").setText();
+            this.getView().byId("titleExpandedHeading").setText(oBundle.getText("CreateTitle"));
+            this.getView().byId("titleSnappedHeading").setText(oBundle.getText("CreateTitle"));
         },
 
 

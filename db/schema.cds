@@ -21,6 +21,9 @@ entity Header {
         aedat       : Date;
         aezet       : Time;
         aenam       : String(12);
+        locked      : Boolean;
+        lockedBy    : String;
+        lockedAt    : DateTime;
         details     : Association to many Detail
                           on  details.vpid  = $self.vpid
                           and details.werks = $self.werks;

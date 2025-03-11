@@ -58,4 +58,16 @@ module.exports = function (srv) {
     srv.on('getKunwe', '*', async request => {
         await performRequest(srv, request, './func/getKunwe');
     });
+
+    srv.on('lock', '*', async request => {
+        await performRequest(srv, request, './func/lock');
+    });
+
+    srv.on('unlock', '*', async request => {
+        await performRequest(srv, request, './func/unlock');
+    });
+
+    srv.on('getLockStatus', '*', async request => {
+        await performRequest(srv, request, './func/getLockStatus');
+    });
 }

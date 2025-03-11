@@ -17,12 +17,12 @@
 				</breadcrumbs>
 
 				<expandedHeading>
-					<m:Title text="{i18n>DetailTitle}" wrapping="true"/>
+					<m:Title id="titleExpandedHeading" wrapping="true"/>
 				</expandedHeading>
 
 				<snappedHeading>
 					<m:FlexBox fitContainer="true" alignItems="Center">
-						<m:Title text="{i18n>DetailTitle}" wrapping="true"/>
+						<m:Title id="titleSnappedHeading" wrapping="true"/>
 					</m:FlexBox>
 				</snappedHeading>
 
@@ -112,13 +112,13 @@
 								<m:Label text="{i18n>ernam}" />
 								<m:Input id="inputErnamDetail" value="{detailModel>/detail/ernam}" maxLength="12" enabled="false" />
 
-								<m:Label text="{i18n>erdat}" />
-								<m:DatePicker id="datePickerAedatDetail" value="{path: 'detailModel>/detail/erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
+								<m:Label text="{i18n>aedat}" />
+								<m:DatePicker id="datePickerAedatDetail" value="{path: 'detailModel>/detail/aedat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
 
-								<m:Label text="{i18n>erzet}" />
-								<m:TimePicker id="timePickerAedatDetail" value="{detailModel>/detail/aedat}" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" enabled="false" />
+								<m:Label text="{i18n>aezet}" />
+								<m:TimePicker id="timePickerAezetDetail" value="{detailModel>/detail/aezet}" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" enabled="false" />
 								
-								<m:Label text="{i18n>ernam}" />
+								<m:Label text="{i18n>aenam}" />
 								<m:Input id="inputAenamDetail" value="{detailModel>/detail/aenam}" maxLength="12" enabled="false" />
 							</form:content>
 						</form:SimpleForm>
