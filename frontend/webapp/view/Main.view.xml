@@ -38,7 +38,7 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="werks" label="{i18n>werks}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputWerks" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" />
+                                    <Input id="inputWerks" maxLength="4"  showValueHelp="true" valueHelpRequest="onWerksVH" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="vkorg" label="{i18n>vkorg}" visibleInFilterBar="true">
@@ -258,12 +258,16 @@
                     <Column app:p13nKey="kunwe_col" headerMenu="menu">
                         <Text text="{i18n>kunwe}"/>
                     </Column>
+                    <Column app:p13nKey="locked_col" headerMenu="menu">
+                        <Text text="{i18n>locked}"/>
+                    </Column>
                 </columns>
 
                 <items>
                     <ColumnListItem
                         type="Navigation"
-                        press="onListItemPress">
+                        press="onListItemPress"
+                        highlight="{= ${masterModel>locked} ? 'Information' : 'None' }" >
                         <ObjectIdentifier title="{masterModel>vpid}"/>
                         <Text text="{masterModel>vctext}"/>
                         <Text text="{masterModel>werks}"/>
@@ -284,6 +288,7 @@
                         <Text text="{masterModel>aezet}"/>
                         <Text text="{masterModel>aenam}"/>
                         <Text text="{masterModel>kunwe}"/>
+                        <Button press="onOpenUnlockMenuAction" tooltip="{i18n>lockedBy}: {masterModel>lockedBy}" icon="sap-icon://locked" type="Transparent" visible="{= ${masterModel>locked} === true ? true : false }"/>
                     </ColumnListItem>
                 </items>
             </Table>

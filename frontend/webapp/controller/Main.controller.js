@@ -144,6 +144,11 @@ sap.ui.define([
                 label: oBundle.getText("kunwe"),
                 path: "kunwe"
             },
+            {
+                key: "locked_col",
+                label: oBundle.getText("locked"),
+                path: "locked"
+            }
             ]);
 
             Engine.getInstance().register(oTable, {
@@ -472,7 +477,7 @@ sap.ui.define([
 
                 oMasterModel.setProperty("/HeaderWithDetails", aNewData);
             } catch (error) {
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
                     title: "Error",
                     details: error
                 });
@@ -820,6 +825,58 @@ sap.ui.define([
 
         onCreateDetail: function () {
             this.getOwnerComponent().getRouter().navTo("create");
+        },
+
+        onOpenUnlockMenuAction: function (oEvent) {
+            this.oContext = oEvent.getSource().getBindingContext('masterModel');
+            
+            var oControl = oEvent.getSource(),
+                oView = this.getView();
+
+            if (!this._oLockMenuFragment) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "frontend.view.fragments.LockMenu",
+                    controller: this
+                }).then(function (oMenu) {
+                    oView.addDependent(oMenu);
+                    oMenu.openBy(oControl);
+                    this._oLockMenuFragment = oMenu;
+                }.bind(this));
+            } else {
+                this._oLockMenuFragment.openBy(oControl);
+            }
+        },
+
+        onUnlockPress: async function () {
+            var that = this,
+                sUrl = baseManifestUrl + "/girovisiteService/unlock",
+                sVpid = this.getView().getModel("masterModel").getProperty(this.oContext + "/vpid"),
+                body = {
+                    vpid: sVpid.toString()
+                };
+            try {
+                sap.ui.core.BusyIndicator.show();  
+                
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
+                console.log("Data fetched: ", oData);
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.information(oBundle.getText("documentUnlocked"), {
+                    onClose: function () {
+                        that.onGoPress();
+                    }
+                });
+            } catch (error) {
+                sap.ui.core.BusyIndicator.hide();
+                MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error,
+                    onClose: function () {
+                        that.onGoPress();
+                    }
+                });
+            } 
         }
     });
 });

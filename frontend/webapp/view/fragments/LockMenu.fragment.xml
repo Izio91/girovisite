@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Menu id="idLockMenuFragment" itemSelected="onMenuAction">
+		<MenuItem text="{i18n>UnlockButton}" icon="sap-icon://unlocked" press="onUnlockPress" />
+	</Menu>
+</core:FragmentDefinition>

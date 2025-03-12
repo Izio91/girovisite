@@ -2,8 +2,9 @@ sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
+    "sap/m/MessageToast",
     "frontend/utils/formatter"
-], (BaseController, JSONModel, MessageBox, formatter) => {
+], (BaseController, JSONModel, MessageBox, MessageToast, formatter) => {
     "use strict";
 
     var baseManifestUrl;
@@ -100,7 +101,17 @@ sap.ui.define([
         },
 
         onGoBack: function () {
-            this.getOwnerComponent().getRouter().navTo("main");
+            var that = this;
+            MessageBox.warning(oBundle.getText("AlertGoBack"), {
+              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+              emphasizedAction: MessageBox.Action.NO,
+              onClose: function (sAction) {
+                if (sAction === MessageBox.Action.YES) {
+                  that._unlockDocument();
+                  that.getOwnerComponent().getRouter().navTo("main");
+                }
+              }
+            });
         },
 
         // Werks value help
@@ -263,7 +274,61 @@ sap.ui.define([
         },
 
         _onEdit: function () {
-            this.getView().getModel("detailModel").setProperty("/editMode", true);
+            this.getLockStatus().then(function (data) {
+              if (data.value[0].result.locked) {
+                MessageBox.warning(oBundle.getText("CannotEdit", data.value[0].result.lockedBy));
+              } else {
+                this._lockDocument();
+              }
+            }.bind(this));
+        },
+
+        _lockDocument : async function () {
+            var that = this,
+                sUrl = baseManifestUrl + "/girovisiteService/lock",
+                body = {
+                    vpid: this._vpid.toString()
+                };
+            try {
+                sap.ui.core.BusyIndicator.show();  
+                
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
+                this.getView().getModel("detailModel").setProperty("/editMode", true);
+                MessageToast.show(oBundle.getText("documentLocked"));
+            } catch (error) {
+                MessageBox.error(oBundle.getText("unableToLockDocument"), {
+                    title: "Error",
+                    details: error
+                });
+            } finally {
+                that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+        _unlockDocument : async function () {
+            var that = this,
+                sUrl = baseManifestUrl + "/girovisiteService/unlock",
+                body = {
+                    vpid: this._vpid.toString()
+                };
+            try {
+                sap.ui.core.BusyIndicator.show();  
+                
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
+                this.getView().getModel("detailModel").setProperty("/editMode", false);
+                MessageToast.show(oBundle.getText("documentUnlocked"));
+            } catch (error) {
+                MessageBox.error(oBundle.getText("unableToUnlockDocument"), {
+                    title: "Error",
+                    details: error
+                });
+            } finally {
+                that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
+                sap.ui.core.BusyIndicator.hide();
+            }
         },
 
         onCancelEditPress: function () {
@@ -273,18 +338,9 @@ sap.ui.define([
               emphasizedAction: MessageBox.Action.NO,
               onClose: function (sAction) {
                 if (sAction === MessageBox.Action.YES) {
-                  that._onCancelEdit().then(result => that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`));
+                  that._unlockDocument();
                 }
               }
-            });
-        },
-
-        _onCancelEdit : function () { 
-            var that = this;
-            /** Promise must to be replaced by get lock info requests */
-            return new Promise(function (resolve, reject) {
-                that.getView().getModel("detailModel").setProperty("/editMode", false); 
-                resolve();
             });
         },
 
@@ -341,6 +397,11 @@ sap.ui.define([
 
         onSavePress : function () {
             /** TODO */
+        },
+
+        getLockStatus: async function () {
+            var sUrl = baseManifestUrl + "/girovisiteService/getLockStatus()?vpid='" + this._vpid + "'";
+            return await this.executeRequest(sUrl, 'GET');
         }
     });
 });

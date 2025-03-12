@@ -103,6 +103,9 @@ view HeaderWithDetails as
             t1.aedat,
             t1.aezet,
             t1.aenam,
+            t1.locked,
+            t1.lockedBy,
+            t1.lockedAt,
             t2.kunnr,
             t2.kunwe
     from Header as t1
