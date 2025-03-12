@@ -50,7 +50,21 @@
 			<ObjectPageSection titleUppercase="false" title="{i18n>headerData}">
 				<subSections>
 					<ObjectPageSubSection titleUppercase="false">
-						<form:SimpleForm id="headerSimpleForm" editable="true" layout="ResponsiveGridLayout" columnsM="2" columnsL="2" columnsXL="3">
+						<form:SimpleForm id="headerSimpleForm" 
+								editable="true" 
+								layout="ResponsiveGridLayout" 
+								labelSpanXL="4"
+								labelSpanL="3"
+								labelSpanM="4"
+								labelSpanS="12"
+								adjustLabelSpan="false"
+								emptySpanXL="0"
+								emptySpanL="4"
+								emptySpanM="0"
+								emptySpanS="0"
+								columnsXL="2"
+								columnsL="1"
+								columnsM="1">
 							<form:content>
 
 								<m:Label text="{i18n>vpid}" />
@@ -60,22 +74,22 @@
 								<m:TextArea id="idVctext" value="{detailModel>/detail/vctext}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" maxLength="30"/>
 
 								<m:Label text="{i18n>werks}" required="true" />
-								<m:Input id="inputWerksDetail" value="{detailModel>/detail/werks}" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="" />
+								<m:Input id="inputWerksDetail" value="{detailModel>/detail/werks}" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>werksDescr}" required="true" />
 								<m:Input id="inputWerksDescrDetail" value="{detailModel>/detail/werksDescr}" enabled="false" />
 								
 								<m:Label text="{i18n>vkorg}" required="true" />
-								<m:Input id="inputVkorgDetail" value="{detailModel>/detail/vkorg}" maxLength="4" showValueHelp="true" valueHelpRequest="onVkorgVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:Input id="inputVkorgDetail" value="{detailModel>/detail/vkorg}" maxLength="4" showValueHelp="true" valueHelpRequest="onVkorgVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>vtweg}" required="true" />
-								<m:Input id="inputVtwegDetail" value="{detailModel>/detail/vtweg}" maxLength="2" showValueHelp="true" valueHelpRequest="onVtwegVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:Input id="inputVtwegDetail" value="{detailModel>/detail/vtweg}" maxLength="2" showValueHelp="true" valueHelpRequest="onVtwegVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>spart}" required="true" />
-								<m:Input id="inputSpartDetail" value="{detailModel>/detail/spart}" maxLength="2" showValueHelp="true" valueHelpRequest="onSpartVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:Input id="inputSpartDetail" value="{detailModel>/detail/spart}" maxLength="2" showValueHelp="true" valueHelpRequest="onSpartVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>driver1}" required="true" />
-								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>driverDescr}" required="true" />
 								<m:Input id="inputDriverDescrDetail" value="{detailModel>/detail/driverDescr}" enabled="false" />
@@ -84,24 +98,26 @@
 								<m:Input id="inputTermCodeDetail" value="{detailModel>/detail/termCode}" maxLength="3" enabled="false" />
 
 								<m:Label text="{i18n>datfr}" required="true" />
-								<m:DatePicker id="datePickerDatfrDetail" value="{path: 'detailModel>/detail/datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:DatePicker id="datePickerDatfrDetail" value="{path: 'detailModel>/detail/datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatfr" />
 
 								<m:Label text="{i18n>datto}" required="true" />
-								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatto" />
 
 								<m:Label text="{i18n>active}" />
-								<m:ComboBox id="comboBoxActiveDetail" selectedKey="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" >
+								<m:ComboBox id="comboBoxActiveDetail" selectedKey="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeActive" >
 									<core:Item key="default" text="" />
 									<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
 									<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
 								</m:ComboBox>
 
 								<m:Label text="{i18n>loevm}" />
-								<m:ComboBox id="comboBoxLoevmDetail" selectedKey="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" >
+								<m:ComboBox id="comboBoxLoevmDetail" selectedKey="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" change="onChangeLoevm" >
 									<core:Item key="default" text="" />
 									<core:Item key="X" text="{i18n>comboBoxKeyCancelled}" />
 									<core:Item key="" text="{i18n>comboBoxKeyNotCancelled}" />
 								</m:ComboBox>
+
+								<core:Title text="" />
 
 								<m:Label text="{i18n>erdat}" />
 								<m:DatePicker id="datePickerErdatDetail" value="{path: 'detailModel>/detail/erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
@@ -136,7 +152,7 @@
 									}
 							}" class="sapUiSmallMargin"
 								rowSelectionChange="onSelectionDetailChange"
-								selectionMode="{= ${detailModel>/isNew} || ${detailModel>/editMode} ? 'MultiToggle' : 'None' }">
+								selectionMode="None">
 							<table:extension>
 								<m:Toolbar>
 									<m:Title text="{parts: [{path: 'i18n>DetailTableTitle'}, {path: 'detailModel>/detail/details/length'}], 
@@ -155,25 +171,25 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunnr}" required="true"/>
 									<table:template>
-										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
+										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" liveChange="eraseValue" />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" > 
 									<m:Label text="{i18n>datab}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  />
+										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDatab"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>datbi}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  />
+										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datab', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDatbi"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>inactive}"/>
 									<table:template>
-										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>inactive'}], formatter: '.formatter.handleInactiveSelectedKey'}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  >
+										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>inactive'}], formatter: '.formatter.handleInactiveSelectedKey'}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeInactive"  >
 											<core:Item key="default" text="" />
 											<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
 											<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
@@ -183,25 +199,25 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunwe}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>kunwe}" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"   />
+										<m:Input value="{detailModel>kunwe}" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" liveChange="eraseValue"   />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtabwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  />
+										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDtabwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtbiwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  />
+										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/dtabwe', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDtbiwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>turno}" required="true" />
 									<table:template>
-										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  >
+										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeTurno"  >
 											<core:Item key="0" text="{i18n>turno0}" />
 											<core:Item key="1" text="{i18n>turno1}" />
 											<core:Item key="2" text="{i18n>turno2}" />
@@ -212,55 +228,55 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sequ}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>sequ}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>sequ}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSequ"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>monday}"/>
 									<table:template>
-										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeMonday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>tuesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeTuesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>wednesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeWednesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>thursday}"/>
 									<table:template>
-										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeThursday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>friday}"/>
 									<table:template>
-										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeFriday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>saturday}"/>
 									<table:template>
-										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSaturday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sunday}"/>
 									<table:template>
-										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePlant"/>
+										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSunday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtfine}"/>
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtfine', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change=".onChangePurchaseOrderItem"  />
+										<m:DatePicker value="{path: 'detailModel>dtfine', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
@@ -309,7 +325,8 @@
 		<footer>
             <m:OverflowToolbar visible="{detailDetailModel>/props/gEditMode}">
                 <m:ToolbarSpacer />
-                <m:Button type="Emphasized" text="{i18n>SaveButton}" icon="sap-icon://save" press="onSavePress" />
+                <m:Button type="Emphasized" text="{i18n>SaveButton}" icon="sap-icon://save" press="onSavePress" visible="{= ${detailModel>/editMode} }" />
+                <m:Button type="Emphasized" text="{i18n>CreateButton}" icon="sap-icon://save" press="onCreatePress" visible="{= ${detailModel>/isNew} }" />
             </m:OverflowToolbar>
 		</footer>
     </ObjectPageLayout>

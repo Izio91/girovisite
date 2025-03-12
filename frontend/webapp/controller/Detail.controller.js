@@ -45,7 +45,7 @@ sap.ui.define([
 
         _onCreateMatched: function (oEvent) {
             console.log("create");
-            this.defineModelForCurrentPage(true, true);
+            this.defineModelForCurrentPage(true, false);
             this.getView().byId("subTitleIdExpandedContent").setText();
             this.getView().byId("subTitleIdSnappedContent").setText();
             this.getView().byId("subTitleIdSnappedTitleOnMobile").setText();
@@ -107,7 +107,6 @@ sap.ui.define([
               emphasizedAction: MessageBox.Action.NO,
               onClose: function (sAction) {
                 if (sAction === MessageBox.Action.YES) {
-                  that._unlockDocument();
                   that.getOwnerComponent().getRouter().navTo("main");
                 }
               }
@@ -115,7 +114,8 @@ sap.ui.define([
         },
 
         // Werks value help
-        onWerksVH : function () {
+        onWerksVH : function (oEvent) {
+            this.oInputWerksDetail = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getWerks()',
                 sPropertyPath = "/valuehelps/werks",
@@ -131,10 +131,12 @@ sap.ui.define([
         onConfirmWerks: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Plant", "inputWerksDetail");
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/PlantName", "inputWerksDescrDetail");
+            this.oInputWerksDetail.fireChangeEvent(this.getControlValue(this.oInputWerksDetail));
         },
 
         // Vkorg value help
         onVkorgVH : function (oEvent) {
+            this.oInputVkorgDetail = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getVkorg()',
                 sPropertyPath = "/valuehelps/vkorg",
@@ -149,10 +151,12 @@ sap.ui.define([
 
         onConfirmVkorg: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/SalesOrganization", "inputVkorgDetail");
+            this.oInputVkorgDetail.fireChangeEvent(this.getControlValue(this.oInputVkorgDetail));
         },
 
         // Vtweg value help
         onVtwegVH : function (oEvent) {
+            this.oInputVtwegDetail = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getVtweg()',
                 sPropertyPath = "/valuehelps/vtweg",
@@ -167,10 +171,12 @@ sap.ui.define([
 
         onConfirmVtweg: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/DistributionChannel", "inputVtwegDetail");
+            this.oInputVtwegDetail.fireChangeEvent(this.getControlValue(this.oInputVtwegDetail));
         },
 
         // Spart value help
         onSpartVH : function (oEvent) {
+            this.oInputSpartDetail = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getSpart()',
                 sPropertyPath = "/valuehelps/spart",
@@ -185,10 +191,12 @@ sap.ui.define([
 
         onConfirmSpart: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Division", "inputSpartDetail");
+            this.oInputSpartDetail.fireChangeEvent(this.getControlValue(this.oInputSpartDetail));
         },
 
         // Driver value help
         onDriverVH : function (oEvent) {
+            this.oInputDriverDetail = oEvent.getSource();
             var oDetailModel= this.getView().getModel("detailModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
                 sPropertyPath = "/valuehelps/driver",
@@ -204,6 +212,7 @@ sap.ui.define([
         onConfirmDriver: function (oEvent) {
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/Customer", "inputDriver1Detail");
             this._onConfirmValueHelp(oEvent, "detailModel", this.getView(), "/CustomerName", "inputDriverDescrDetail");
+            this.oInputDriverDetail.fireChangeEvent(this.getControlValue(this.oInputDriverDetail));
         },
 
         // Kunnr value help
@@ -229,8 +238,15 @@ sap.ui.define([
                 sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
                 sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
                 sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
-                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue; 
+                sAddressValue = sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue,
+                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sAddressValue,
+                sKunnrPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnr",
+                sKunnrAddressPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrAddress",
+                sKunnrCompanyNamePath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrCompanyName"; 
             this.oInputKunnr.setValue(sValue);
+            this.getView().getModel("detailModel").setProperty(sKunnrPath, sCustomerValue);
+            this.getView().getModel("detailModel").setProperty(sKunnrAddressPath, sAddressValue);
+            this.getView().getModel("detailModel").setProperty(sKunnrCompanyNamePath, sCustomerNameValue);
         },
 
         // Kunwe value help
@@ -256,29 +272,35 @@ sap.ui.define([
                 sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
                 sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
                 sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
-                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue; 
+                sDataCessazione = this.getView().getModel("detailModel").getProperty(sPath + "/DataCessazione"),
+                sAddressValue = sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue,
+                sValue = sCustomerValue + " - " + sCustomerNameValue + " " + sAddressValue,
+                sKunwePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunwe",
+                sKunweAddressPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweAddress",
+                sKunweCompanyNamePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweCompanyName",
+                sDtfinePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/dtfine"; 
             this.oInputKunwe.setValue(sValue);
+            this.getView().getModel("detailModel").setProperty(sKunwePath, sCustomerValue);
+            this.getView().getModel("detailModel").setProperty(sKunweAddressPath, sAddressValue);
+            this.getView().getModel("detailModel").setProperty(sKunweCompanyNamePath, sCustomerNameValue);
+            this.getView().getModel("detailModel").setProperty(sDtfinePath, sDataCessazione);
         },
 
         onEditPress: function () {
-            var that = this;
-            MessageBox.warning(oBundle.getText("AlertEdit"), {
-              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-              emphasizedAction: MessageBox.Action.NO,
-              onClose: function (sAction) {
-                if (sAction === MessageBox.Action.YES) {
-                  that._onEdit();
-                }
-              }
-            });
-        },
-
-        _onEdit: function () {
             this.getLockStatus().then(function (data) {
-              if (data.value[0].result.locked) {
-                MessageBox.warning(oBundle.getText("CannotEdit", data.value[0].result.lockedBy));
+              if (data.value[0].result[0].locked) {
+                MessageBox.warning(oBundle.getText("CannotEdit", [data.value[0].result[0].lockedBy]));
               } else {
-                this._lockDocument();
+                var that = this;
+                MessageBox.warning(oBundle.getText("AlertEdit"), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.NO,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._lockDocument();
+                    }
+                }
+                });
               }
             }.bind(this));
         },
@@ -395,8 +417,137 @@ sap.ui.define([
             oDetailModel.setProperty("/detail/details", aRows);
         },
 
+        onCreatePress : function () {
+            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+            this.getOwnerComponent().getRouter().navTo("detail", { vpid: '639', vctext: 'AGENTE PROVVISORIO 810', werks: 'PRD1', vkorg: 'CLR1', vtweg: '10', spart: '0' });
+        },
+
         onSavePress : function () {
-            /** TODO */
+            
+            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+        },
+
+        eraseValue: function (oEvent) {
+            oEvent.getSource().setValue();
+        },
+
+        _onChangeEventHandler: function (oEvent, sProperty) {
+            var oControl = oEvent.getSource(),
+                bControlBelongingToHeader = oControl.getBindingContext("detailModel") === undefined,
+                sPath = bControlBelongingToHeader ? "/detail" + sProperty : oControl.getBindingContext("detailModel").getPath() + sProperty,
+                sValue = this.getControlValue(oControl);
+            this.getView().getModel("detailModel").setProperty(sPath, sValue);
+        },
+
+        onChangeWerks: function (oEvent) {
+            var sWerksDescr = this.getControlValue(this.getView().byId("inputWerksDescrDetail"));
+            this.getView().getModel("detailModel").setProperty("/detail/werksDescr", sWerksDescr);
+            this._onChangeEventHandler(oEvent, "/werks");
+        },
+
+        onChangeVkorg: function (oEvent) { 
+            this._onChangeEventHandler(oEvent, "/vkorg");
+        },
+
+        onChangeVtweg: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/vtweg");
+        },
+
+        onChangeSpart: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/spart");
+        },
+
+        onChangeDriver: function () {
+            var sDriverDescr = this.getControlValue(this.getView().byId("inputDriverDescrDetail")),
+                sDriver = this.getControlValue(this.getView().byId("inputDriver1Detail")),
+                sTermCode = sDriver !== null && sDriver !== '' && sDriver !== undefined ? sDriver.slice(-3) : null;
+            this.getView().getModel("detailModel").setProperty("/detail/driverDescr", sDriverDescr);
+            this.getView().getModel("detailModel").setProperty("/detail/driver1", sDriver);
+            this.getView().getModel("detailModel").setProperty("/detail/termCode", sTermCode);
+        },
+
+        onChangeDatfr: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/datfr");
+        },
+
+        onChangeDatto: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/datto");
+        },
+
+        onChangeActive: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/active");
+        },
+
+        onChangeLoevm: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/loevm");
+        },
+
+        onChangeKunnr: function (oEvent) {
+            var sDetailPath = oEvent.getSource().getBindingContext("detailModel").getPath() + "/kunwe"
+                sCustomerValue = oEvent.getSource().getValue(); 
+            this.getView().getModel("detailModel").setProperty(sDetailPath, sCustomerValue);
+        },
+
+        onChangeDatab: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/datab");
+        },
+
+        onChangeDatbi: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/datbi");
+        },
+
+        onChangeInactive: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/inactive");
+        },
+
+        onChangeKunwe: function (oEvent) {
+            var sDetailPath = oEvent.getSource().getBindingContext("detailModel").getPath() + "/kunwe"
+                sCustomerValue = oEvent.getSource().getValue(); 
+            this.getView().getModel("detailModel").setProperty(sDetailPath, sCustomerValue);
+        },
+
+        onChangeDtabwe: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/dtabwe");
+        },
+
+        onChangeDtbiwe: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/dtbiwe");
+        },
+
+        onChangeTurno: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/turno");
+        },
+
+        onChangeSequ: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/sequ");
+        },
+
+        onChangeMonday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/monday");
+        },
+
+        onChangeTuesday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/tuesday");
+        },
+
+        onChangeWednesday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/wednesday");
+        },
+
+        onChangeThursday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/thursday");
+        },
+
+        onChangeFriday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/friday");
+        },
+
+        onChangeSaturday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/saturday");
+        },
+
+        onChangeSunday: function (oEvent) {
+            this._onChangeEventHandler(oEvent, "/sunday");
         },
 
         getLockStatus: async function () {

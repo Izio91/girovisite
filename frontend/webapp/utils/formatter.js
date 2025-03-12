@@ -1,6 +1,6 @@
 sap.ui.define([
-  
-], function () {
+  "sap/ui/core/date/UI5Date"
+], function (UI5Date) {
   "use strict";
 
   return {
@@ -19,6 +19,12 @@ sap.ui.define([
             if (!sDate) return null;
             var parts = sDate.split('/');
             return parts[2] + '-' + parts[1] + '-' + parts[0];
+        },
+
+        getUI5Date: function (sDate) {
+            if (!sDate) return null;
+            let aDate = sDate.split('-').map(Number)
+            return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
         },
 
         handleInactiveSelectedKey: function (bIsNew, sInactive) {
