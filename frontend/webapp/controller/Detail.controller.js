@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
+    "sap/ui/core/Fragment",
     "frontend/utils/formatter"
-], (BaseController, JSONModel, MessageBox, MessageToast, formatter) => {
+], (BaseController, JSONModel, MessageBox, MessageToast, Fragment, formatter) => {
     "use strict";
 
     var baseManifestUrl;
@@ -39,13 +40,13 @@ sap.ui.define([
             this.getView().byId("titleExpandedHeading").setText(oBundle.getText("DetailTitle"));
             this.getView().byId("titleSnappedHeading").setText(oBundle.getText("DetailTitle"));
 
-            this.defineModelForCurrentPage(false, false);
+            this.defineModelForCurrentPage(false, false, true);
             this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
         },
 
         _onCreateMatched: function (oEvent) {
             console.log("create");
-            this.defineModelForCurrentPage(true, false);
+            this.defineModelForCurrentPage(true, false, false);
             this.getView().byId("subTitleIdExpandedContent").setText();
             this.getView().byId("subTitleIdSnappedContent").setText();
             this.getView().byId("subTitleIdSnappedTitleOnMobile").setText();
@@ -57,11 +58,35 @@ sap.ui.define([
         /**
          * Define the model for the current page and attach it to the view.
          */
-        defineModelForCurrentPage: function (bIsNew, bEdit) {
+        defineModelForCurrentPage: function (bIsNew, bEdit, bReadOnly) {
             var oModel = {
                 "isNew": bIsNew,
                 "editMode": bEdit,
+                "readOnly": bReadOnly,
                 "detail": {
+                    "active": "",
+                    "aedat": null,
+                    "aenam": null,
+                    "aezet": null,
+                    "datfr": null,
+                    "datto": null,
+                    "driver1": null,
+                    "driverDescr": null,
+                    "erdat": null,
+                    "ernam": null,
+                    "erzet": null,
+                    "locked": false,
+                    "lockedAt": null,
+                    "lockedBy": null,
+                    "loevm": null,
+                    "spart": null,
+                    "termCode": null,
+                    "vctext": null,
+                    "vkorg": null,
+                    "vpid": null,
+                    "vtweg": null,
+                    "werks": null,
+                    "werksDescr": null,
                     "details": []
                 },
                 "valuehelps": {
@@ -80,6 +105,7 @@ sap.ui.define([
 
         _fetchData: async function (sUrl) {  
             var oDetailModel = this.getView().getModel("detailModel"),
+                bReadOnly = false,
                 that = this;
 
             try {
@@ -89,9 +115,32 @@ sap.ui.define([
                 var oData = await this.executeRequest(sUrl, 'GET');
                 console.log("Data fetched: ", oData);
 
+                // Enrich oData.details with isKunnr and isKunwe boolean properties
+                oData.details = oData.details.map(detail => {
+                    if (detail.kunnr) {
+                        detail.isKunnr = true;
+                    } else {
+                        detail.isKunnr = false;
+                    }
+                    
+                    if (detail.kunwe) {
+                        detail.isKunwe = true;
+                    } else {
+                        detail.isKunwe = false;
+                    }
+                    
+                    return detail;
+                });
+                
                 oDetailModel.setProperty("/detail", oData);
+                if (oData.loevm === 'X') {
+                    bReadOnly = true;
+                }
+                
+                oDetailModel.setProperty("/detail", oData);
+                oDetailModel.setProperty("/readOnly", bReadOnly);
             } catch (error) {
-                MessageBox.error(that.getOwnerComponent().getModel("i18n").getResourceBundle().getText("ErrorReadingDataFromBackend"), {
+                MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
                     title: "Error",
                     details: error
                 });
@@ -391,19 +440,54 @@ sap.ui.define([
         },
 
         onAddRow: function (oEvent) {
-          this._addRow();
+            this.oContext = oEvent.getSource().getBindingContext('detailModel');
+            
+            var oControl = oEvent.getSource(),
+                oView = this.getView();
+
+            if (!this._oAddRowMenuFragment) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "frontend.view.fragments.AddRowMenu",
+                    controller: this
+                }).then(function (oMenu) {
+                    oView.addDependent(oMenu);
+                    oMenu.openBy(oControl);
+                    this._oAddRowMenuFragment = oMenu;
+                }.bind(this));
+            } else {
+                this._oAddRowMenuFragment.openBy(oControl);
+            }
         },
 
-        _addRow: function () {
+        onAddKunnr: function () {
+            this._addRow(true, false);
+        }, 
+
+        onAddKunwe: function () {
+            this._addRow(false, true);
+        },
+
+        _addRow: function (bIsKunnr, bIsKunwe) {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
-                nVppos = aRows ? aRows[aRows.length -1].vppos + 1 : 1;
+                nVppos = aRows.length > 0 ? aRows[aRows.length -1].vppos + 1 : 1;
 
             if (!aRows) {
                 aRows = [];
+            } else {
+                aRows.forEach(oRow => {
+                    // All previous agent must be inactive
+                    if (oRow.isKunnr) {
+                        oRow.inactive = 'X';
+                    }
+                })
             }
-            aRows.unshift({
+
+            aRows.push({
               "isNew": true,
+              "isKunnr": bIsKunnr,
+              "isKunwe": bIsKunwe,
               "aedat": null,
               "aenam": null,
               "aezet": null,
@@ -416,8 +500,13 @@ sap.ui.define([
               "erdat": null,
               "ernam": null,
               "erzet": null,
+              "inactive": bIsKunnr ? '' : null,
               "kunnr": null,
+              "kunnrAddress": null,
+              "kunnrCompanyName": null,
               "kunwe": null,
+              "kunweAddress": null,
+              "kunweCompanyName": null,
               "turno": null,
               "sequ": null,
               "monday": null,
@@ -538,7 +627,17 @@ sap.ui.define([
         },
 
         onChangeLoevm: function (oEvent) {
-            this._onChangeEventHandler(oEvent, "/loevm");
+            var that = this;
+            MessageBox.warning(oBundle.getText("AlertLoevm"), {
+              title: oBundle.getText("TitleAlertLoevm"),
+              actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+              emphasizedAction: MessageBox.Action.NO,
+              onClose: function (sAction) {
+                if (sAction === MessageBox.Action.YES) {
+                  that._onChangeEventHandler(oEvent, "/loevm");
+                }
+              }
+            });
         },
 
         onChangeKunnr: function (oEvent) {
@@ -711,6 +810,9 @@ sap.ui.define([
             var sDate = this._getCurrentDate(),
                 sTime = this._getCurrentTime(),
                 oDetail = this.getView().getModel("detailModel").getProperty("/detail");
+
+            this._checkDataBeforeUpdateOrCreate(oDetail);
+            this._setDatbiIfLoevm(oDetail);
             
             oDetail.aedat = sDate;
             oDetail.aezet = sTime;
@@ -718,27 +820,42 @@ sap.ui.define([
             oDetail.erzet = sTime;
             this.getView().getModel("detailModel").setProperty("/detail", oDetail);
             console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+            
+
             // this.getOwnerComponent().getRouter().navTo("detail", { vpid: '639', vctext: 'AGENTE PROVVISORIO 810', werks: 'PRD1', vkorg: 'CLR1', vtweg: '10', spart: '0' });
         },
 
-        onSavePress : function () {
+        onUpdatePress : function () {
             var sDate = this._getCurrentDate(),
                 sTime = this._getCurrentTime(),
                 oDetail = this.getView().getModel("detailModel").getProperty("/detail");
+
+            this._checkDataBeforeUpdateOrCreate(oDetail);
+            this._setDatbiIfLoevm(oDetail);
             
+            oDetail.aedat = sDate;
+            oDetail.aezet = sTime;
             oDetail.erdat = sDate;
             oDetail.erzet = sTime;
             this.getView().getModel("detailModel").setProperty("/detail", oDetail);
             console.log(this.getView().getModel("detailModel").getProperty("/detail"));
         },
 
-        _checkDataBeforeSaveCreate : function () {
+        _checkDataBeforeUpdateOrCreate : function () {
             var sErrorMessage = '',
-                oDetail = this.getView().getModel("detailModel").setProperty("/detail", oDetail);
+                oDetail = this.getView().getModel("detailModel").getProperty("/detail");
 
             sErrorMessage = sErrorMessage + this._checkRequiredInfo(oDetail);
+            sErrorMessage = sErrorMessage + this._checkActiveAgent(oDetail);
+            sErrorMessage = sErrorMessage + this._checkAgentsTemporalContinuity(oDetail);
+            sErrorMessage = sErrorMessage + this._checkKunwePresent(oDetail);
         },
 
+        /**
+         * Check if all required fields are set considering also the kunnr/kunwe row type
+         * @param {*} oDetail 
+         * @returns {string} - error message if some required field is not set, empty string otherwise
+         */
         _checkRequiredInfo : function (oDetail) {
             var sErrorMessage = '';
 
@@ -758,17 +875,136 @@ sap.ui.define([
             checkDataFilled(oDetail.datto, "datto");
 
             oDetail.details.forEach(detail => {
-                checkDataFilled(detail.kunnr, "kunnr");
-                checkDataFilled(detail.datab, "datab");
-                checkDataFilled(detail.datbi, "datbi");
-                checkDataFilled(detail.kunwe, "kunwe");
-                checkDataFilled(detail.dtabwe, "dtabwe");
-                checkDataFilled(detail.dtbiwe, "dtbiwe");
-                checkDataFilled(detail.turno, "turno");
-                checkDataFilled(detail.sequ, "sequ");
+                if (detail.isKunnr) {
+                    checkDataFilled(detail.kunnr, "kunnr");
+                    checkDataFilled(detail.datab, "datab");
+                    checkDataFilled(detail.datbi, "datbi");
+                } else {
+                    checkDataFilled(detail.kunwe, "kunwe");
+                    checkDataFilled(detail.dtabwe, "dtabwe");
+                    checkDataFilled(detail.dtbiwe, "dtbiwe");
+                    checkDataFilled(detail.turno, "turno");
+                    checkDataFilled(detail.sequ, "sequ");
+                }
             }); 
 
             return sErrorMessage;
+        },
+
+        /**
+         * Check if current agent is active for another plan in the same range
+         * @param {*} oDetail 
+         * @returns {string} - if the agent is active or no agent has been selected it returns a string containing an error message, empty string otherwise
+         */
+        _checkActiveAgent : async function (oDetail) {
+            const activeAgent = oDetail.details.filter(detail => detail.isKunnr && detail.inactive === '');
+            var sErrorMessage = "",
+                bIsNew = this.getView().getModel("detailModel").getProperty("/isNew"),
+                bIsActive = this.getView().getModel("detailModel").getProperty("/detail/active") === 'X';
+            if (activeAgent.length > 0) {
+                var sKunnr = activeAgent[0].kunnr, // agent code
+                    sDatab = activeAgent[0].datab, // agent starting validity date
+                    sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and (datbi ge '${sDatab}');$select=vpid,kunnr,inactive,datab,datbi)`;
+
+                try { 
+                    
+                    // Execute the request
+                    var oResult = await this.executeRequest(sUrl, 'GET'),
+                        aDetails = [];
+                    console.log("Detail fetched: ", oResult);
+
+                    // Merge all details from result
+                    oResult.forEach(oItem => {
+                        aDetails = aDetails.concat(oItem.details);
+                    });
+
+                    if (aDetails.length !== 0) {
+                        sErrorMessage = oBundle.getText("agentAlreadyActive", [aDetails[0].vpid])+"\n";
+                    }
+                    
+                } catch (error) {
+                    MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
+                        title: "Error",
+                        details: error
+                    });
+                    sErrorMessage = oBundle.getText("ErrorCheckingActiveAgent")+"\n";
+                } 
+            } else {
+                if (bIsNew || bIsActive) {
+                    sErrorMessage = oBundle.getText("noAgentForCurrentPlan")+"\n";
+                } 
+            }
+
+            return sErrorMessage;
+        },
+
+        /**
+         * Check if agents have a temporal range with continuity and without overlaps
+         * @param {*} oDetail 
+         * @returns {string} - error message if some agent has no continuity or overlaps, empty string otherwise
+         */
+        _checkAgentsTemporalContinuity: function (oDetail) {
+            var aAgents = oDetail.details.filter(detail => detail.isKunnr),
+                sErrorMessage = "";
+            if (aAgents.length > 1) {
+                // Sort the array by the starting date 'datab'
+                aAgents.sort((a, b) => new Date(a.datab) - new Date(b.datab));
+
+                for (let i = 1; i < aAgents.length; i++) {
+                    let prevEnd = new Date(aAgents[i - 1].datbi); // Previous object's end date
+                    let currStart = new Date(aAgents[i].datab);   // Current object's start date
+                    
+                    // Check for gaps (if current start is not exactly the next day after previous end)
+                    let expectedNextStart = new Date(prevEnd);
+                    expectedNextStart.setDate(prevEnd.getDate() + 1);
+
+                    if (currStart.getTime() !== expectedNextStart.getTime()) {
+                        console.log("Gap detected between:", aAgents[i - 1], "and", aAgents[i]);
+                        sErrorMessage = sErrorMessage + oBundle.getText("errorGapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr])+"\n";
+                    }
+
+                    // Check for overlaps
+                    if (currStart <= prevEnd) {
+                        console.log("Overlap detected between:", aAgents[i - 1], "and", aAgents[i]);
+                        sErrorMessage = sErrorMessage + oBundle.getText("errorOverlapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr])+"\n";
+                    }
+                }
+            }
+            return sErrorMessage;
+        },
+
+        /**
+         * Check if at least one kunwe is present
+         * @param {*} oDetail 
+         * @returns {string} - error message if no kunwe is present for current plan, empty string otherwise
+         */
+        _checkKunwePresent : function (oDetail) {
+            var sErrorMessage = "",
+                bAtLeastOneKunweIsPresent = false;
+            oDetail.details.forEach(oDetail => {
+                if (oDetail.kunwe) {
+                    bAtLeastOneKunweIsPresent = true;
+                }
+            });
+
+            if (!bAtLeastOneKunweIsPresent) {
+                sErrorMessage = oBundle.getText("noKunweForCurrentPlan")+"\n";
+            }
+            return sErrorMessage;
+        },
+
+        /**
+         * Set datbi value with current date if loevm is flagged
+         * @param {*} oDetail 
+         */
+        _setDatbiIfLoevm: function (oDetail) {
+            if (oDetail.loevm === 'X') {
+                var sCurrentDate = this._getCurrentDate();
+                oDetail.details.forEach(detail => {
+                    detail.detbi = sCurrentDate;
+                })
+                this.getView().getModel("detailModel").setProperty("/detail", oDetail);
+            }
         }
     });
 });

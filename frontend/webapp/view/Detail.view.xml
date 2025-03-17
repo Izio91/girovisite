@@ -39,8 +39,8 @@
 				</snappedTitleOnMobile>
 
 				<actions>
-					<m:Button text="{i18n>EditButton}" type="Emphasized" visible="{= !${detailModel>/isNew} &amp;&amp; !${detailModel>/editMode} }" press="onEditPress" />
-					<m:Button text="{i18n>CancelEditButton}" type="Emphasized" icon="sap-icon://edit-outside" press="onCancelEditPress" visible="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" />
+					<m:Button text="{i18n>EditButton}" type="Emphasized" visible="{= !${detailModel>/isNew} &amp;&amp; !${detailModel>/editMode} &amp;&amp; !${detailModel>/readOnly} }" press="onEditPress" />
+					<m:Button text="{i18n>CancelEditButton}" type="Emphasized" icon="sap-icon://edit-outside" press="onCancelEditPress" visible="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} &amp;&amp; !${detailModel>/readOnly} }" />
 					<m:Button icon="sap-icon://nav-back" type="Transparent" text="{i18n>goBack}" press="onGoBack" />
 				</actions>
 			</ObjectPageDynamicHeaderTitle>
@@ -104,7 +104,7 @@
 								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatto" />
 
 								<m:Label text="{i18n>active}" />
-								<m:ComboBox id="comboBoxActiveDetail" selectedKey="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeActive" >
+								<m:ComboBox id="comboBoxActiveDetail" selectedKey="{parts: [{path: 'detailModel>/detail/active'}, {path: 'detailModel/isNew'}], formatter: '.formatter.handleActivePlanSelectedKey'}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeActive" >
 									<core:Item key="default" text="" />
 									<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
 									<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
@@ -172,53 +172,53 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunnr}" required="true"/>
 									<table:template>
-										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" liveChange="eraseValue" />
+										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" liveChange="eraseValue" />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" > 
 									<m:Label text="{i18n>datab}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDatab"  />
+										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatab"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>datbi}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datab', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDatbi"  />
+										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datab', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatbi"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>inactive}"/>
 									<table:template>
-										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>inactive'}], formatter: '.formatter.handleInactiveSelectedKey'}"  enabled="{= ${detailModel>/editMode} }" change="onChangeInactive"  >
+										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>isNew'}, {path: 'detailModel>inactive'}, {path: 'detailModel>isKunnr'}], formatter: '.formatter.handleInactiveAgentSelectedKey'}"  enabled="{= ${detailModel>/editMode} &amp;&amp; ${detailModel>isKunnr} }" change="onChangeInactive"  >
 											<core:Item key="default" text="" />
-											<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
-											<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
+											<core:Item key="" text="{i18n>comboBoxKeyActive}" />
+											<core:Item key="X" text="{i18n>comboBoxKeyNotActive}" />
 										</m:ComboBox>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunwe}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>kunwe}" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" liveChange="eraseValue"   />
+										<m:Input value="{detailModel>kunwe}" showValueHelp="true" valueHelpRequest="onKunweVH" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe} }" liveChange="eraseValue"   />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtabwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDtabwe"  />
+										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeDtabwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtbiwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/dtabwe', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDtbiwe"  />
+										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/dtabwe', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeDtbiwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>turno}" required="true" />
 									<table:template>
-										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeTurno"  >
+										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeTurno"  >
 											<core:Item key="0" text="{i18n>turno0}" />
 											<core:Item key="1" text="{i18n>turno1}" />
 											<core:Item key="2" text="{i18n>turno2}" />
@@ -229,56 +229,56 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sequ}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>sequ}" type="Number" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>sequ}" type="Number" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableSequenceControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSequ"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>monday}"/>
 									<table:template>
-										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeMonday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>tuesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeTuesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>wednesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeWednesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>thursday}"/>
 									<table:template>
-										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeThursday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>friday}"/>
 									<table:template>
-										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeFriday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>saturday}"/>
 									<table:template>
-										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSaturday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sunday}"/>
 									<table:template>
-										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableSundayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSunday"/>
 									</table:template>
 								</table:Column>
@@ -332,9 +332,9 @@
 		</sections>
 
 		<footer>
-            <m:OverflowToolbar visible="{detailDetailModel>/props/gEditMode}">
+            <m:OverflowToolbar visible="{= !${detailModel>/readOnly} }">
                 <m:ToolbarSpacer />
-                <m:Button type="Emphasized" text="{i18n>SaveButton}" icon="sap-icon://save" press="onSavePress" visible="{= ${detailModel>/editMode} }" />
+                <m:Button type="Emphasized" text="{i18n>UpdateButton}" icon="sap-icon://save" press="onUpdatePress" visible="{= ${detailModel>/editMode} }" />
                 <m:Button type="Emphasized" text="{i18n>CreateButton}" icon="sap-icon://save" press="onCreatePress" visible="{= ${detailModel>/isNew} }" />
             </m:OverflowToolbar>
 		</footer>

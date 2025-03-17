@@ -1,0 +1,6 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<Menu id="idAddRowMenuFragment" itemSelected="onMenuAction">
+		<MenuItem text="{i18n>addKunnr}" icon="sap-icon://add-employee" press="onAddKunnr" />
+		<MenuItem text="{i18n>addKunwe}" icon="sap-icon://cart-4" press="onAddKunwe" />
+	</Menu>
+</core:FragmentDefinition>

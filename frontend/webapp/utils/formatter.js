@@ -27,20 +27,24 @@ sap.ui.define([
             return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
         },
 
-        handleInactiveSelectedKey: function (bIsNew, sInactive) {
-            return bIsNew ? 'X' : sInactive;
+        handleInactiveAgentSelectedKey: function (bIsNew, sInactive, bIsKunnr) {
+            return bIsNew && bIsKunnr ? '' : sInactive;
         },
 
-        enableSequenceControl: function (bIsNew, bEditMode, sTurno) {
-            return (bIsNew || bEditMode) && (sTurno !== null && sTurno !== undefined && sTurno !== '');
+        handleActivePlanSelectedKey: function (sActive, bIsNew) {
+            return bIsNew ? '' : sActive;
         },
 
-        enableDayControl: function (bIsNew, bEditMode, sTurno) {
-            return (bIsNew || bEditMode) && (sTurno === "1" || sTurno === "3");
+        enableSequenceControl: function (bIsNew, bEditMode, sTurno, bIsKunwe) {
+            return (bIsNew || bEditMode) && (sTurno !== null && sTurno !== undefined && sTurno !== '') && bIsKunwe;
         },
 
-        enableSundayControl: function (bIsNew, bEditMode, sTurno) {
-            return (bIsNew || bEditMode) && (sTurno === "2" || sTurno === "3");
+        enableDayControl: function (bIsNew, bEditMode, sTurno, bIsKunwe) {
+            return (bIsNew || bEditMode) && (sTurno === "1" || sTurno === "3") && bIsKunwe;
+        },
+
+        enableSundayControl: function (bIsNew, bEditMode, sTurno, bIsKunwe) {
+            return (bIsNew || bEditMode) && (sTurno === "2" || sTurno === "3") && bIsKunwe;
         }
     };
 });
