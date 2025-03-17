@@ -3,31 +3,32 @@
   "tenant-mode": "dedicated",
   "description": "Security profile of called application",
   "scopes": [
-      {
-          "name": "$XSAPPNAME.Admin",
-          "description": "Admin"
-      },
-      {
-          "name": "$XSAPPNAME.View",
-          "description": "View Permission"
-      }
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Admin"
+    },
+    {
+      "name": "$XSAPPNAME.View",
+      "description": "View Permission"
+    }
   ],
   "attributes": [],
   "role-templates": [
-      {
-          "name": "Admin",
-          "description": "generated",
-          "scope-references": [
-              "$XSAPPNAME.Admin"
-          ],
-          "attribute-references": []
-      }, {
-          "name": "Viewer",
-          "description": "Access Application",
-          "scope-references": [
-              "$XSAPPNAME.View",
-              "uaa.user"
-          ]
-      }
+    {
+      "name": "Admin",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.Admin"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "Viewer",
+      "description": "Access Application",
+      "scope-references": [
+        "$XSAPPNAME.View",
+        "uaa.user"
+      ]
+    }
   ]
 }

@@ -31,6 +31,27 @@ async function performRequest(srv, request, path) {
 }
 
 module.exports = function (srv) {
+    srv.before('CREATE', 'Header', async request => {
+        const db = cds.transaction(request);
+
+        // Fetch the next value from the sequence
+        const result = await db.run(`SELECT "HEADER_VPID".NEXTVAL FROM DUMMY`);
+        const nVpid = result[0][`HEADER_VPID.NEXTVAL`];
+        const sLockedBy = request.req.authInfo.getLogonName();
+
+        request.data.vpid = nVpid;
+        request.data.ernam = sLockedBy;
+        request.data.aenam = sLockedBy;
+
+        // Assign the same vpid to all associated Details
+        if (request.data.details) {
+            request.data.details.forEach(detail => {
+                detail.vpid = nVpid;
+                detail.vppos = parseInt(detail.vppos);  // Ensure vppos is an integer;
+            });
+        }
+    }); 
+
     srv.on('getWerks', '*', async request => {
         await performRequest(srv, request, './func/getWerks');
     });

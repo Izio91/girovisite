@@ -48,6 +48,9 @@
     },
     "hana": {
       "deploy-format": "hdbtable"
+    },
+    "sql": {
+      "native_hana_associations": false
     }
   },
   "sapux": [

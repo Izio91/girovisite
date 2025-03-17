@@ -89,7 +89,7 @@
 								<m:Input id="inputSpartDetail" value="{detailModel>/detail/spart}" maxLength="2" showValueHelp="true" valueHelpRequest="onSpartVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
 								
 								<m:Label text="{i18n>driver1}" required="true" />
-								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
+								<m:Input id="inputDriver1Detail" value="{detailModel>/detail/driver1}" maxLength="10" showValueHelp="true" valueHelpRequest="onDriverVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" change="onChangeDriver" />
 								
 								<m:Label text="{i18n>driverDescr}" required="true" />
 								<m:Input id="inputDriverDescrDetail" value="{detailModel>/detail/driverDescr}" enabled="false" />
@@ -152,13 +152,14 @@
 									}
 							}" class="sapUiSmallMargin"
 								rowSelectionChange="onSelectionDetailChange"
-								selectionMode="None">
+								selectionMode="{= ${detailModel>/isNew} || ${detailModel>/editMode} ? 'MultiToggle' : 'None' }">
 							<table:extension>
 								<m:Toolbar>
 									<m:Title text="{parts: [{path: 'i18n>DetailTableTitle'}, {path: 'detailModel>/detail/details/length'}], 
 										formatter: '.formatter.getI18nTextWithCount'}" level="H2" />
 									<m:ToolbarSpacer />
 									<m:Button text="{i18n>AddButton}" press="onAddRow" visible="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
+									<m:Button id="deleteRowFromTable" text="{i18n>DeleteButton}" type="Reject" press="onDeleteSelectedRows" visible="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" />
 								</m:Toolbar>
 							</table:extension>
 							<table:columns>
@@ -189,7 +190,7 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>inactive}"/>
 									<table:template>
-										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>inactive'}], formatter: '.formatter.handleInactiveSelectedKey'}"  enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeInactive"  >
+										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>inactive'}], formatter: '.formatter.handleInactiveSelectedKey'}"  enabled="{= ${detailModel>/editMode} }" change="onChangeInactive"  >
 											<core:Item key="default" text="" />
 											<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
 											<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
@@ -228,49 +229,57 @@
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sequ}" required="true" />
 									<table:template>
-										<m:Input value="{detailModel>sequ}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSequ"/>
+										<m:Input value="{detailModel>sequ}" type="Number" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableSequenceControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSequ"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>monday}"/>
 									<table:template>
-										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeMonday"/>
+										<m:Input value="{detailModel>monday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeMonday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>tuesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeTuesday"/>
+										<m:Input value="{detailModel>tuesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeTuesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>wednesday}"/>
 									<table:template>
-										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeWednesday"/>
+										<m:Input value="{detailModel>wednesday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeWednesday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>thursday}"/>
 									<table:template>
-										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeThursday"/>
+										<m:Input value="{detailModel>thursday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeThursday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>friday}"/>
 									<table:template>
-										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeFriday"/>
+										<m:Input value="{detailModel>friday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeFriday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>saturday}"/>
 									<table:template>
-										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSaturday"/>
+										<m:Input value="{detailModel>saturday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableDayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSaturday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>sunday}"/>
 									<table:template>
-										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeSunday"/>
+										<m:Input value="{detailModel>sunday}" type="Number" maxLength="3" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}], 
+											formatter: '.formatter.enableSundayControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSunday"/>
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >

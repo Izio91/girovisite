@@ -3,144 +3,148 @@ ID: girovisite
 description: Gestione giro visite
 version: 1.1.0
 modules:
-- name: girovisite-srv
-  type: nodejs
-  path: gen/srv
-  properties:
-    OPTIMIZE_MEMORY: "true"
-    Path_API_WERKS: "/sap/opu/odata/sap/YY1_GIRI_WERKS_CDS/YY1_GIRI_WERKS?$format=json"
-    Path_API_VKORG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=SalesOrganization"
-    Path_API_VTWEG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=DistributionChannel"
-    Path_API_SPART: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=Division"
-    Path_API_DRIVER: "/sap/opu/odata/sap/YY1_GIRI_VAN_CDS/YY1_GIRI_VAN?$format=json"
-    Path_API_KUNNR: "/sap/opu/odata/sap/YY1_GIRI_AGENTE_CDS/YY1_GIRI_AGENTE?$format=json"
-    Path_API_KUNWE: "/sap/opu/odata/sap/YY1_GIRI_PDV_CDS/YY1_GIRI_PDV?$format=json"
-    Destination_OData_S4HANA: "odataS4_V2"
-  requires:
-  - name: girovisite-db
-  - name: girovisite-destination-service
-  - name: uaa_girovisite
-  - name: girovisite_autoscaler
-    parameters:
-      path: ./autoscaler.json
-  provides:
-  - name: srv-api
+  - name: girovisite-srv
+    type: nodejs
+    path: gen/srv
     properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-  build-parameters:
-    builder: npm
-- name: girovisite-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: girovisite-db
-  parameters:
-    buildpack: nodejs_buildpack
-- name: girovisite-destination-content
-  type: com.sap.application.content
-  requires:
-  - name: girovisite-destination-service
-    parameters:
-      content-target: true
-  - name: girovisite_html_srv
-    parameters:
-      service-key:
-        name: girovisite_html_srv-key
-  - name: uaa_girovisite
-    parameters:
-      service-key:
-        name: uaa_girovisite-key
-  parameters:
-    content:
-      instance:
-        destinations:
-        - Name: girovisite_html_srv
-          ServiceInstanceName: girovisite-html5-srv
-          ServiceKeyName: girovisite_html_srv-key
-          sap.cloud.service: girovisite
-        - Authentication: OAuth2UserTokenExchange
-          Name: girovisite_uaa_girovisite
-          ServiceInstanceName: girovisite-xsuaa-service
-          ServiceKeyName: uaa_girovisite-key
-          sap.cloud.service: girovisite
-        existing_destinations_policy: ignore
-  build-parameters:
-    no-source: true
-- name: girovisite-app-content
-  type: com.sap.application.content
-  path: .
-  requires:
-  - name: girovisite_html_srv
-    parameters:
-      content-target: true
-  build-parameters:
-    build-result: resources
+      OPTIMIZE_MEMORY: "true"
+      Path_API_WERKS: "/sap/opu/odata/sap/YY1_GIRI_WERKS_CDS/YY1_GIRI_WERKS?$format=json"
+      Path_API_VKORG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=SalesOrganization"
+      Path_API_VTWEG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=DistributionChannel"
+      Path_API_SPART: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=Division"
+      Path_API_DRIVER: "/sap/opu/odata/sap/YY1_GIRI_VAN_CDS/YY1_GIRI_VAN?$format=json"
+      Path_API_KUNNR: "/sap/opu/odata/sap/YY1_GIRI_AGENTE_CDS/YY1_GIRI_AGENTE?$format=json"
+      Path_API_KUNWE: "/sap/opu/odata/sap/YY1_GIRI_PDV_CDS/YY1_GIRI_PDV?$format=json"
+      Destination_OData_S4HANA: "odataS4_V2"
     requires:
-    - artifacts:
-      - girovisitefrontend.zip
-      name: frontend
-      target-path: resources/
-- name: frontend
-  type: html5
-  path: frontend
-  build-parameters:
-    build-result: dist
-    builder: custom
-    commands:
-    - npm install
-    - npm run build:cf
-    supported-platforms: []
-resources:
-- name: girovisite-db
-  type: com.sap.xs.hdi-container
-  parameters:
-    service: hana
-    service-plan: hdi-shared
-- name: girovisite-destination-service
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: true
-      init_data:
+      - name: girovisite-db
+      - name: girovisite-destination-service
+      - name: uaa_girovisite
+      - name: girovisite_autoscaler
+        parameters:
+          path: ./autoscaler.json
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm
+  - name: girovisite-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: girovisite-db
+    parameters:
+      buildpack: nodejs_buildpack
+  - name: girovisite-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: girovisite-destination-service
+        parameters:
+          content-target: true
+      - name: girovisite_html_srv
+        parameters:
+          service-key:
+            name: girovisite_html_srv-key
+      - name: uaa_girovisite
+        parameters:
+          service-key:
+            name: uaa_girovisite-key
+    parameters:
+      content:
         instance:
           destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          existing_destinations_policy: update
-      version: 1.0.0
-    service: destination
-    service-name: girovisite-destination-service
-    service-plan: lite
-- name: girovisite_autoscaler
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: autoscaler
-    service-plan: standard
-- name: girovisite_html_srv
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-name: girovisite-html5-srv
-    service-plan: app-host
-- name: uaa_girovisite
-  type: org.cloudfoundry.managed-service
-  parameters:
-    path: ./xs-security.json
-    service: xsuaa
-    service-name: girovisite-xsuaa-service
-    service-plan: application
+            - Name: girovisite_html_srv
+              ServiceInstanceName: girovisite-html5-srv
+              ServiceKeyName: girovisite_html_srv-key
+              sap.cloud.service: girovisite
+            - Authentication: OAuth2UserTokenExchange
+              Name: girovisite_uaa_girovisite
+              ServiceInstanceName: girovisite-xsuaa-service
+              ServiceKeyName: uaa_girovisite-key
+              sap.cloud.service: girovisite
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
+  - name: girovisite-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: girovisite_html_srv
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - girovisitefrontend.zip
+          name: frontend
+          target-path: resources/
+  - name: frontend
+    type: html5
+    path: frontend
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms:
+        []
+resources:
+  - name: girovisite-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: girovisite-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: girovisite-destination-service
+      service-plan: lite
+  - name: girovisite_autoscaler
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: autoscaler
+      service-plan: standard
+  - name: girovisite_html_srv
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: girovisite-html5-srv
+      service-plan: app-host
+  - name: uaa_girovisite
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: girovisite-xsuaa-service
+      service-plan: application
+      config:
+        xsappname: girovisite-${org}-${space}
+        tenant-mode: dedicated
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-  - builder: custom
-    commands:
-    - npm install
-    - npx cds build --production
-    - npx rimraf gen/db/src/gen/data
+    - builder: custom
+      commands:
+        - npm install
+        - npx cds build --production
+        - npx rimraf gen/db/src/gen/data

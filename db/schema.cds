@@ -24,7 +24,7 @@ entity Header {
         locked      : Boolean;
         lockedBy    : String;
         lockedAt    : DateTime;
-        details     : Association to many Detail
+        details     : Composition of many Detail
                           on  details.vpid  = $self.vpid
                           and details.werks = $self.werks;
 

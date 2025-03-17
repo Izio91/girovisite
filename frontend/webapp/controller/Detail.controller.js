@@ -243,10 +243,10 @@ sap.ui.define([
                 sKunnrPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnr",
                 sKunnrAddressPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrAddress",
                 sKunnrCompanyNamePath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrCompanyName"; 
-            this.oInputKunnr.setValue(sValue);
             this.getView().getModel("detailModel").setProperty(sKunnrPath, sCustomerValue);
             this.getView().getModel("detailModel").setProperty(sKunnrAddressPath, sAddressValue);
             this.getView().getModel("detailModel").setProperty(sKunnrCompanyNamePath, sCustomerNameValue);
+            this.oInputKunnr.setValue(sValue);
         },
 
         // Kunwe value help
@@ -279,11 +279,11 @@ sap.ui.define([
                 sKunweAddressPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweAddress",
                 sKunweCompanyNamePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweCompanyName",
                 sDtfinePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/dtfine"; 
-            this.oInputKunwe.setValue(sValue);
             this.getView().getModel("detailModel").setProperty(sKunwePath, sCustomerValue);
             this.getView().getModel("detailModel").setProperty(sKunweAddressPath, sAddressValue);
             this.getView().getModel("detailModel").setProperty(sKunweCompanyNamePath, sCustomerNameValue);
             this.getView().getModel("detailModel").setProperty(sDtfinePath, sDataCessazione);
+            this.oInputKunwe.setValue(sValue);
         },
 
         onEditPress: function () {
@@ -368,10 +368,26 @@ sap.ui.define([
 
         onSelectionDetailChange : function () {
             var oTable = this.getView().byId("idDetailTable"),
-              aIndices = oTable.getSelectedIndices(),
-              bEnableDeleteButton = aIndices.length > 0;
+            bCannotSelectRow = false;
+
+            oTable.getSelectedIndices().forEach((iIndex) => {
+                var oContext = oTable.getContextByIndex(iIndex); // Get row context
+                var oRowData = oContext.getObject(); // Get row data
+        
+                if (!oRowData.isNew) {
+                    // If isNew is undefined or false, deselect the row
+                    oTable.removeSelectionInterval(iIndex, iIndex);
+                    bCannotSelectRow = true;
+                }
+            });
+
+            var aIndices = oTable.getSelectedIndices(),
+                bEnableDeleteButton = aIndices.length > 0;
             this.getView().byId("deleteRowFromTable").setEnabled(bEnableDeleteButton);
 
+            if (bCannotSelectRow) {
+                MessageToast.show(oBundle.getText("cannotSelectRow"));
+            }
         },
 
         onAddRow: function (oEvent) {
@@ -381,12 +397,13 @@ sap.ui.define([
         _addRow: function () {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
-                nVppos = aRows ? aRows.length + 1 : 1;
+                nVppos = aRows ? aRows[aRows.length -1].vppos + 1 : 1;
 
             if (!aRows) {
                 aRows = [];
             }
             aRows.unshift({
+              "isNew": true,
               "aedat": null,
               "aenam": null,
               "aezet": null,
@@ -417,14 +434,56 @@ sap.ui.define([
             oDetailModel.setProperty("/detail/details", aRows);
         },
 
-        onCreatePress : function () {
-            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
-            this.getOwnerComponent().getRouter().navTo("detail", { vpid: '639', vctext: 'AGENTE PROVVISORIO 810', werks: 'PRD1', vkorg: 'CLR1', vtweg: '10', spart: '0' });
+        /**
+         * Deletes the selected rows from the model.
+         * Determines the difference between currently bound data and selected rows,
+         * then updates the model to reflect the remaining (non-deleted) rows.
+         */
+        _onDeleteSelectedRows: function() {
+            var oDetailModel = this.getView().getModel("detailModel"),
+              oTable = this.getView().byId("idDetailTable"),
+              aSelectedIndices = oTable.getSelectedIndices(),
+              selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex)),
+              oBinding = oTable.getBinding("rows"),
+              aBindingContext = oBinding.getContexts(0, oBinding.getLength());
+      
+            let a = new Set(aBindingContext);
+            let b = new Set(selectedContexts);
+            let diff = new Set([...a].filter(x => !b.has(x)));
+      
+            var aDiff = [...diff];
+      
+            var values = aDiff.map((ctx, index) => {
+              return ctx.getObject();
+            });
+      
+            oDetailModel.setProperty("/detail/details", values);
         },
 
-        onSavePress : function () {
-            
-            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+        /**
+         * Main function to handle deletion of selected rows.
+         * Calls the cache handler, deletion logic, and updates selection details.
+         */
+        onDeleteSelectedRows: function () {
+          this._onDeleteSelectedRows();
+          this.onSelectionDetailChange();
+        },
+
+
+        _getCurrentDate : function() {
+            var dDate = new Date(),
+                aLocaleDate = dDate.toLocaleDateString('it-IT').split("/"),
+                sYear = aLocaleDate[2],
+                sMonth = aLocaleDate[1].padStart(2, '0'),
+                sDay = aLocaleDate[0].padStart(2, '0'),
+                sDate = sYear + "-" + sMonth + "-" + sDay;
+            return sDate
+        },
+
+        _getCurrentTime : function() {
+            var dDate = new Date(),
+                sTime = dDate.toLocaleTimeString('it-IT');
+            return sTime
         },
 
         eraseValue: function (oEvent) {
@@ -516,43 +575,200 @@ sap.ui.define([
 
         onChangeTurno: function (oEvent) {
             this._onChangeEventHandler(oEvent, "/turno");
+            this._changeDaysValueOnChangingTurno(oEvent);
+        },
+
+        _changeDaysValueOnChangingTurno: function (oEvent) {
+            var oControl = oEvent.getSource(),
+                sPathMonday = oControl.getBindingContext("detailModel").getPath() + "/monday",
+                sPathTuesday = oControl.getBindingContext("detailModel").getPath() + "/tuesday",
+                sPathWednesday = oControl.getBindingContext("detailModel").getPath() + "/wednesday",
+                sPathThursday = oControl.getBindingContext("detailModel").getPath() + "/thursday",
+                sPathFriday = oControl.getBindingContext("detailModel").getPath() + "/friday",
+                sPathSaturday = oControl.getBindingContext("detailModel").getPath() + "/saturday",
+                sPathSunday = oControl.getBindingContext("detailModel").getPath() + "/sunday";
+            
+            this.getView().getModel("detailModel").setProperty(sPathMonday, null);
+            this.getView().getModel("detailModel").setProperty(sPathTuesday, null);
+            this.getView().getModel("detailModel").setProperty(sPathWednesday, null);
+            this.getView().getModel("detailModel").setProperty(sPathThursday, null);
+            this.getView().getModel("detailModel").setProperty(sPathFriday, null);
+            this.getView().getModel("detailModel").setProperty(sPathSaturday, null);
+            this.getView().getModel("detailModel").setProperty(sPathSunday, null);
+        },
+
+        onLiveChangeSequAndDays: function (oEvent) {
+            var sValue = oEvent.getSource().getValue();
+            if (sValue.length >= 4) {
+                oEvent.getSource().setValue(sValue.substr(0, 3));
+            }
         },
 
         onChangeSequ: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/sequ");
+            this._changeDaysValueOnChangingSequ(oEvent);
+        },
+
+        _changeDaysValueOnChangingSequ: function (oEvent) {
+            var oControl = oEvent.getSource(),
+                sPathMonday = oControl.getBindingContext("detailModel").getPath() + "/monday",
+                sPathTuesday = oControl.getBindingContext("detailModel").getPath() + "/tuesday",
+                sPathWednesday = oControl.getBindingContext("detailModel").getPath() + "/wednesday",
+                sPathThursday = oControl.getBindingContext("detailModel").getPath() + "/thursday",
+                sPathFriday = oControl.getBindingContext("detailModel").getPath() + "/friday",
+                sPathSaturday = oControl.getBindingContext("detailModel").getPath() + "/saturday",
+                sPathSunday = oControl.getBindingContext("detailModel").getPath() + "/sunday",
+                sPathTurno = oControl.getBindingContext("detailModel").getPath() + "/turno",
+                sSequ = this.getControlValue(oControl),
+                sTurnoKey = this.getView().getModel("detailModel").getProperty(sPathTurno);
+
+            switch (sTurnoKey) {
+                case "1":
+                    this.getView().getModel("detailModel").setProperty(sPathMonday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathTuesday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathWednesday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathThursday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathFriday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathSaturday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathSunday, null);
+                    break;
+                case "2":
+                    this.getView().getModel("detailModel").setProperty(sPathMonday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathTuesday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathWednesday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathThursday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathFriday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathSaturday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathSunday, sSequ);
+                    break;
+                case "3":
+                    this.getView().getModel("detailModel").setProperty(sPathMonday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathTuesday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathWednesday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathThursday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathFriday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathSaturday, sSequ);
+                    this.getView().getModel("detailModel").setProperty(sPathSunday, sSequ);
+                    break;
+                default:
+                    this.getView().getModel("detailModel").setProperty(sPathMonday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathTuesday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathWednesday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathThursday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathFriday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathSaturday, null);
+                    this.getView().getModel("detailModel").setProperty(sPathSunday, null);
+            }
         },
 
         onChangeMonday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/monday");
         },
 
         onChangeTuesday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/tuesday");
         },
 
         onChangeWednesday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/wednesday");
         },
 
         onChangeThursday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/thursday");
         },
 
         onChangeFriday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/friday");
         },
 
         onChangeSaturday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/saturday");
         },
 
         onChangeSunday: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/sunday");
+        },
+
+        _padSequAndDayValue : function (oEvent) {
+            var sValue = oEvent.getSource().getValue();
+            oEvent.getSource().setValue(sValue.padStart(3, '0'));
         },
 
         getLockStatus: async function () {
             var sUrl = baseManifestUrl + "/girovisiteService/getLockStatus()?vpid='" + this._vpid + "'";
             return await this.executeRequest(sUrl, 'GET');
+        },
+
+        onCreatePress : function () {
+            var sDate = this._getCurrentDate(),
+                sTime = this._getCurrentTime(),
+                oDetail = this.getView().getModel("detailModel").getProperty("/detail");
+            
+            oDetail.aedat = sDate;
+            oDetail.aezet = sTime;
+            oDetail.erdat = sDate;
+            oDetail.erzet = sTime;
+            this.getView().getModel("detailModel").setProperty("/detail", oDetail);
+            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+            // this.getOwnerComponent().getRouter().navTo("detail", { vpid: '639', vctext: 'AGENTE PROVVISORIO 810', werks: 'PRD1', vkorg: 'CLR1', vtweg: '10', spart: '0' });
+        },
+
+        onSavePress : function () {
+            var sDate = this._getCurrentDate(),
+                sTime = this._getCurrentTime(),
+                oDetail = this.getView().getModel("detailModel").getProperty("/detail");
+            
+            oDetail.erdat = sDate;
+            oDetail.erzet = sTime;
+            this.getView().getModel("detailModel").setProperty("/detail", oDetail);
+            console.log(this.getView().getModel("detailModel").getProperty("/detail"));
+        },
+
+        _checkDataBeforeSaveCreate : function () {
+            var sErrorMessage = '',
+                oDetail = this.getView().getModel("detailModel").setProperty("/detail", oDetail);
+
+            sErrorMessage = sErrorMessage + this._checkRequiredInfo(oDetail);
+        },
+
+        _checkRequiredInfo : function (oDetail) {
+            var sErrorMessage = '';
+
+            function checkDataFilled (sValue, sLabel) {
+                if (!sValue || sValue.trim() === '') {
+                    sErrorMessage = sErrorMessage + oBundle.getText("missingData", [oBundle.getText(sLabel)])+"\n";
+                }
+            }
+
+            checkDataFilled(oDetail.vctext, "vctext");
+            checkDataFilled(oDetail.werks, "werks");
+            checkDataFilled(oDetail.vkorg, "vkorg");
+            checkDataFilled(oDetail.vtweg, "vtweg");
+            checkDataFilled(oDetail.spart, "spart");
+            checkDataFilled(oDetail.driver1, "driver1");
+            checkDataFilled(oDetail.datfr, "datfr");
+            checkDataFilled(oDetail.datto, "datto");
+
+            oDetail.details.forEach(detail => {
+                checkDataFilled(detail.kunnr, "kunnr");
+                checkDataFilled(detail.datab, "datab");
+                checkDataFilled(detail.datbi, "datbi");
+                checkDataFilled(detail.kunwe, "kunwe");
+                checkDataFilled(detail.dtabwe, "dtabwe");
+                checkDataFilled(detail.dtbiwe, "dtbiwe");
+                checkDataFilled(detail.turno, "turno");
+                checkDataFilled(detail.sequ, "sequ");
+            }); 
+
+            return sErrorMessage;
         }
     });
 });

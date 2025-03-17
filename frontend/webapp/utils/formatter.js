@@ -29,6 +29,18 @@ sap.ui.define([
 
         handleInactiveSelectedKey: function (bIsNew, sInactive) {
             return bIsNew ? 'X' : sInactive;
+        },
+
+        enableSequenceControl: function (bIsNew, bEditMode, sTurno) {
+            return (bIsNew || bEditMode) && (sTurno !== null && sTurno !== undefined && sTurno !== '');
+        },
+
+        enableDayControl: function (bIsNew, bEditMode, sTurno) {
+            return (bIsNew || bEditMode) && (sTurno === "1" || sTurno === "3");
+        },
+
+        enableSundayControl: function (bIsNew, bEditMode, sTurno) {
+            return (bIsNew || bEditMode) && (sTurno === "2" || sTurno === "3");
         }
     };
 });
