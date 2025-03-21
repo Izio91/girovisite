@@ -25,7 +25,6 @@ sap.ui.define([
 
 
         _onDetailMatched: function (oEvent) {
-            console.log("detail");
             this._vpid = oEvent.getParameter("arguments").vpid;
             this._vctext = oEvent.getParameter("arguments").vctext;
             this._werks = oEvent.getParameter("arguments").werks;
@@ -49,7 +48,6 @@ sap.ui.define([
         },
 
         _onCreateMatched: function (oEvent) {
-            console.log("create");
             this.defineModelForCurrentPage(true, false, false);
             this.getView().byId("subTitleIdExpandedContent").setText();
             this.getView().byId("subTitleIdSnappedContent").setText();
@@ -120,7 +118,6 @@ sap.ui.define([
 
                 // Execute the request
                 var oData = await this.executeRequest(sUrl, 'GET');
-                console.log("Data fetched: ", oData);
 
                 oData.active = oData.active === 'X';
                 oData.loevm = oData.loevm === 'X';
@@ -1049,7 +1046,6 @@ sap.ui.define([
                         // Execute the request
                         var oResult = await this.executeRequest(sUrl, 'GET'),
                             aDetails = [];
-                        console.log("Detail fetched: ", oResult);
 
                         if (oResult) {
                             // Merge all details from result
@@ -1100,13 +1096,11 @@ sap.ui.define([
                     expectedNextStart.setDate(prevEnd.getDate() + 1);
 
                     if (currStart.getTime() !== expectedNextStart.getTime()) {
-                        console.log("Gap detected between:", aAgents[i - 1], "and", aAgents[i]);
                         aErrorMessage.push(oBundle.getText("errorGapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr]) + "\n");
                     }
 
                     // Check for overlaps
                     if (currStart <= prevEnd) {
-                        console.log("Overlap detected between:", aAgents[i - 1], "and", aAgents[i]);
                         aErrorMessage.push(oBundle.getText("errorOverlapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr]) + "\n");
                     }
                 }

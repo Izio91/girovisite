@@ -240,6 +240,7 @@ sap.ui.define([
                 template: new ColumnListItem({
                     cells: aCells,
                     type: "Navigation",
+                    highlight: "{= ${masterModel>locked} ? 'Information' : 'None' }",
                     press: this.onListItemPress.bind(this)
                 })
             });
@@ -481,7 +482,6 @@ sap.ui.define([
                 
                 // Execute the request
                 var oData = await this.executeRequest(sUrl, 'GET');
-                console.log("Data fetched: ", oData);
 
                 var aPreviousData = oMasterModel.getProperty("/HeaderWithDetails") || [],
                     aNewData = aPreviousData.concat(oData.value);
@@ -542,9 +542,8 @@ sap.ui.define([
             } else {
                 // For other fields, check if a valid value is provided
                 if (sValue !== null && sValue !== '') {
-                    // If the field is a date, convert the value to the appropriate format
+                    // If the field is a date add appropriate operator
                     if (bIsDate) {
-                        sValue = sValue.toISOString().split("T")[0]; // Convert date to YYYY-MM-DD format
                         // Return the appropriate filter condition based on the field type
                         if (sField === 'datfr') {
                             return `${sField} ge '${sValue}'`;
@@ -871,7 +870,6 @@ sap.ui.define([
                 
                 // Execute the request
                 var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
-                console.log("Data fetched: ", oData);
                 sap.ui.core.BusyIndicator.hide();
                 MessageBox.information(oBundle.getText("documentUnlocked"), {
                     onClose: function () {

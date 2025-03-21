@@ -115,7 +115,6 @@ sap.ui.define([
             
             that.executeRequest(sUrl, 'GET')    
             .then(function (oData) {
-                console.log("Data fetched: ", oData);
                 oModel.setProperty(sPropertyPath, oData.value[0].result);
                 sap.ui.core.BusyIndicator.hide();
                 that.openFragment(sIdControl, sFragmentName, oView, oModel, that)
