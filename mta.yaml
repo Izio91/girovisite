@@ -135,9 +135,6 @@ resources:
       service: xsuaa
       service-name: girovisite-xsuaa-service
       service-plan: application
-      config:
-        xsappname: girovisite-${org}-${space}
-        tenant-mode: dedicated
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

@@ -104,18 +104,10 @@
 								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatto" />
 
 								<m:Label text="{i18n>active}" />
-								<m:ComboBox id="comboBoxActiveDetail" selectedKey="{parts: [{path: 'detailModel>/detail/active'}, {path: 'detailModel/isNew'}], formatter: '.formatter.handleActivePlanSelectedKey'}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeActive" >
-									<core:Item key="default" text="" />
-									<core:Item key="X" text="{i18n>comboBoxKeyActive}" />
-									<core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
-								</m:ComboBox>
+								<m:CheckBox id="checkBoxActiveDetail" selected="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" select="onSelectActive" />
 
 								<m:Label text="{i18n>loevm}" />
-								<m:ComboBox id="comboBoxLoevmDetail" selectedKey="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" change="onChangeLoevm" >
-									<core:Item key="default" text="" />
-									<core:Item key="X" text="{i18n>comboBoxKeyCancelled}" />
-									<core:Item key="" text="{i18n>comboBoxKeyNotCancelled}" />
-								</m:ComboBox>
+								<m:CheckBox id="comboBoxLoevmDetail" selected="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" select="onSelectLoevm" />
 
 								<core:Title text="" />
 
@@ -175,26 +167,34 @@
 										<m:Input value="{detailModel>kunnr}" showValueHelp="true" valueHelpRequest="onKunnrVH" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" liveChange="eraseValue" />
 									</table:template>
 								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>kunnrAddress}" required="true"/>
+									<table:template>
+										<m:Input value="{detailModel>kunnrAddress}" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>kunnrCompanyName}" required="true"/>
+									<table:template>
+										<m:Input value="{detailModel>kunnrCompanyName}" enabled="false" />
+									</table:template>
+								</table:Column>
 								<table:Column width="8rem" > 
 									<m:Label text="{i18n>datab}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatab"  />
+										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatab"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>datbi}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datab', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatbi"  />
+										<m:DatePicker value="{path: 'detailModel>datbi', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>datab', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatbi"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>inactive}"/>
 									<table:template>
-										<m:ComboBox selectedKey="{parts: [{path: 'detailModel>isNew'}, {path: 'detailModel>inactive'}, {path: 'detailModel>isKunnr'}], formatter: '.formatter.handleInactiveAgentSelectedKey'}"  enabled="{= ${detailModel>/editMode} &amp;&amp; ${detailModel>isKunnr} }" change="onChangeInactive"  >
-											<core:Item key="default" text="" />
-											<core:Item key="" text="{i18n>comboBoxKeyActive}" />
-											<core:Item key="X" text="{i18n>comboBoxKeyNotActive}" />
-										</m:ComboBox>
+										<m:CheckBox selected="{parts: [{path: 'detailModel>isNew'}, {path: 'detailModel>inactive'}, {path: 'detailModel>isKunnr'}], formatter: '.formatter.handleInactiveAgentSelectedKey'}" enabled="false" />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
@@ -204,21 +204,33 @@
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
+									<m:Label text="{i18n>kunweAddress}" required="true"/>
+									<table:template>
+										<m:Input value="{detailModel>kunweAddress}" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>kunweCompanyName}" required="true"/>
+									<table:template>
+										<m:Input value="{detailModel>kunweCompanyName}" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtabwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeDtabwe"  />
+										<m:DatePicker value="{path: 'detailModel>dtabwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe} }" change="onChangeDtabwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>dtbiwe}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/dtabwe', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeDtbiwe"  />
+										<m:DatePicker value="{path: 'detailModel>dtbiwe', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>dtabwe', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe} }" change="onChangeDtbiwe"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>turno}" required="true" />
 									<table:template>
-										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe } }" change="onChangeTurno"  >
+										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe} }" change="onChangeTurno"  >
 											<core:Item key="0" text="{i18n>turno0}" />
 											<core:Item key="1" text="{i18n>turno1}" />
 											<core:Item key="2" text="{i18n>turno2}" />

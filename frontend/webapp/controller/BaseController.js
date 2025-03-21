@@ -55,7 +55,7 @@ sap.ui.define([
                     return oControl.getSelected();
 
                 case "sap.m.DatePicker":
-                    return oControl.getValue()
+                    return oControl.getValue();
 
                 case "sap.m.TimePicker":
                     return oControl.getValue();

@@ -5,9 +5,10 @@ module.exports = async (request, tx) => {
         vpid
     } = request.data,
         sLockedBy = request.req.authInfo.getLogonName();
-
+    
+    sLockedBy = !sLockedBy ? '' : sLockedBy.substring(0,12);
     let updateQuery = UPDATE('Header')
-        .set({ locked: true, lockedBy: sLockedBy, lockedAt: new Date() })
+        .set({ locked: true, lockedBy: sLockedBy, lockedAt: new Date(), aenam: sLockedBy })
         .where({ vpid: vpid });
 
     let aResult = await tx.run(updateQuery);

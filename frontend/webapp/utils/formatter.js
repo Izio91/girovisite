@@ -27,12 +27,8 @@ sap.ui.define([
             return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
         },
 
-        handleInactiveAgentSelectedKey: function (bIsNew, sInactive, bIsKunnr) {
-            return bIsNew && bIsKunnr ? '' : sInactive;
-        },
-
-        handleActivePlanSelectedKey: function (sActive, bIsNew) {
-            return bIsNew ? '' : sActive;
+        handleInactiveAgentSelectedKey: function (bIsNew, bInactive, bIsKunnr) {
+            return bIsNew && bIsKunnr ? false : bInactive;
         },
 
         enableSequenceControl: function (bIsNew, bEditMode, sTurno, bIsKunwe) {

@@ -2,6 +2,7 @@
   "src/gen/**/*.hdbview",
   "src/gen/**/*.hdbindex",
   "src/gen/**/*.hdbconstraint",
+  "src/gen/**/*.hdbsequence",
   "src/gen/**/*_drafts.hdbtable",
   "src/gen/**/*.hdbcalculationview"
 ]

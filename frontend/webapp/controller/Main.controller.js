@@ -11,6 +11,7 @@ sap.ui.define([
     'sap/m/p13n/MetadataHelper',
     'sap/ui/model/Sorter',
     'sap/m/ColumnListItem',
+    'sap/m/Button',
     'sap/m/Text',
     'sap/m/ObjectIdentifier',
     'sap/ui/core/library',
@@ -18,7 +19,7 @@ sap.ui.define([
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
     "frontend/utils/formatter"
-], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator, formatter) => {
+], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Button, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator, formatter) => {
     "use strict";
 
     var baseManifestUrl;
@@ -147,7 +148,8 @@ sap.ui.define([
             {
                 key: "locked_col",
                 label: oBundle.getText("locked"),
-                path: "locked"
+                path: "locked",
+                tooltip: "lockedBy"
             }
             ]);
 
@@ -214,6 +216,15 @@ sap.ui.define([
                 if (oColumnState.key === 'vpid_col') {
                     return new ObjectIdentifier({
                         title: "{masterModel>" + this.oMetadataHelper.getProperty(oColumnState.key).path + "}"
+                    });
+                }
+                if (oColumnState.key === 'locked_col') {
+                    return new Button({
+                        press: this.onOpenUnlockMenuAction.bind(this),
+                        tooltip: "{i18n>lockedBy}: {masterModel>" + this.oMetadataHelper.getProperty(oColumnState.key).tooltip + "}",
+                        icon: "sap-icon://locked",
+                        type: "Transparent",
+                        visible: "{= ${masterModel>" + this.oMetadataHelper.getProperty(oColumnState.key).path + "} === true ? true : false }",
                     });
                 }
                 return new Text({

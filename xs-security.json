@@ -4,24 +4,22 @@
   "description": "Security profile of called application",
   "scopes": [
     {
-      "name": "$XSAPPNAME.Admin",
-      "description": "Admin"
+        "name": "uaa.user",
+        "description": "UAA"
     },
     {
       "name": "$XSAPPNAME.View",
       "description": "View Permission"
     }
   ],
-  "attributes": [],
-  "role-templates": [
+  "attributes": [
     {
-      "name": "Admin",
-      "description": "generated",
-      "scope-references": [
-        "$XSAPPNAME.Admin"
-      ],
-      "attribute-references": []
-    },
+      "name": "user_name",
+      "description": "SAP User ID",
+      "valueType": "string"
+    }
+  ],
+  "role-templates": [
     {
       "name": "Viewer",
       "description": "Access Application",

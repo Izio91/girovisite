@@ -37,11 +37,11 @@ module.exports = function (srv) {
         // Fetch the next value from the sequence
         const result = await db.run(`SELECT "HEADER_VPID".NEXTVAL FROM DUMMY`);
         const nVpid = result[0][`HEADER_VPID.NEXTVAL`];
-        const sLockedBy = request.req.authInfo.getLogonName();
-
+        var sLogonName = request.req.authInfo.getLogonName();
+        sLogonName = !sLogonName ? '' : sLogonName.substring(0,12);
         request.data.vpid = nVpid;
-        request.data.ernam = sLockedBy;
-        request.data.aenam = sLockedBy;
+        request.data.ernam = sLogonName;
+        request.data.aenam = sLogonName;
 
         // Assign the same vpid to all associated Details
         if (request.data.details) {
