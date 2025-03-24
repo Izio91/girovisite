@@ -864,8 +864,10 @@ sap.ui.define([
             MessageBox.information(oBundle.getText("createAlert"), {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                 emphasizedAction: MessageBox.Action.YES,
-                onClose: function () {
-                    that._confirmCreate();
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmCreate();
+                    }
                 }
             });
         },

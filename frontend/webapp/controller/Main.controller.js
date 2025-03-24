@@ -839,6 +839,7 @@ sap.ui.define([
 
         onOpenUnlockMenuAction: function (oEvent) {
             this.oContext = oEvent.getSource().getBindingContext('masterModel');
+            this.LockedBy = this.getView().getModel("masterModel").getProperty(this.oContext.getPath()+'/lockedBy');
             
             var oControl = oEvent.getSource(),
                 oView = this.getView();
@@ -858,7 +859,21 @@ sap.ui.define([
             }
         },
 
-        onUnlockPress: async function () {
+        onUnlockPress: function () {
+            var that = this;
+            MessageBox.warning(oBundle.getText("unlockAlert", [this.LockedBy]), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.YES,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmUnlock();
+                    }
+                }
+            });
+            
+        },
+
+        _confirmUnlock: async function () {
             var that = this,
                 sUrl = baseManifestUrl + "/girovisiteService/unlock",
                 sVpid = this.getView().getModel("masterModel").getProperty(this.oContext + "/vpid"),
