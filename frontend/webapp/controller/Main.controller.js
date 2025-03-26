@@ -252,7 +252,7 @@ sap.ui.define([
             var oKeysDescending = {};
 
             if (oState.Sorter) {
-                oState.Sorter.forEach(({key, descending}) => ( oKeysDescending[key] = descending ));
+                oState.Sorter.forEach(({ key, descending }) => (oKeysDescending[key] = descending));
             }
 
             oState.Groups.forEach(function (oGroup) {
@@ -425,7 +425,7 @@ sap.ui.define([
             });
         },
 
-        onListItemPress: function(oEvent) {
+        onListItemPress: function (oEvent) {
             var oObject = oEvent.getSource().getBindingContext("masterModel").getObject(),
                 sVpid = oObject.vpid,
                 sVctext = oObject.vctext,
@@ -485,7 +485,7 @@ sap.ui.define([
 
                 var aPreviousData = oMasterModel.getProperty("/HeaderWithDetails") || [],
                     aNewData = aPreviousData.concat(oData.value);
-
+                aNewData = [...new Set(aNewData)];
                 oMasterModel.setProperty("/HeaderWithDetails", aNewData);
             } catch (error) {
                 MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
@@ -506,6 +506,7 @@ sap.ui.define([
             var sUrl = baseManifestUrl + "/girovisiteService/HeaderWithDetails?",
                 aParams = [];
 
+            aParams.push("$select=vpid,vctext,werks,vkorg,vtweg,spart,driver1,termCode,datfr,datto,active,loevm,erdat,erzet,ernam,aedat,aezet,aenam,locked,lockedBy,lockedAt,kunnr,kunwe");
             // Add pagination parameters
             aParams.push("$top=" + this._iTop);
             aParams.push("$skip=" + this._iSkip);
@@ -533,7 +534,7 @@ sap.ui.define([
          * @param {boolean} [bIsDate=false] - Indicates whether the value is a date.
          * @returns {string|null} The filter condition as a string, or null if no valid condition can be created.
          */
-        _getFilterAsString : function (sField, sValue, bIsDate = false) {
+        _getFilterAsString: function (sField, sValue, bIsDate = false) {
             // Check if the field is one of the special cases ('active' or 'loevm') and if a valid value is provided
             if (sField === 'active' || sField === 'loevm') {
                 if (sValue !== null && sValue !== 'default') {
@@ -567,7 +568,7 @@ sap.ui.define([
          * 
          * @returns {Promise<Array>} A Promise that resolves to an array of filter conditions to be used in the query.
          */
-        _getFilters : function () {
+        _getFilters: function () {
             var aFilters = [],
                 oView = this.getView(),
                 that = this;
@@ -579,7 +580,7 @@ sap.ui.define([
              * @param {string} sValue - The value to filter by.
              * @param {string} bIsDate - True if the UI control is a DatePicker, false otherwise. 
              */
-            function addFilter (sField, sValue, bIsDate) {
+            function addFilter(sField, sValue, bIsDate) {
                 var sFilterAsString = that._getFilterAsString(sField, sValue, bIsDate);
 
                 if (sFilterAsString !== null) {
@@ -657,7 +658,7 @@ sap.ui.define([
              * Helper function to reset text input fields.
              * @param {string} sControlId - The ID of the input field to reset.
              */
-            function resetValue (sControlId) {
+            function resetValue(sControlId) {
                 this.getView().byId(sControlId).setValue(null);
             };
 
@@ -665,7 +666,7 @@ sap.ui.define([
              * Helper function to reset date picker values.
              * @param {string} sControlId - The ID of the date picker to reset.
              */
-            function resetDateValue (sControlId) {
+            function resetDateValue(sControlId) {
                 this.getView().byId(sControlId).setDateValue(null);
             };
 
@@ -673,7 +674,7 @@ sap.ui.define([
              * Helper function to reset checkbox or selection fields.
              * @param {string} sControlId - The ID of the selection control to reset.
              */
-            function resetSelected (sControlId) {
+            function resetSelected(sControlId) {
                 this.getView().byId(sControlId).setSelectedItem(null);
             };
 
@@ -681,7 +682,7 @@ sap.ui.define([
              * Helper function to reset drop-down selection.
              * @param {string} sControlId - The ID of the drop-down control to reset.
              */
-            function resetSelectedItem (sControlId) {
+            function resetSelectedItem(sControlId) {
                 this.getView().byId(sControlId).setSelectedItem(null);
             };
 
@@ -689,7 +690,7 @@ sap.ui.define([
              * Helper function to reset drop-down selected key.
              * @param {string} sControlId - The ID of the drop-down control to reset.
              */
-            function resetSelectedKey (sControlId) {
+            function resetSelectedKey(sControlId) {
                 this.getView().byId(sControlId).setSelectedKey('default');
             };
 
@@ -726,8 +727,8 @@ sap.ui.define([
         },
 
         // Werks value help
-        onWerksVH : function () {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onWerksVH: function () {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getWerks()',
                 sPropertyPath = "/valuehelps/werks",
                 sIdControl = "idWerksDialog_VH",
@@ -744,8 +745,8 @@ sap.ui.define([
         },
 
         // Vkorg value help
-        onVkorgVH : function (oEvent) {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onVkorgVH: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getVkorg()',
                 sPropertyPath = "/valuehelps/vkorg",
                 sIdControl = "idVkorgDialog_VH",
@@ -762,8 +763,8 @@ sap.ui.define([
         },
 
         // Vtweg value help
-        onVtwegVH : function (oEvent) {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onVtwegVH: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getVtweg()',
                 sPropertyPath = "/valuehelps/vtweg",
                 sIdControl = "idVtwegDialog_VH",
@@ -780,8 +781,8 @@ sap.ui.define([
         },
 
         // Driver value help
-        onDriverVH : function (oEvent) {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onDriverVH: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
                 sPropertyPath = "/valuehelps/driver",
                 sIdControl = "idDriverDialog_VH",
@@ -798,8 +799,8 @@ sap.ui.define([
         },
 
         // Kunnr value help
-        onKunnrVH : function (oEvent) {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onKunnrVH: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
                 sPropertyPath = "/valuehelps/kunnr",
                 sIdControl = "idKunnrDialog_VH",
@@ -816,8 +817,8 @@ sap.ui.define([
         },
 
         // Kunwe value help
-        onKunweVH : function (oEvent) {
-            var oMasterModel= this.getView().getModel("masterModel"),
+        onKunweVH: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"),
                 sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
                 sPropertyPath = "/valuehelps/kunwe",
                 sIdControl = "idKunweDialog_VH",
@@ -839,7 +840,7 @@ sap.ui.define([
 
         onOpenUnlockMenuAction: function (oEvent) {
             this.oContext = oEvent.getSource().getBindingContext('masterModel');
-            this.LockedBy = this.getView().getModel("masterModel").getProperty(this.oContext.getPath()+'/lockedBy');
+            this.LockedBy = this.getView().getModel("masterModel").getProperty(this.oContext.getPath() + '/lockedBy');
             
             var oControl = oEvent.getSource(),
                 oView = this.getView();

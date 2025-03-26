@@ -8,6 +8,6 @@
 		confirm="onConfirmDriver">
 		<StandardListItem 
 			title="{Customer}"
-			description="{CustomerName}" />	
+			description="{CustomerName} | {SortField}" />	
 	</SelectDialog>
 </core:FragmentDefinition>

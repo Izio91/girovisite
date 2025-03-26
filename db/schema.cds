@@ -85,16 +85,32 @@ annotate Detail with @assert.unique: {uniqueKey: [
 
 view HeaderWithDetails as
     select distinct
-        key t1.vpid,
+        key t1.vpid, 
+        key t1.werks, 
+        key t2.vppos, 
             t1.vctext,
-        key t1.werks,
-            t1.vkorg,
-            t1.vtweg,
-            t1.spart,
             t1.driver1,
             t1.termCode,
             t1.datfr,
             t1.datto,
+            t2.kunnr,
+            t2.datab,
+            t2.datbi,
+            t2.kunwe,
+            t2.dtabwe,
+            t2.dtbiwe,
+            t2.turno,
+            t2.monday,
+            t2.tuesday,
+            t2.wednesday,
+            t2.thursday,
+            t2.friday,
+            t2.saturday,
+            t2.sunday,
+            t1.vkorg,
+            t1.vtweg,
+            t1.spart,
+            t2.dtfine,
             t1.active,
             t1.loevm,
             t1.erdat,
@@ -105,10 +121,9 @@ view HeaderWithDetails as
             t1.aenam,
             t1.locked,
             t1.lockedBy,
-            t1.lockedAt,
-            t2.kunnr,
-            t2.kunwe
+            t1.lockedAt
     from Header as t1
     left outer join Detail as t2
         on  t1.vpid  = t2.vpid
-        and t1.werks = t2.werks;
+        and t1.werks = t2.werks
+    order by t1.vpid asc ;

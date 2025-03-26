@@ -18,7 +18,6 @@ async function performRequest(srv, request, path) {
         return request.reply(result);
 
     } catch (error) {
-        await tx.rollback(error);
         return request.error({
             code: error.status || 500,
             message: error.message || 'An unexpected error occurred'
@@ -34,7 +33,7 @@ module.exports = function (srv) {
         const result = await db.run(`SELECT "HEADER_VPID".NEXTVAL FROM DUMMY`);
         const nVpid = result[0][`HEADER_VPID.NEXTVAL`];
         var sLogonName = request.req.authInfo.getLogonName();
-        sLogonName = !sLogonName ? '' : sLogonName.substring(0,12);
+        sLogonName = !sLogonName ? '' : sLogonName.substring(0, 12);
         request.data.vpid = nVpid;
         request.data.ernam = sLogonName;
         request.data.aenam = sLogonName;
