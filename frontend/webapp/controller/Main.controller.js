@@ -24,12 +24,49 @@ sap.ui.define([
 
     var baseManifestUrl;
     var oBundle;
+    var aCSVHeaderIndexes;
     return BaseController.extend("frontend.controller.Main", {
         formatter: formatter,
         onInit() {
             baseManifestUrl = jQuery.sap.getModulePath(this.getOwnerComponent().getMetadata().getManifest()["sap.app"].id);
             // read msg from i18n model
             oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            aCSVHeaderIndexes = {
+                vpid: 0,
+                vctext: 1,
+                SortField: 2,
+                driver1: 3,
+                termCode: 4,
+                datfr: 5,
+                datto: 6,
+                kunnr: 7,
+                KunnrCustomerName: 8,
+                datab: 9,
+                datbi: 10,
+                kunwe: 11,
+                KunweCustomerName: 12,
+                StreetName: 13,
+                PostalCode: 14,
+                CityName: 15,
+                dtabwe: 16,
+                dtbiwe: 17,
+                turno: 18,
+                monday: 19,
+                tuesday: 20,
+                wednesday: 21,
+                thursday: 22,
+                friday: 23,
+                saturday: 24,
+                sunday: 25,
+                BusinessPartnerGrouping: 26,
+                vkorg: 27,
+                vtweg: 28,
+                spart: 29,
+                dtfine: 30,
+                active: 31,
+                loevm: 32
+            };
+
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("main").attachPatternMatched(this._onObjectMatched, this);
         },
@@ -206,7 +243,7 @@ sap.ui.define([
 
             //Update the columns per selection in the state
             this.updateColumns(oState);
-            
+
             this.getView().getModel("masterModel").setProperty("/HeaderWithDetails", []);
             await this._fetchData();
             // Create groups if any
@@ -433,7 +470,7 @@ sap.ui.define([
                 sVkorg = oObject.vkorg,
                 sVtweg = oObject.vtweg,
                 sSpart = oObject.spart;
-            
+
             this.getOwnerComponent().getRouter().navTo("detail", { vpid: sVpid, vctext: sVctext, werks: sWerks, vkorg: sVkorg, vtweg: sVtweg, spart: sSpart });
         },
 
@@ -475,11 +512,11 @@ sap.ui.define([
                 that = this;
 
             try {
-                sap.ui.core.BusyIndicator.show();  
-                
+                sap.ui.core.BusyIndicator.show();
+
                 // Wait for the query URL to be fully built
                 var sUrl = await this._buildFilterQuery();
-                
+
                 // Execute the request
                 var oData = await this.executeRequest(sUrl, 'GET');
 
@@ -496,7 +533,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.hide();
             }
         },
-        
+
         /**
          * Constructs the filter query URL for the service request.
          * 
@@ -552,7 +589,7 @@ sap.ui.define([
                             return `${sField} le '${sValue}'`;
                         } else {
                             return `${sField} eq '${sValue}'`; // Equality for other fields
-                        }  
+                        }
                     } else {
                         // For non-date fields, return an equality filter condition
                         return `${sField} eq '${sValue}'`;
@@ -809,7 +846,7 @@ sap.ui.define([
         },
 
         onSearchKunnr: function (oEvent) {
-            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunnrDialog_VH");  
+            this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName", "StreetName", "CityName", "Region", "PostalCode"], "idKunnrDialog_VH");
         },
 
         onConfirmKunnr: function (oEvent) {
@@ -841,7 +878,7 @@ sap.ui.define([
         onOpenUnlockMenuAction: function (oEvent) {
             this.oContext = oEvent.getSource().getBindingContext('masterModel');
             this.LockedBy = this.getView().getModel("masterModel").getProperty(this.oContext.getPath() + '/lockedBy');
-            
+
             var oControl = oEvent.getSource(),
                 oView = this.getView();
 
@@ -871,7 +908,7 @@ sap.ui.define([
                     }
                 }
             });
-            
+
         },
 
         _confirmUnlock: async function () {
@@ -882,8 +919,8 @@ sap.ui.define([
                     vpid: sVpid.toString()
                 };
             try {
-                sap.ui.core.BusyIndicator.show();  
-                
+                sap.ui.core.BusyIndicator.show();
+
                 // Execute the request
                 var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
                 sap.ui.core.BusyIndicator.hide();
@@ -901,7 +938,112 @@ sap.ui.define([
                         that.onGoPress();
                     }
                 });
-            } 
-        }
+            }
+        },
+
+        onExportCSV: function () {
+            var that = this;
+            MessageBox.information(oBundle.getText("ExportAlert"), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.YES,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmExportCSV();
+                    }
+                }
+            });
+        },
+
+        _confirmExportCSV: async function () {
+            var sUrl = baseManifestUrl + "/girovisiteService/getDataForCSV()?",
+                oData = [],
+                aFilters = await this._getFilters(),
+                that = this;
+
+            if (aFilters.length > 0) {
+                sUrl = sUrl + "filter=" + aFilters.join(" and ");
+            }
+
+            sap.ui.core.BusyIndicator.show();
+
+            this.executeRequest(sUrl, 'GET')
+                .then(function (oData) {
+                    let aResult = oData.value[0].result;
+                    sap.ui.core.BusyIndicator.hide();
+                    if (aResult.length > 0) {
+                        // Reorder each object based on the specified order
+                        const sortedResults = aResult.map(obj => {
+                            let sortedObj = {};
+                            Object.keys(aCSVHeaderIndexes).forEach(key => {
+                                sortedObj[key] = obj[key] !== undefined ? obj[key] : null; // Ensure all keys exist
+                            });
+                            return sortedObj;
+                        });
+                        let aHeaders = that.getColumnsCSV(Object.keys(sortedResults[0]));
+                        const csv = that.getCSV(aHeaders, sortedResults);
+                        // Create a Blob from the CSV
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement("a");
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", that.getFileName() + ".csv");
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        MessageBox.information(oBundle.getText("NoDataDueCurrentFilters"));
+                    }
+                })
+                .catch(function (error) {
+                    let sErrorMessage = "";
+                    sap.ui.core.BusyIndicator.hide();
+                    if (error.status === 504) {
+                        sErrorMessage = oBundle.getText("ExportTimeoutError");
+                    } else {
+                        sErrorMessage = oBundle.getText("ErrorReadingDataFromBackend");
+                    }
+                    console.log("Request failed:", error);
+                    MessageBox.error(sErrorMessage);
+                });
+
+        },
+
+        getColumnsCSV: function (oDataKeys) {
+            var aColumns = [];
+            oDataKeys.forEach((sKey) => {
+                aColumns[aCSVHeaderIndexes[sKey]] = { 'label': oBundle.getText(sKey), 'property': sKey };
+            });
+            return aColumns;
+        },
+
+        /**
+         * 
+         * @param {array of object} aHeader 
+         * @param {array of object} aGroupedData 
+         * @returns the csv content
+         */
+        getCSV: function (aHeader, aGroupedData) {
+            const sHeader = aHeader.map(oHeader => oHeader.label.replaceAll(',', ' ')).join(',');
+            return [sHeader, ...aGroupedData.map(row => Object.values(row).map((value) => {
+                if (typeof value === 'string') {
+                    value = String(value).replaceAll(",", " ");
+                }
+                return value
+            }).join(','))].join('\r\n');
+        },
+
+        /**
+         * 
+         * @returns the excel file name
+         */
+        getFileName: function () {
+            const dDate = new Date(),
+                sYear = dDate.getFullYear().toString(),
+                sMonth = String(dDate.getMonth() + 1).padStart(2, 0),
+                sDay = String(dDate.getDate()).padStart(2, 0),
+                sHours = dDate.getHours().toString(),
+                sMinutes = dDate.getMinutes().toString();
+            return "Report_Giri_Visita_" + sDay + sMonth + sYear;
+        },
     });
 });

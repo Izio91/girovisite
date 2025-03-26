@@ -45,7 +45,7 @@ module.exports = function (srv) {
                 detail.vppos = parseInt(detail.vppos);  // Ensure vppos is an integer;
             });
         }
-    }); 
+    });
 
     srv.on('getWerks', '*', async request => {
         await performRequest(srv, request, './func/getWerks');
@@ -73,6 +73,10 @@ module.exports = function (srv) {
 
     srv.on('getKunwe', '*', async request => {
         await performRequest(srv, request, './func/getKunwe');
+    });
+
+    srv.on('getDataForCSV', '*', async request => {
+        await performRequest(srv, request, './func/getDataForCSV');
     });
 
     srv.on('lock', '*', async request => {

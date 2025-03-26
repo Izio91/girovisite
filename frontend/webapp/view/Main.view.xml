@@ -155,6 +155,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <ToolbarSpacer/>
+                        <Button text="{i18n>ExportButton}" icon="sap-icon://excel-attachment" press="onExportCSV" tooltip="{i18n>ExportTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="openPersonalizationDialog" tooltip="Settings"/>
                     </OverflowToolbar>
                 </headerToolbar>
