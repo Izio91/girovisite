@@ -1,6 +1,7 @@
 <mvc:View controllerName="frontend.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:f="sap.f"
+    xmlns:u="sap.ui.unified"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
     xmlns:dnd="sap.ui.core.dnd"
@@ -155,6 +156,8 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <ToolbarSpacer/>
+                        <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="xls,xlsx,csv" placeholder="{i18n>importPlaceholder}" />
+                        <Button text="{i18n>ImportButton}" icon="sap-icon://add-document" press="onImport" tooltip="{i18n>ImportTooltip}"/>
                         <Button text="{i18n>ExportButton}" icon="sap-icon://excel-attachment" press="onExportCSV" tooltip="{i18n>ExportTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="openPersonalizationDialog" tooltip="Settings"/>
                     </OverflowToolbar>

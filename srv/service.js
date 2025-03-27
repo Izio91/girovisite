@@ -90,4 +90,8 @@ module.exports = function (srv) {
     srv.on('getLockStatus', '*', async request => {
         await performRequest(srv, request, './func/getLockStatus');
     });
+
+    srv.on('massiveImport', '*', async request => {
+        await performRequest(srv, request, './func/massiveImport');
+    });
 }

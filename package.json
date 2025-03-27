@@ -44,6 +44,12 @@
         "credentials": {
           "destination": "S4_HANA"
         }
+      },
+      "cloudIntegration": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "CloudIntegration_API"
+        }
       }
     },
     "hana": {

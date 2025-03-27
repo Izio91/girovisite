@@ -1,0 +1,7 @@
+_schema-version: "3.1"
+ID: girovisite_dev_extension
+extends: girovisite
+modules:
+  - name: girovisite-srv
+    properties:
+      Path_MASSIVE_IMPORT: "/api/dev/import"

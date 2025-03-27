@@ -479,6 +479,7 @@ sap.ui.define([
          */
         defineModelForCurrentPage: function () {
             var oModel = {
+                "MassiveImportFile": null,
                 "HeaderWithDetails": [],
                 "valuehelps": {
                     "werks": [],
@@ -1023,13 +1024,13 @@ sap.ui.define([
          * @returns the csv content
          */
         getCSV: function (aHeader, aGroupedData) {
-            const sHeader = aHeader.map(oHeader => oHeader.label.replaceAll(',', ' ')).join(',');
+            const sHeader = aHeader.map(oHeader => oHeader.label.replaceAll(',', ' ')).join(';');
             return [sHeader, ...aGroupedData.map(row => Object.values(row).map((value) => {
                 if (typeof value === 'string') {
                     value = String(value).replaceAll(",", " ");
                 }
                 return value
-            }).join(','))].join('\r\n');
+            }).join(';'))].join('\r\n');
         },
 
         /**
@@ -1045,5 +1046,96 @@ sap.ui.define([
                 sMinutes = dDate.getMinutes().toString();
             return "Report_Giri_Visita_" + sDay + sMonth + sYear;
         },
+        
+
+        handleFileChange: function (oEvent) {
+            var oMasterModel = this.getView().getModel("masterModel"), 
+                aFiles = oEvent.getParameter("files");  // Get the list of files
+    
+    
+            if (aFiles && aFiles.length) {
+                var oFile = aFiles[0],    
+                    oReader = new FileReader();
+
+                // Define what to do when file is successfully read
+                oReader.onload = function (oEvent) {
+                    var sBase64 = oEvent.target.result;  // The Base64 encoded file content
+                    // If you want only the base64 part, remove the prefix like "data:image/png;base64,"
+                    var sBase64Content = sBase64.split(",")[1];
+                    // Set property model NewUploadedFile
+                    oMasterModel.setProperty("/MassiveImportFile", {
+                        "attachment": sBase64Content
+                    });
+                };
+    
+                // Read the file as Data URL to get Base64
+                oReader.readAsDataURL(oFile);
+            
+            }
+        },
+
+        onImport: function () {
+            var that = this;
+            MessageBox.information(oBundle.getText("ImportAlert"), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.YES,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        that._confirmImport();
+                    }
+                }
+            });
+        },
+
+        _confirmImport: function () {
+            var oFileUploader = this.getView().byId("fileUploader"),
+                oMassiveImportFile = this.getView().getModel("masterModel").getProperty("/MassiveImportFile"),
+                sUrl = baseManifestUrl + `/girovisiteService/massiveImport`;
+
+            if (!oFileUploader.getValue()) {
+                MessageBox.warning(oBundle.getText("noFileSelected"));
+                return;
+            }
+
+            this._uploadFile(oFileUploader, sUrl, oMassiveImportFile);
+        },
+
+        _uploadFile: function (oFileUploader, sUrl, oMassiveImportFile) {
+            var that = this;
+
+            oFileUploader.checkFileReadable()
+                .then(function () {
+                    sap.ui.core.BusyIndicator.show();
+                    return that.executeRequest(sUrl, 'POST', JSON.stringify(oMassiveImportFile));
+                })
+                .then(function () {
+                    that._handleUploadSuccess(oFileUploader);
+                })
+                .catch(function (error) {
+                    that._handleUploadError(error);
+                });
+        },
+
+        _handleUploadSuccess: function (oFileUploader) {
+            var that = this;
+            
+            sap.ui.core.BusyIndicator.hide();
+            oFileUploader.clear();
+
+            MessageBox.success(oBundle.getText("successImport"), {
+                actions: [MessageBox.Action.CLOSE],
+                title: "Success",
+                onClose: function () {
+                    that.onGoPress();
+                }
+            });
+        },
+
+        _handleUploadError: function (error) {
+            sap.ui.core.BusyIndicator.hide();
+            console.error("Request failed:", error);
+            MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"));
+        }
+
     });
 });
