@@ -731,49 +731,41 @@ sap.ui.define([
         },
 
         _changeDaysValueOnChangingTurno: function (oEvent) {
-            var oControl = oEvent.getSource(),
-                sPathMonday = oControl.getBindingContext("detailModel").getPath() + "/monday",
-                sPathTuesday = oControl.getBindingContext("detailModel").getPath() + "/tuesday",
-                sPathWednesday = oControl.getBindingContext("detailModel").getPath() + "/wednesday",
-                sPathThursday = oControl.getBindingContext("detailModel").getPath() + "/thursday",
-                sPathFriday = oControl.getBindingContext("detailModel").getPath() + "/friday",
-                sPathSaturday = oControl.getBindingContext("detailModel").getPath() + "/saturday",
-                sPathSunday = oControl.getBindingContext("detailModel").getPath() + "/sunday";
-
-            this.getView().getModel("detailModel").setProperty(sPathMonday, null);
-            this.getView().getModel("detailModel").setProperty(sPathTuesday, null);
-            this.getView().getModel("detailModel").setProperty(sPathWednesday, null);
-            this.getView().getModel("detailModel").setProperty(sPathThursday, null);
-            this.getView().getModel("detailModel").setProperty(sPathFriday, null);
-            this.getView().getModel("detailModel").setProperty(sPathSaturday, null);
-            this.getView().getModel("detailModel").setProperty(sPathSunday, null);
+            var oControl = oEvent.getSource()
+                oTable = this.getView().byId("idDetailTable"),
+                oRow = oControl.getParent(),
+                nRowIndex = oTable.indexOfRow(oRow),
+                sCurrentPath = oControl.getBindingContext("detailModel").getPath(),
+                sKunweIndex = String(this._getKunweIndex(nRowIndex)).padStart(3,'0'),
+                sPathSequ = sCurrentPath + "/sequ",
+                sTurnoKey = this.getControlValue(oControl);
+            
+            this.getView().getModel("detailModel").setProperty(sPathSequ, sKunweIndex);
+            this._setDaysValues(oControl, null, null);
+            this._setDaysValues(oControl, sTurnoKey, sKunweIndex);
         },
 
-        onLiveChangeSequAndDays: function (oEvent) {
-            var sValue = oEvent.getSource().getValue();
-            if (sValue.length >= 4) {
-                oEvent.getSource().setValue(sValue.substr(0, 3));
+        _getKunweIndex : function (nRowIndex) {
+            var nKunweIndex = 0,
+                aDetails = this.getView().getModel("detailModel").getProperty("/detail/details"),
+                aSortedDetails = aDetails.sort((a,b) => a.vppos - b.vppos);
+            for(let i = 0; i <= nRowIndex; i++) {
+                if (aSortedDetails[i].isKunwe) {
+                    nKunweIndex++;
+                }
             }
+            return nKunweIndex;
         },
 
-        onChangeSequ: function (oEvent) {
-            this._padSequAndDayValue(oEvent);
-            this._onChangeEventHandler(oEvent, "/sequ");
-            this._changeDaysValueOnChangingSequ(oEvent);
-        },
-
-        _changeDaysValueOnChangingSequ: function (oEvent) {
-            var oControl = oEvent.getSource(),
-                sPathMonday = oControl.getBindingContext("detailModel").getPath() + "/monday",
-                sPathTuesday = oControl.getBindingContext("detailModel").getPath() + "/tuesday",
-                sPathWednesday = oControl.getBindingContext("detailModel").getPath() + "/wednesday",
-                sPathThursday = oControl.getBindingContext("detailModel").getPath() + "/thursday",
-                sPathFriday = oControl.getBindingContext("detailModel").getPath() + "/friday",
-                sPathSaturday = oControl.getBindingContext("detailModel").getPath() + "/saturday",
-                sPathSunday = oControl.getBindingContext("detailModel").getPath() + "/sunday",
-                sPathTurno = oControl.getBindingContext("detailModel").getPath() + "/turno",
-                sSequ = this.getControlValue(oControl),
-                sTurnoKey = this.getView().getModel("detailModel").getProperty(sPathTurno);
+        _setDaysValues: function (oControl, sTurnoKey, sSequ) {
+            var sCurrentPath = oControl.getBindingContext("detailModel").getPath(),
+                sPathMonday = sCurrentPath + "/monday",
+                sPathTuesday = sCurrentPath + "/tuesday",
+                sPathWednesday = sCurrentPath + "/wednesday",
+                sPathThursday = sCurrentPath + "/thursday",
+                sPathFriday = sCurrentPath + "/friday",
+                sPathSaturday = sCurrentPath + "/saturday",
+                sPathSunday = sCurrentPath + "/sunday";
 
             switch (sTurnoKey) {
                 case "1":
@@ -812,6 +804,28 @@ sap.ui.define([
                     this.getView().getModel("detailModel").setProperty(sPathSaturday, null);
                     this.getView().getModel("detailModel").setProperty(sPathSunday, null);
             }
+        },
+
+        onLiveChangeSequAndDays: function (oEvent) {
+            var sValue = oEvent.getSource().getValue();
+            if (sValue.length >= 4) {
+                oEvent.getSource().setValue(sValue.substr(0, 3));
+            }
+        },
+
+        onChangeSequ: function (oEvent) {
+            this._padSequAndDayValue(oEvent);
+            this._onChangeEventHandler(oEvent, "/sequ");
+            this._changeDaysValueOnChangingSequ(oEvent);
+        },
+
+        _changeDaysValueOnChangingSequ: function (oEvent) {
+            var oControl = oEvent.getSource(),
+                sPathTurno = oControl.getBindingContext("detailModel").getPath() + "/turno",
+                sSequ = this.getControlValue(oControl),
+                sTurnoKey = this.getView().getModel("detailModel").getProperty(sPathTurno);
+            
+            this._setDaysValues(oControl, sTurnoKey, sSequ);
         },
 
         onChangeMonday: function (oEvent) {
@@ -930,6 +944,7 @@ sap.ui.define([
 
             bIsValid = await this._checkDataBeforeUpdateOrCreate(oDetail);
             if (bIsValid) {
+                var oRecoveryDetail = JSON.parse(JSON.stringify(oDetail));
                 this._setDatbiIfLoevm(oDetail);
                 oDetail = this._convertBoolToString(oDetail);
 
@@ -954,6 +969,7 @@ sap.ui.define([
                         }
                     });
                 } catch (error) {
+                    this.getView().getModel("detailModel").setProperty("/detail", oRecoveryDetail);
                     MessageBox.error(oBundle.getText("ErrorUpdateOrCreate"));
                 }
             }
@@ -1041,7 +1057,8 @@ sap.ui.define([
                 if (newAgent.length > 0) {
                     var sKunnr = newAgent[0].kunnr, // agent code
                         sDatab = newAgent[0].datab, // agent starting validity date
-                        sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and (datbi ge '${sDatab}');$select=vpid,kunnr,inactive,datab,datbi)`;
+                        sDatbi = newAgent[0].datbi, // agent starting validity date
+                        sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and (datab le '${sDatab}' and datbi ge '${sDatbi}');$select=vpid,kunnr,inactive,datab,datbi)`;
 
                     try {
 

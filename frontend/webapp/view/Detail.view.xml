@@ -71,7 +71,7 @@
 								<m:Input id="idVpid" value="{detailModel>/detail/vpid}" enabled="false"/>
 								
 								<m:Label text="{i18n>vctext}" required="true" />
-								<m:TextArea id="idVctext" value="{detailModel>/detail/vctext}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" maxLength="30"/>
+								<m:TextArea id="idVctext" value="{detailModel>/detail/vctext}" enabled="{= ${detailModel>/isNew} }" maxLength="30"/>
 
 								<m:Label text="{i18n>werks}" required="true" />
 								<m:Input id="inputWerksDetail" value="{detailModel>/detail/werks}" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
@@ -104,10 +104,10 @@
 								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatto" />
 
 								<m:Label text="{i18n>active}" />
-								<m:CheckBox id="checkBoxActiveDetail" selected="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" select="onSelectActive" />
+								<m:CheckBox id="checkBoxActiveDetail" text="{= ${detailModel>/detail/active} ? ${i18n>checkBoxActive} : ${i18n>checkBoxNotActive} }" selected="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" select="onSelectActive" />
 
 								<m:Label text="{i18n>loevm}" />
-								<m:CheckBox id="comboBoxLoevmDetail" selected="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" select="onSelectLoevm" />
+								<m:CheckBox id="comboBoxLoevmDetail" text="{= ${detailModel>/detail/loevm} ? ${i18n>checkBoxCancelled} : ${i18n>checkBoxNotCancelled} }" selected="{detailModel>/detail/loevm}" enabled="{= !${detailModel>/isNew} &amp;&amp; ${detailModel>/editMode} }" select="onSelectLoevm" />
 
 								<core:Title text="" />
 
@@ -298,42 +298,6 @@
 									<m:Label text="{i18n>dtfine}"/>
 									<table:template>
 										<m:DatePicker value="{path: 'detailModel>dtfine', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>erdat}"/>
-									<table:template>
-										<m:DatePicker value="{path: 'detailModel>erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>erzet}"/>
-									<table:template>
-										<m:TimePicker support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" value="{detailModel>erzet}" enabled="false"  />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>ernam}"/>
-									<table:template>
-										<m:Input value="{detailModel>ernam}" maxLength="12" enabled="false" />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>aedat}"/>
-									<table:template>
-										<m:DatePicker value="{path: 'detailModel>aedat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false"  />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>aezet}"/>
-									<table:template>
-										<m:TimePicker support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" value="{detailModel>aezet}" enabled="false"  />
-									</table:template>
-								</table:Column>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>aenam}"/>
-									<table:template>
-										<m:Input value="{detailModel>aenam}" maxLength="12" enabled="false" />
 									</table:template>
 								</table:Column>
 							</table:columns>
