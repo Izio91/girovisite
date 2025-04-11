@@ -15,6 +15,7 @@ service girovisiteService @(requires: 'authenticated-user') @(path: '/girovisite
   function getKunnr()            returns array of String;
   function getKunwe()            returns array of String;
   function getLockStatus()       returns array of String;
+  function getDataForCSV()       returns array of String;
   action   lock(vpid : String)   returns array of String;
   action   unlock(vpid : String) returns array of String;
 }
