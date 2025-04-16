@@ -182,7 +182,7 @@
 								<table:Column width="8rem" > 
 									<m:Label text="{i18n>datab}" required="true" />
 									<table:template>
-										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" maxDate="{'path':'detailModel>/detail/datto', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatab"  />
+										<m:DatePicker value="{path: 'detailModel>datab', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" maxDate="{parts: [{'path':'detailModel>/detail/datto'}, {'path':'detailModel>datbi'}], formatter:'.formatter.getMaxDate'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunnr} }" change="onChangeDatab"  />
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >

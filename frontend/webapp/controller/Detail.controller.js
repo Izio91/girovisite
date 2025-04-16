@@ -676,6 +676,17 @@ sap.ui.define([
 
             if (bRandgeIsDefined) {
                 this._onChangeEventHandler(oEvent, "/datab");
+
+                // Check if datbi is still valid
+                var oView = this.getView();
+                var oModel = oView.getModel("detailModel");
+                var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+                var sDatab = oModel.getProperty(sPath+"/datab");
+                var sDatbi = oModel.getProperty(sPath+"/datbi");
+        
+                if (sDatbi && sDatab && sDatbi < sDatab) {
+                    oModel.setProperty(sPath+"/datbi", sDatab); // set it to the new min value
+                }
             } else {
                 oEvent.getSource().setValue(null);
                 MessageBox.error(oBundle.getText("noRangeDefined"));
@@ -731,7 +742,7 @@ sap.ui.define([
         },
 
         _changeDaysValueOnChangingTurno: function (oEvent) {
-            var oControl = oEvent.getSource()
+            var oControl = oEvent.getSource(),
                 oTable = this.getView().byId("idDetailTable"),
                 oRow = oControl.getParent(),
                 nRowIndex = oTable.indexOfRow(oRow),
@@ -741,14 +752,13 @@ sap.ui.define([
                 sTurnoKey = this.getControlValue(oControl);
             
             this.getView().getModel("detailModel").setProperty(sPathSequ, sKunweIndex);
-            this._setDaysValues(oControl, null, null);
             this._setDaysValues(oControl, sTurnoKey, sKunweIndex);
         },
 
         _getKunweIndex : function (nRowIndex) {
             var nKunweIndex = 0,
                 aDetails = this.getView().getModel("detailModel").getProperty("/detail/details"),
-                aSortedDetails = aDetails.sort((a,b) => a.vppos - b.vppos);
+                aSortedDetails = JSON.parse(JSON.stringify(aDetails)).sort((a, b) => a.vppos - b.vppos);
             for(let i = 0; i <= nRowIndex; i++) {
                 if (aSortedDetails[i].isKunwe) {
                     nKunweIndex++;
@@ -981,21 +991,22 @@ sap.ui.define([
                 sErrorMessage = '',
                 oDetail = this.getView().getModel("detailModel").getProperty("/detail"),
                 bIsValid = true;
+            if (!oDetail.loevm) {
+                aErrorMessage = aErrorMessage.concat(this._checkRequiredInfo(oDetail));
+                aErrorMessage = aErrorMessage.concat(await this._checkActiveAgent(oDetail));
+                aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
+                aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
+                aErrorMessage = aErrorMessage.concat(this._checkEachKunweHasDifferentOrder(oDetail));
 
-            aErrorMessage = aErrorMessage.concat(this._checkRequiredInfo(oDetail));
-            aErrorMessage = aErrorMessage.concat(await this._checkActiveAgent(oDetail));
-            aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
-            aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
-            aErrorMessage = aErrorMessage.concat(this._checkEachKunweHasDifferentOrder(oDetail));
+                sErrorMessage = [...new Set(aErrorMessage)].join(" ");
 
-            sErrorMessage = [...new Set(aErrorMessage)].join(" ");
-
-            if (sErrorMessage !== '') {
-                bIsValid = false;
-                MessageBox.error(oBundle.getText("ErrorUpdateOrCreate"), {
-                    title: "Error",
-                    details: sErrorMessage
-                });
+                if (sErrorMessage !== '') {
+                    bIsValid = false;
+                    MessageBox.error(oBundle.getText("ErrorUpdateOrCreate"), {
+                        title: "Error",
+                        details: sErrorMessage
+                    });
+                }
             }
             return bIsValid;
         },
@@ -1052,39 +1063,43 @@ sap.ui.define([
                 bIsActive = this.getView().getModel("detailModel").getProperty("/detail/active");
             // If there is at least one agent
             if (allActiveAgent.length > 0) {
-                // Check active agent only for the new record if any
-                var newAgent = allActiveAgent.filter(detail => detail.isNew);
-                if (newAgent.length > 0) {
-                    var sKunnr = newAgent[0].kunnr, // agent code
-                        sDatab = newAgent[0].datab, // agent starting validity date
-                        sDatbi = newAgent[0].datbi, // agent starting validity date
-                        sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and (datab le '${sDatab}' and datbi ge '${sDatbi}');$select=vpid,kunnr,inactive,datab,datbi)`;
-
-                    try {
-
-                        // Execute the request
-                        var oResult = await this.executeRequest(sUrl, 'GET'),
-                            aDetails = [];
-
-                        if (oResult) {
-                            // Merge all details from result
-                            oResult.value.forEach(oItem => {
-                                aDetails = aDetails.concat(oItem.details);
-                            });
-                        }
-
-                        if (aDetails.length !== 0) {
-                            aErrorMessage.push(oBundle.getText("agentAlreadyActive", [aDetails[0].vpid]) + "\n");
-                        }
-
-                    } catch (error) {
-                        MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
-                            title: "Error",
-                            details: error
-                        });
-                        aErrorMessage.push(oBundle.getText("ErrorCheckingActiveAgent") + "\n");
+                var sKunnr = allActiveAgent[0].kunnr, // agent code
+                    sDatab = allActiveAgent[0].datab, // agent starting validity date
+                    sDatbi = allActiveAgent[0].datbi, // agent starting validity date
+                    sVpid = allActiveAgent[0].vpid, // current vpid
+                    sUrl = null;
+                    if (!sVpid) {
+                        sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and (datab le '${sDatbi}' and datbi ge '${sDatab}');$select=vpid,kunnr,inactive,datab,datbi)`;
+                    } else {
+                        sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=loevm eq null or loevm eq ''&$select=vpid&$expand=details($filter=kunnr eq '${sKunnr}' and (inactive eq null or inactive eq '') and vpid ne '${sVpid}' and (datab le '${sDatbi}' and datbi ge '${sDatab}');$select=vpid,kunnr,inactive,datab,datbi)`;
                     }
+                    
+
+                try {
+
+                    // Execute the request
+                    var oResult = await this.executeRequest(sUrl, 'GET'),
+                        aDetails = [];
+
+                    if (oResult) {
+                        // Merge all details from result
+                        oResult.value.forEach(oItem => {
+                            aDetails = aDetails.concat(oItem.details);
+                        });
+                    }
+
+                    if (aDetails.length !== 0) {
+                        aErrorMessage.push(oBundle.getText("agentAlreadyActive", [aDetails[0].vpid]) + "\n");
+                    }
+
+                } catch (error) {
+                    MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
+                        title: "Error",
+                        details: error
+                    });
+                    aErrorMessage.push(oBundle.getText("ErrorCheckingActiveAgent") + "\n");
                 }
+                
             } else {
                 if (bIsNew || bIsActive) {
                     aErrorMessage.push(oBundle.getText("noAgentForCurrentPlan") + "\n");

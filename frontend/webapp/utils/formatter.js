@@ -27,6 +27,24 @@ sap.ui.define([
             return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
         },
 
+        getMaxDate: function (sDateA, sDateB) {
+            let sDate = null;
+            if (sDateA && sDateB && sDateA !== '' && sDateB !== '') {
+                if (sDateA < sDateB) {
+                    sDate = sDateA;
+                } else {
+                    sDate = sDateB;
+                }
+            } else {
+                if (sDateA && sDateA !== '') {
+                    sDate = sDateA;
+                }
+            }
+            if (!sDate) return null;
+            let aDate = sDate.split('-').map(Number)
+            return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
+        },
+
         handleInactiveAgentSelectedKey: function (bIsNew, bInactive, bIsKunnr) {
             return bIsNew && bIsKunnr ? false : bInactive;
         },
