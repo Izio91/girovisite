@@ -138,6 +138,34 @@ sap.ui.define([
 
                     return detail;
                 });
+                let aKunwe = oData.details.filter(a => a.isKunwe);
+                let aKunnr = oData.details.filter(a => a.isKunnr);
+                // Sort by ascendent sequ
+                aKunwe.sort((a, b) => {
+                    if (a.sequ > b.sequ ) {
+                        return 1;
+                    } else if (a.sequ < b.sequ) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                // Sort by active agent: active agent must be first one, inactive agents will be sorted by their datbi date
+                aKunnr.sort((a, b) => {
+                    if (!a.inactive && b.inactive) {
+                        return -1;
+                    }  else if (a.inactive && !b.inactive) {
+                        return 1;
+                    } else {
+                        if (a.datbi > b.datbi) {
+                            return -1;
+                        } else if (a.datbi < b.datbi) {
+                            return 1;
+                        }
+                    }
+                    return 0; 
+                });
+
+                oData.details = aKunnr.concat(aKunwe);
 
                 oDetailModel.setProperty("/detail", oData);
                 if (oData.loevm) {
@@ -474,10 +502,11 @@ sap.ui.define([
         _addRow: function (bIsKunnr, bIsKunwe) {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
+                aCopyRows = (JSON.parse(JSON.stringify(aRows))),
                 bCreateMode = oDetailModel.getProperty("/isNew");
 
-            aRows.sort((a, b) => a.vppos - b.vppos);
-            var nVppos = aRows.length > 0 ? aRows[aRows.length - 1].vppos + 1 : 1;
+                aCopyRows.sort((a, b) => a.vppos - b.vppos);
+            var nVppos = aCopyRows.length > 0 ? aCopyRows[aCopyRows.length - 1].vppos + 1 : 1;
 
             // All previous agent must be inactive if a new agent is adding
             if (bIsKunnr) {
@@ -488,7 +517,7 @@ sap.ui.define([
                 });
             }
 
-            aRows.push({
+            let oNewInsert = {
                 "isNew": true,
                 "isKunnr": bIsKunnr,
                 "isKunwe": bIsKunwe,
@@ -523,7 +552,14 @@ sap.ui.define([
                 "vpid": oDetailModel.getProperty("/detail/vpid"),
                 "vppos": nVppos,
                 "werks": oDetailModel.getProperty("/detail/werks")
-            });
+            };
+
+            if (bIsKunnr) {
+                // If agent, add to first position
+                aRows.unshift(oNewInsert)
+            } else {
+                aRows.push(oNewInsert);
+            }
             oDetailModel.setProperty("/detail/details", aRows);
 
             // In create mode only one agent must be present, for this reason addKunnr button is disabled

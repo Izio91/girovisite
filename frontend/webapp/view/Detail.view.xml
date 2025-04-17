@@ -138,11 +138,7 @@
 				<subSections>
 					<ObjectPageSubSection title="{i18n>detailData}" titleUppercase="false">
 						<table:Table id="idDetailTable" rows="{
-								path: 'detailModel>/detail/details',
-									sorter: {
-										path: 'vppos'
-									}
-							}" class="sapUiSmallMargin"
+								path: 'detailModel>/detail/details'}" class="sapUiSmallMargin"
 								rowSelectionChange="onSelectionDetailChange"
 								selectionMode="{= ${detailModel>/isNew} || ${detailModel>/editMode} ? 'MultiToggle' : 'None' }">
 							<table:extension>
@@ -155,12 +151,6 @@
 								</m:Toolbar>
 							</table:extension>
 							<table:columns>
-								<table:Column width="8rem" >
-									<m:Label text="{i18n>vppos}"/>
-									<table:template>
-										<m:ObjectIdentifier title="{detailModel>vppos}" />
-									</table:template>
-								</table:Column>
 								<table:Column width="8rem" >
 									<m:Label text="{i18n>kunnr}" required="true"/>
 									<table:template>
