@@ -98,10 +98,10 @@
 								<m:Input id="inputTermCodeDetail" value="{detailModel>/detail/termCode}" maxLength="3" enabled="false" />
 
 								<m:Label text="{i18n>datfr}" required="true" />
-								<m:DatePicker id="datePickerDatfrDetail" value="{path: 'detailModel>/detail/datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatfr" />
+								<m:DatePicker id="datePickerDatfrDetail" value="{path: 'detailModel>/detail/datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getMinDateDatfr'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatfr" />
 
 								<m:Label text="{i18n>datto}" required="true" />
-								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} }" change="onChangeDatto" />
+								<m:DatePicker id="datePickerDattoDetail" value="{'path':'detailModel>/detail/datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}" minDate="{'path':'detailModel>/detail/datfr', formatter:'.formatter.getUI5Date'}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" change="onChangeDatto" />
 
 								<m:Label text="{i18n>active}" />
 								<m:CheckBox id="checkBoxActiveDetail" text="{= ${detailModel>/detail/active} ? ${i18n>checkBoxActive} : ${i18n>checkBoxNotActive} }" selected="{detailModel>/detail/active}" enabled="{= ${detailModel>/isNew} || ${detailModel>/editMode} }" select="onSelectActive" />

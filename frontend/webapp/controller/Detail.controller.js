@@ -70,12 +70,12 @@ sap.ui.define([
                 "editMode": bEdit,
                 "readOnly": bReadOnly,
                 "detail": {
-                    "active": false,
+                    "active": bIsNew,
                     "aedat": null,
                     "aenam": null,
                     "aezet": null,
                     "datfr": null,
-                    "datto": null,
+                    "datto": '9999-12-31',
                     "driver1": null,
                     "driverDescr": null,
                     "erdat": null,
@@ -502,6 +502,8 @@ sap.ui.define([
         _addRow: function (bIsKunnr, bIsKunwe) {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
+                sDatfr = oDetailModel.getProperty("/detail/datfr"),
+                sDatto = oDetailModel.getProperty("/detail/datto"),
                 aCopyRows = (JSON.parse(JSON.stringify(aRows))),
                 bCreateMode = oDetailModel.getProperty("/isNew");
 
@@ -527,8 +529,8 @@ sap.ui.define([
                 "datab": null,
                 "datbi": null,
                 "driver1": null,
-                "dtabwe": null,
-                "dtbiwe": null,
+                "dtabwe": bIsKunwe ? sDatfr : null,
+                "dtbiwe": bIsKunwe ? sDatto : null,
                 "dtfine": null,
                 "erdat": null,
                 "ernam": null,
@@ -579,7 +581,9 @@ sap.ui.define([
                 aSelectedIndices = oTable.getSelectedIndices(),
                 selectedContexts = aSelectedIndices.map(iIndex => oTable.getContextByIndex(iIndex)),
                 oBinding = oTable.getBinding("rows"),
-                aBindingContext = oBinding.getContexts(0, oBinding.getLength());
+                aBindingContext = oBinding.getContexts(0, oBinding.getLength()),
+                bCreateMode = oDetailModel.getProperty("/isNew"),
+                bRemovedRowsContainsKunnr = selectedContexts.map(context => oDetailModel.getProperty(context.getPath()+"/isKunnr")).includes(true);
 
             let a = new Set(aBindingContext);
             let b = new Set(selectedContexts);
@@ -592,6 +596,10 @@ sap.ui.define([
             });
 
             oDetailModel.setProperty("/detail/details", values);
+
+            if (bCreateMode && bRemovedRowsContainsKunnr) {
+                this.getView().byId("idAddRowMenuFragment").getItems()[0].setEnabled(true);
+            }
         },
 
         /**
@@ -675,6 +683,21 @@ sap.ui.define([
 
         onChangeDatto: function (oEvent) {
             this._onChangeEventHandler(oEvent, "/datto");
+            let oDetailModel = this.getView().getModel("detailModel").getProperty("/detail"),
+                sDatto = oDetailModel.datto;
+
+            oDetailModel.details.forEach(detail => {
+                if (detail.isKunnr) {
+                    if (detail.datbi && sDatto < detail.datbi) {
+                        detail.datbi = sDatto;
+                    }
+                } else {
+                    if (detail.dtbiwe && sDatto < detail.dtbiwe) {
+                        detail.dtbiwe = sDatto;
+                    }
+                }
+            });
+            this.getView().getModel("detailModel").setProperty("/detail", oDetailModel);
         },
 
         onSelectActive: function (oEvent) {

@@ -53,7 +53,19 @@
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="driver1" label="{i18n>driver1}" visibleInFilterBar="true">
                                 <fb:control>
-                                    <Input id="inputDriver1" maxLength="10"  showValueHelp="true" valueHelpRequest="onDriverVH" />
+                                    <MultiComboBox id="multiComboDriver1" 
+                                        items="{
+                                            path: 'masterModel>/valuehelps/driver',
+				                            length: 10000,
+                                            sorter: {
+                                                path: 'CustomerName',
+                                                descending: false,
+                                                group: true
+                                            },
+                                            groupHeaderFactory: '.getGroupHeader'
+                                        }">
+                                        <core:Item key="{masterModel>Customer}" text="{masterModel>Customer} | {masterModel>SortField}" />
+                                    </MultiComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem groupName="DefaultGroup" name="kunnr" label="{i18n>kunnr}" visibleInFilterBar="true">

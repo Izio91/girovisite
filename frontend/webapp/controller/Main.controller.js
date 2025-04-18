@@ -18,8 +18,9 @@ sap.ui.define([
     'sap/m/table/ColumnWidthController',
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
-    "frontend/utils/formatter"
-], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Button, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator, formatter) => {
+    "frontend/utils/formatter",
+    'sap/ui/core/SeparatorItem'
+], (BaseController, JSONModel, MessageBox, Fragment, Engine, SelectionController, SortController, GroupController, FilterController, MetadataHelper, Sorter, ColumnListItem, Button, Text, ObjectIdentifier, coreLibrary, ColumnWidthController, Filter, FilterOperator, formatter, SeparatorItem) => {
     "use strict";
 
     var baseManifestUrl;
@@ -74,6 +75,7 @@ sap.ui.define([
 
         _onObjectMatched: async function () {
             this.defineModelForCurrentPage();
+            await this._fetchDrivers();
             // This function is responsible for applying filters and fetching data based on user input.
             await this.onGoPress();
             this._registerForP13n();
@@ -503,6 +505,35 @@ sap.ui.define([
             this._fetchData();
         },
 
+        _fetchDrivers: async function () {
+            var oMasterModel = this.getView().getModel("masterModel"),
+                sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
+                sPropertyPath = "/valuehelps/driver",
+                that = this;
+
+            try {
+                sap.ui.core.BusyIndicator.show();
+
+                // Execute the request
+                var oData = await this.executeRequest(sUrl, 'GET');
+                oMasterModel.setProperty(sPropertyPath, oData.value[0].result);
+                sap.ui.core.BusyIndicator.hide();
+            } catch (error) {
+                MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+            } finally {
+                sap.ui.core.BusyIndicator.hide();
+            }
+        },
+
+		getGroupHeader: function (oGroup) {
+			return new SeparatorItem( {
+				text: oGroup.key
+			});
+		},
+
         /**
          * Fetch data with current filters and pagination parameters.
          * It constructs the query parameters from the input fields and sends an AJAX request to the backend.
@@ -591,8 +622,15 @@ sap.ui.define([
                             return `${sField} eq '${sValue}'`; // Equality for other fields
                         }
                     } else {
-                        // For non-date fields, return an equality filter condition
-                        return `${sField} eq '${sValue}'`;
+                        if (sField === 'driver1') {
+                            if (sValue.length > 0) {
+                                let aValue = sValue.map(driver => `${sField} eq '${driver}'`);
+                                return `(${aValue.join(' or ')})`;
+                            }
+                        } else {
+                            // For non-date fields, return an equality filter condition
+                            return `${sField} eq '${sValue}'`;
+                        }
                     }
                 }
             }
@@ -630,7 +668,7 @@ sap.ui.define([
                 ["werks", "inputWerks", false],
                 ["vkorg", "inputVkorg", false],
                 ["vtweg", "inputVtweg", false],
-                ["driver1", "inputDriver1", false],
+                ["driver1", "multiComboDriver1", false],
                 ["kunnr", "inputKunnr", false],
                 ["kunwe", "inputKunwe", false],
                 ["datfr", "datePickerDatfr", true],
@@ -731,11 +769,19 @@ sap.ui.define([
                 this.getView().byId(sControlId).setSelectedKey('default');
             };
 
+            /**
+             * Helper function to reset multi combo box selected key.
+             * @param {string} sControlId - The ID of the drop-down control to reset.
+             */
+            function resetSelectedKeys(sControlId) {
+                this.getView().byId(sControlId).setSelectedKeys(null);
+            };
+
             resetValue.call(this, "inputVpid");
             resetValue.call(this, "inputWerks");
             resetValue.call(this, "inputVkorg");
             resetValue.call(this, "inputVtweg");
-            resetValue.call(this, "inputDriver1");
+            resetSelectedKeys.call(this, "multiComboDriver1");
             resetValue.call(this, "inputKunnr");
             resetValue.call(this, "inputKunwe");
             resetDateValue.call(this, "datePickerDatfr");
@@ -829,10 +875,6 @@ sap.ui.define([
 
         onSearchDriver: function (oEvent) {
             this._onSearchValueHelp(oEvent, this.getView(), ["Customer", "CustomerName"], "idDriverDialog_VH");
-        },
-
-        onConfirmDriver: function (oEvent) {
-            this._onConfirmValueHelp(oEvent, "masterModel", this.getView(), "/Customer", "inputDriver1");
         },
 
         // Kunnr value help
