@@ -595,11 +595,34 @@ sap.ui.define([
                 return ctx.getObject();
             });
 
+            values = this._activeLastInsertedAgent(values);
             oDetailModel.setProperty("/detail/details", values);
 
             if (bCreateMode && bRemovedRowsContainsKunnr) {
                 this.getView().byId("idAddRowMenuFragment").getItems()[0].setEnabled(true);
             }
+        },
+
+        /**
+         * If active agent has been removed, active the one with grater vppos
+         */
+        _activeLastInsertedAgent: function (aDetails) {
+            let nKunnrIndex = null;
+            let nMaxKunnrVppos = 0;
+            // Find last inserted agent
+            for (let i = 0 ; i < aDetails.length; i++) {
+                if (aDetails[i].isKunnr) {
+                    if (nMaxKunnrVppos < aDetails[i].vppos) {
+                        nMaxKunnrVppos = aDetails[i].vppos;
+                        nKunnrIndex = i;
+                    }
+                }
+            }
+            // Active last agent
+            if (nKunnrIndex !== null) {
+                aDetails[nKunnrIndex].inactive = false;
+            }
+            return aDetails;
         },
 
         /**
@@ -804,7 +827,7 @@ sap.ui.define([
             var oControl = oEvent.getSource(),
                 oTable = this.getView().byId("idDetailTable"),
                 oRow = oControl.getParent(),
-                nRowIndex = oTable.indexOfRow(oRow),
+                nRowIndex = parseInt(oRow.getBindingContext("detailModel").getPath().split("/")[3]),
                 sCurrentPath = oControl.getBindingContext("detailModel").getPath(),
                 sKunweIndex = String(this._getKunweIndex(nRowIndex)).padStart(3,'0'),
                 sPathSequ = sCurrentPath + "/sequ",
