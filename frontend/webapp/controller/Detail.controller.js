@@ -660,6 +660,22 @@ sap.ui.define([
             return sTime
         },
 
+        onLiveChangeVcText: function (oEvent) {
+            var sValue = oEvent.getSource().getValue(),
+                bTextContainsInvalidChar = false,
+                aInvalidCharacters = ["/","\\"];
+            aInvalidCharacters.forEach(sChar => {
+                if (sValue.includes(sChar) ) {
+                    bTextContainsInvalidChar = true;
+                    sValue = sValue.replaceAll(sChar, " ");
+                }
+            })
+            if (bTextContainsInvalidChar) {
+                MessageToast.show(oBundle.getText("invalidCharacter"));
+                oEvent.getSource().setValue(sValue);
+            }
+        },
+
         eraseValue: function (oEvent) {
             oEvent.getSource().setValue();
         },

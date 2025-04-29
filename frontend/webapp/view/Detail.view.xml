@@ -71,7 +71,7 @@
 								<m:Input id="idVpid" value="{detailModel>/detail/vpid}" enabled="false"/>
 								
 								<m:Label text="{i18n>vctext}" required="true" />
-								<m:TextArea id="idVctext" value="{detailModel>/detail/vctext}" enabled="{= ${detailModel>/isNew} }" maxLength="30"/>
+								<m:TextArea id="idVctext" value="{detailModel>/detail/vctext}" enabled="{= ${detailModel>/isNew} }" maxLength="30" liveChange="onLiveChangeVcText"/>
 
 								<m:Label text="{i18n>werks}" required="true" />
 								<m:Input id="inputWerksDetail" value="{detailModel>/detail/werks}" maxLength="4" showValueHelp="true" valueHelpRequest="onWerksVH" enabled="{= ${detailModel>/isNew} }" liveChange="eraseValue" />
