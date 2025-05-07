@@ -48,24 +48,26 @@ sap.ui.define([
                 KunweCustomerName: 12,
                 StreetName: 13,
                 PostalCode: 14,
-                CityName: 15,
-                dtabwe: 16,
-                dtbiwe: 17,
-                turno: 18,
-                monday: 19,
-                tuesday: 20,
-                wednesday: 21,
-                thursday: 22,
-                friday: 23,
-                saturday: 24,
-                sunday: 25,
-                BusinessPartnerGrouping: 26,
-                vkorg: 27,
-                vtweg: 28,
-                spart: 29,
-                dtfine: 30,
-                active: 31,
-                loevm: 32
+                CustomerGroup: 15,
+                CustomerConditionGroup2: 16,
+                CityName: 17,
+                dtabwe: 18,
+                dtbiwe: 19,
+                turno: 20,
+                monday: 21,
+                tuesday: 22,
+                wednesday: 23,
+                thursday: 24,
+                friday: 25,
+                saturday: 26,
+                sunday: 27,
+                BusinessPartnerGrouping: 28,
+                vkorg: 29,
+                vtweg: 30,
+                spart: 31,
+                dtfine: 32,
+                active: 33,
+                loevm: 34
             };
 
             var oRouter = this.getOwnerComponent().getRouter();
@@ -76,6 +78,7 @@ sap.ui.define([
         _onObjectMatched: async function () {
             this.defineModelForCurrentPage();
             await this._fetchDrivers();
+            this.onClearFilterBar();
             // This function is responsible for applying filters and fetching data based on user input.
             await this.onGoPress();
             this._registerForP13n();
@@ -138,6 +141,11 @@ sap.ui.define([
                 key: "kunnr_col",
                 label: oBundle.getText("kunnr"),
                 path: "kunnr"
+            },
+            {
+                key: "inactive_col",
+                label: oBundle.getText("inactive"),
+                path: "inactive"
             },
             {
                 key: "active_col",
@@ -528,12 +536,6 @@ sap.ui.define([
             }
         },
 
-		getGroupHeader: function (oGroup) {
-			return new SeparatorItem( {
-				text: oGroup.key
-			});
-		},
-
         /**
          * Fetch data with current filters and pagination parameters.
          * It constructs the query parameters from the input fields and sends an AJAX request to the backend.
@@ -574,7 +576,7 @@ sap.ui.define([
             var sUrl = baseManifestUrl + "/girovisiteService/HeaderWithDetails?",
                 aParams = [];
 
-            aParams.push("$select=vpid,vctext,werks,vkorg,vtweg,spart,driver1,termCode,datfr,datto,active,loevm,erdat,erzet,ernam,aedat,aezet,aenam,locked,lockedBy,lockedAt,kunnr,kunwe");
+            aParams.push("$select=vpid,vctext,werks,vkorg,vtweg,spart,driver1,termCode,datfr,datto,active,loevm,inactive,erdat,erzet,ernam,aedat,aezet,aenam,locked,lockedBy,lockedAt,kunnr,kunwe");
             // Add pagination parameters
             aParams.push("$top=" + this._iTop);
             aParams.push("$skip=" + this._iSkip);
@@ -603,8 +605,8 @@ sap.ui.define([
          * @returns {string|null} The filter condition as a string, or null if no valid condition can be created.
          */
         _getFilterAsString: function (sField, sValue, bIsDate = false) {
-            // Check if the field is one of the special cases ('active' or 'loevm') and if a valid value is provided
-            if (sField === 'active' || sField === 'loevm') {
+            // Check if the field is one of the special cases ('active' or 'loevm' or 'inactive') and if a valid value is provided
+            if (sField === 'active' || sField === 'loevm' || sField === 'inactive') {
                 if (sValue !== null && sValue !== 'default') {
                     return `${sField} eq '${sValue}'`;
                 }
@@ -675,6 +677,7 @@ sap.ui.define([
                 ["datto", "datePickerDatto", true],
                 ["active", "comboBoxActive", false],
                 ["loevm", "comboBoxLoevm", false],
+                ["inactive", "comboBoxInactive", false],
                 ["spart", "inputSpart", false],
                 ["termCode", "inputTermCode", false],
                 ["erdat", "datePickerErdat", true],
@@ -788,6 +791,7 @@ sap.ui.define([
             resetDateValue.call(this, "datePickerDatto");
             resetSelectedKey.call(this, "comboBoxActive");
             resetSelectedKey.call(this, "comboBoxLoevm");
+            resetSelectedKey.call(this, "comboBoxInactive");
             resetValue.call(this, "inputSpart");
             resetValue.call(this, "inputTermCode");
             resetDateValue.call(this, "datePickerErdat");

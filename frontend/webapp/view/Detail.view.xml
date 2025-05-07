@@ -218,7 +218,7 @@
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
-									<m:Label text="{i18n>turno}" required="true" />
+									<m:Label text="{i18n>turno}" />
 									<table:template>
 										<m:ComboBox selectedKey="{detailModel>turno}"  enabled="{= (${detailModel>/isNew} || ${detailModel>/editMode}) &amp;&amp; ${detailModel>isKunwe} }" change="onChangeTurno"  >
 											<core:Item key="0" text="{i18n>turno0}" />
@@ -229,7 +229,7 @@
 									</table:template>
 								</table:Column>
 								<table:Column width="8rem" >
-									<m:Label text="{i18n>sequ}" required="true" />
+									<m:Label text="{i18n>sequ}" />
 									<table:template>
 										<m:Input value="{detailModel>sequ}" type="Number" enabled="{parts: [{path: 'detailModel>/isNew'}, {path: 'detailModel>/editMode'}, {path: 'detailModel>turno'}, {path: 'detailModel>isKunwe'}], 
 											formatter: '.formatter.enableSequenceControl'}" liveChange="onLiveChangeSequAndDays" change="onChangeSequ"/>

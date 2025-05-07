@@ -1092,6 +1092,7 @@ sap.ui.define([
             if (!oDetail.loevm) {
                 aErrorMessage = aErrorMessage.concat(this._checkRequiredInfo(oDetail));
                 aErrorMessage = aErrorMessage.concat(await this._checkActiveAgent(oDetail));
+                aErrorMessage = aErrorMessage.concat(await this._checkDriver(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkEachKunweHasDifferentOrder(oDetail));
@@ -1141,8 +1142,6 @@ sap.ui.define([
                     checkDataFilled(detail.kunwe, "kunwe");
                     checkDataFilled(detail.dtabwe, "dtabwe");
                     checkDataFilled(detail.dtbiwe, "dtbiwe");
-                    checkDataFilled(detail.turno, "turno");
-                    checkDataFilled(detail.sequ, "sequ");
                 }
             });
 
@@ -1202,6 +1201,45 @@ sap.ui.define([
                 if (bIsNew || bIsActive) {
                     aErrorMessage.push(oBundle.getText("noAgentForCurrentPlan") + "\n");
                 }
+            }
+
+            return aErrorMessage;
+        },
+
+        /**
+         * Check if current VAN is in another plan in the same range
+         * @param {*} oDetail 
+         * @returns {string} - if the VAN is in another plan it returns a string containing an error message, empty string otherwise
+         */
+        _checkDriver: async function (oDetail) {
+            var sDriver = oDetail.driver1,
+                sVpid = oDetail.vpid,
+                sDatfr = oDetail.datfr,
+                sDatto = oDetail.datto,
+                sUrl = null,
+                aErrorMessage = [];
+
+            if (!sVpid) {
+                sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=(loevm eq null or loevm eq '') and (datfr le '${sDatto}' and datto ge '${sDatfr}') and driver1 eq '${sDriver}'&$select=vpid,datfr,datto`;
+            } else {
+                sUrl = baseManifestUrl + `/girovisiteService/Header?$filter=(loevm eq null or loevm eq '') and vpid ne '${sVpid}' and (datfr le '${sDatto}' and datto ge '${sDatfr}') and driver1 eq '${sDriver}'&$select=vpid,datfr,datto`;
+            }
+                
+            try {
+
+                // Execute the request
+                var oResult = await this.executeRequest(sUrl, 'GET');
+
+                if (oResult.value.length !== 0) {
+                    aErrorMessage.push(oBundle.getText("vanAlreadyPresent", [oResult.value[0].vpid]) + "\n");
+                }
+
+            } catch (error) {
+                MessageBox.error(oBundle.getText("ErrorReadingDataFromBackend"), {
+                    title: "Error",
+                    details: error
+                });
+                aErrorMessage.push(oBundle.getText("ErrorCheckingDriver") + "\n");
             }
 
             return aErrorMessage;

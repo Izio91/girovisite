@@ -94,6 +94,7 @@ view HeaderWithDetails as
             t1.datfr,
             t1.datto,
             t2.kunnr,
+            t2.inactive,
             t2.datab,
             t2.datbi,
             t2.kunwe,

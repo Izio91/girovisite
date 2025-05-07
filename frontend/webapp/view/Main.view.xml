@@ -58,13 +58,12 @@
                                             path: 'masterModel>/valuehelps/driver',
 				                            length: 10000,
                                             sorter: {
-                                                path: 'CustomerName',
-                                                descending: false,
-                                                group: true
+                                                path: 'Customer',
+                                                descending: false
                                             },
                                             groupHeaderFactory: '.getGroupHeader'
                                         }">
-                                        <core:Item key="{masterModel>Customer}" text="{masterModel>Customer} | {masterModel>SortField}" />
+                                        <core:Item key="{masterModel>Customer}" text="{masterModel>Customer}" />
                                     </MultiComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
@@ -103,6 +102,15 @@
                                         <core:Item key="default" text="" />
                                         <core:Item key="X" text="{i18n>comboBoxKeyCancelled}" />
                                         <core:Item key="" text="{i18n>comboBoxKeyNotCancelled}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="ianctive" label="{i18n>inactive}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <ComboBox id="comboBoxInactive" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyInactive}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotInactive}" />
                                     </ComboBox>
                                 </fb:control>
                             </fb:FilterGroupItem>
@@ -244,6 +252,9 @@
                     <Column app:p13nKey="kunnr_col" headerMenu="menu">
                         <Text text="{i18n>kunnr}"/>
                     </Column>
+                    <Column app:p13nKey="inactive_col" headerMenu="menu">
+                        <Text text="{i18n>inactive}"/>
+                    </Column>
                     <Column app:p13nKey="active_col" visible="false" headerMenu="menu">
                         <Text text="{i18n>active}"/>
                     </Column>
@@ -292,6 +303,7 @@
                         <Text text="{path: 'masterModel>datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
                         <Text text="{path: 'masterModel>datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
                         <Text text="{masterModel>kunnr}"/>
+                        <Text text="{masterModel>inactive}"/>
                         <Text text="{masterModel>active}"/>
                         <Text text="{masterModel>loevm}"/>
                         <Text text="{path: 'masterModel>erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>

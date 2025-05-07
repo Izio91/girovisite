@@ -86,7 +86,9 @@ module.exports = async (request, tx) => {
             StreetName: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.StreetName || null,
             PostalCode: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.PostalCode || null,
             CityName: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.CityName || null,
-            BusinessPartnerGrouping: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.BusinessPartnerGrouping || null
+            BusinessPartnerGrouping: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.BusinessPartnerGrouping || null,
+            CustomerGroup: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.CustomerGroup || null,
+            CustomerConditionGroup2: oResultKunwe.find(customer => customer.Customer === item.kunwe)?.CustomerConditionGroup2 || null
         }));
     }
 

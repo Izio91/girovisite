@@ -46,25 +46,11 @@ sap.ui.define([
         },
 
         getMinDateDatfr: function (sDate) {
-            if (!sDate) {
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = today.getMonth(); // Months are zero-based
-                const dd = today.getDate();
-    
-                if (dd === 1) {
-                    return UI5Date.getInstance(yyyy, mm, 1);
-                } else {
-                    const nextMonth = new Date(yyyy, mm+1, 1);
-                    const nextMonthYYYY = nextMonth.getFullYear();
-                    const nextMonthMM = nextMonth.getMonth();
-                    return UI5Date.getInstance(nextMonthYYYY,nextMonthMM,1);
-                }
-            } else {
-                if (!sDate) return null;
-                let aDate = sDate.split('-').map(Number)
-                return UI5Date.getInstance(aDate[0], aDate[1] - 1, aDate[2]);
-            }
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = today.getMonth(); // Months are zero-based
+
+            return UI5Date.getInstance(yyyy, mm, 1);
         },
 
         handleInactiveAgentSelectedKey: function (bIsNew, bInactive, bIsKunnr) {
