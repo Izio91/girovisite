@@ -182,6 +182,7 @@ sap.ui.define([
             } finally {
                 sap.ui.core.BusyIndicator.hide();
             }
+            return oData;
         },
 
         onGoBack: function () {
@@ -377,7 +378,7 @@ sap.ui.define([
                         emphasizedAction: MessageBox.Action.NO,
                         onClose: function (sAction) {
                             if (sAction === MessageBox.Action.YES) {
-                                that._lockDocument();
+                                that._updateDescriptions();
                             }
                         }
                     });
@@ -385,17 +386,22 @@ sap.ui.define([
             }.bind(this));
         },
 
-        _lockDocument: async function () {
+        _updateDescriptions: async function () {
             var that = this,
                 sUrl = baseManifestUrl + "/girovisiteService/lock",
                 body = {
                     vpid: this._vpid.toString()
-                };
-            try {
-                sap.ui.core.BusyIndicator.show();
+                },
+                oDetailModel = this.getView().getModel("detailModel"),
+                oDetail = null,
+                aKunnr = [],
+                aKunwe = [];
 
+            sap.ui.core.BusyIndicator.show();
+            
+            try {
                 // Execute the request
-                var oData = await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
+                await this.executeRequest(sUrl, 'POST', JSON.stringify(body));
                 this.getView().getModel("detailModel").setProperty("/editMode", true);
                 MessageToast.show(oBundle.getText("documentLocked"));
             } catch (error) {
@@ -404,8 +410,71 @@ sap.ui.define([
                     details: error
                 });
             } finally {
-                that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
-                sap.ui.core.BusyIndicator.hide();
+                oDetail = await that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
+            }
+
+            try {
+                let sKunnrUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
+                    oKunnrResult = await this.executeRequest(sKunnrUrl, 'GET');
+                aKunnr = oKunnrResult.value[0].result;
+                oDetail.details.forEach(detail => {
+                    if (detail.isKunnr) {
+                        const oFoundKunnr = aKunnr.find((oKunnr) => oKunnr.Customer === detail.kunnr);
+                        if (oFoundKunnr) {
+                            detail.kunnrAddress = oFoundKunnr.StreetName + " " + oFoundKunnr.CityName + " " + oFoundKunnr.Region + " " + oFoundKunnr.PostalCode;
+                            detail.kunnrCompanyName = oFoundKunnr.CustomerName;
+                        }
+                    }
+                });
+                oDetailModel.setProperty("/detail", oDetail);
+            } catch (error) {
+                console.error(error);
+            }
+
+
+            try {
+                let sKunweUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
+                    oKunweResult = await this.executeRequest(sKunweUrl, 'GET');
+                aKunwe = oKunweResult.value[0].result;
+                oDetail.details.forEach(detail => {
+                    if (detail.isKunwe) {
+                        const oFoundKunwe = aKunwe.find((oKunwe) => oKunwe.Customer === detail.kunwe);
+                        if (oFoundKunwe) {
+                            detail.kunweAddress = oFoundKunwe.StreetName + " " + oFoundKunwe.CityName + " " + oFoundKunwe.Region + " " + oFoundKunwe.PostalCode;
+                            detail.kunweCompanyName = oFoundKunwe.CustomerName;
+                        }
+                    }
+                });
+                oDetailModel.setProperty("/detail", oDetail);
+            } catch (error) {
+                console.error(error);
+            }
+            await this._updateAfterEditPressed();
+            sap.ui.core.BusyIndicator.hide();
+        },
+        
+        _updateAfterEditPressed: async function () {
+            var oDetail = this.getView().getModel("detailModel").getProperty("/detail");
+
+            var oRecoveryDetail = JSON.parse(JSON.stringify(oDetail));
+            oDetail = this._convertBoolToString(oDetail);
+
+            oDetail.details = oDetail.details.map(detail => {
+                delete detail.isKunnr;
+                delete detail.isKunwe;
+                delete detail.isNew;
+                return detail;
+            });
+
+            const sUrl = baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`;
+
+            try {
+                const oResult = await this.executeRequest(sUrl, 'PUT', JSON.stringify(oDetail));
+                oDetail = this._convertStringToBool(oDetail);
+                await this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
+            } catch (error) {
+                console.error(error);
+                this.getView().getModel("detailModel").setProperty("/detail", oRecoveryDetail);
             }
         },
 
