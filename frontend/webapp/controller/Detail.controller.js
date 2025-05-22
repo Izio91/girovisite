@@ -10,6 +10,7 @@ sap.ui.define([
 
     var baseManifestUrl;
     var oBundle;
+    var sLogonName;
 
     return BaseController.extend("frontend.controller.Detail", {
         formatter: formatter,
@@ -18,9 +19,26 @@ sap.ui.define([
             // read msg from i18n model
             oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
+            this._getLogonName().then(function(sResult) {
+                sLogonName = sResult;
+            })
+
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("detail").attachPatternMatched(this._onDetailMatched, this);
             oRouter.getRoute("create").attachPatternMatched(this._onCreateMatched, this);
+        },
+
+        _getLogonName : async function () {
+            var sUrl = baseManifestUrl + `/girovisiteService/getLogonName()`,
+                sResult = "",
+            oResult = null;
+            try {
+                oResult = await this.executeRequest(sUrl, 'GET');
+                sResult = oResult.value[0].result;
+            } catch (error) {
+                console.error(error);
+            }
+            return sResult;
         },
 
 
@@ -326,10 +344,22 @@ sap.ui.define([
                 sAddressValue = sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue,
                 sKunnrPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnr",
                 sKunnrAddressPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrAddress",
-                sKunnrCompanyNamePath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrCompanyName";
-            this.getView().getModel("detailModel").setProperty(sKunnrPath, sCustomerValue);
-            this.getView().getModel("detailModel").setProperty(sKunnrAddressPath, sAddressValue);
-            this.getView().getModel("detailModel").setProperty(sKunnrCompanyNamePath, sCustomerNameValue);
+                sKunnrCompanyNamePath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrCompanyName",
+                sIsNewPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/isNew",
+                oDetailModel = this.getView().getModel("detailModel");
+            oDetailModel.setProperty(sKunnrPath, sCustomerValue);
+            oDetailModel.setProperty(sKunnrAddressPath, sAddressValue);
+            oDetailModel.setProperty(sKunnrCompanyNamePath, sCustomerNameValue);
+
+            // If is an update then store date and time of last modify
+            if (!oDetailModel.getProperty(sIsNewPath)) {
+                let sAedatPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/aedat",
+                    sAezetPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/aezet",
+                    sAenamPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/aenam";
+                oDetailModel.setProperty(sAedatPath, this._getCurrentDate());
+                oDetailModel.setProperty(sAezetPath, this._getCurrentTime());
+                oDetailModel.setProperty(sAenamPath, sLogonName);
+            }
         },
 
         // Kunwe value help
@@ -360,11 +390,23 @@ sap.ui.define([
                 sKunwePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunwe",
                 sKunweAddressPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweAddress",
                 sKunweCompanyNamePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweCompanyName",
-                sDtfinePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/dtfine";
-            this.getView().getModel("detailModel").setProperty(sKunwePath, sCustomerValue);
-            this.getView().getModel("detailModel").setProperty(sKunweAddressPath, sAddressValue);
-            this.getView().getModel("detailModel").setProperty(sKunweCompanyNamePath, sCustomerNameValue);
-            this.getView().getModel("detailModel").setProperty(sDtfinePath, sDataCessazione);
+                sDtfinePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/dtfine",
+                sIsNewPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/isNew",
+                oDetailModel = this.getView().getModel("detailModel");
+            oDetailModel.setProperty(sKunwePath, sCustomerValue);
+            oDetailModel.setProperty(sKunweAddressPath, sAddressValue);
+            oDetailModel.setProperty(sKunweCompanyNamePath, sCustomerNameValue);
+            oDetailModel.setProperty(sDtfinePath, sDataCessazione);
+
+            // If is an update then store date and time of last modify
+            if (!oDetailModel.getProperty(sIsNewPath)) {
+                let sAedatPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/aedat",
+                    sAezetPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/aezet",
+                    sAenamPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/aenam";
+                oDetailModel.setProperty(sAedatPath, this._getCurrentDate());
+                oDetailModel.setProperty(sAezetPath, this._getCurrentTime());
+                oDetailModel.setProperty(sAenamPath, sLogonName);
+            }
         },
 
         onEditPress: function () {
@@ -601,9 +643,9 @@ sap.ui.define([
                 "dtabwe": bIsKunwe ? sDatfr : null,
                 "dtbiwe": bIsKunwe ? sDatto : null,
                 "dtfine": null,
-                "erdat": null,
-                "ernam": null,
-                "erzet": null,
+                "erdat": this._getCurrentDate(),
+                "ernam": sLogonName,
+                "erzet": this._getCurrentTime(),
                 "inactive": bIsKunnr ? false : null,
                 "kunnr": null,
                 "kunnrAddress": null,
@@ -787,10 +829,32 @@ sap.ui.define([
 
         onChangeDatfr: function (oEvent) {
             this._onChangeEventHandler(oEvent, "/datfr");
+
+            var oView = this.getView();
+            var oModel = oView.getModel("detailModel");
+            var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+            var bIsNew = oModel.getProperty(sPath+"/isNew");
+
+            // If is an update then store date and time of last modify
+            if (!bIsNew) {
+                oModel.setProperty(sPath+"/aedat", this._getCurrentDate());
+                oModel.setProperty(sPath+"/aezet", this._getCurrentTime());
+            }
         },
 
         onChangeDatto: function (oEvent) {
             this._onChangeEventHandler(oEvent, "/datto");
+
+            var oView = this.getView();
+            var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+            var bIsNew = oView.getModel("detailModel").getProperty(sPath+"/isNew");
+
+            // If is an update then store date and time of last modify
+            if (!bIsNew) {
+                oView.getModel("detailModel").setProperty(sPath+"/aedat", this._getCurrentDate());
+                oView.getModel("detailModel").setProperty(sPath+"/aezet", this._getCurrentTime());
+            }
+
             let oDetailModel = this.getView().getModel("detailModel").getProperty("/detail"),
                 sDatto = oDetailModel.datto;
 
@@ -850,9 +914,16 @@ sap.ui.define([
                 var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
                 var sDatab = oModel.getProperty(sPath+"/datab");
                 var sDatbi = oModel.getProperty(sPath+"/datbi");
+                var bIsNew = oModel.getProperty(sPath+"/isNew");
         
                 if (sDatbi && sDatab && sDatbi < sDatab) {
                     oModel.setProperty(sPath+"/datbi", sDatab); // set it to the new min value
+                }
+
+                // If is an update then store date and time of last modify
+                if (!bIsNew) {
+                    oModel.setProperty(sPath+"/aedat", this._getCurrentDate());
+                    oModel.setProperty(sPath+"/aezet", this._getCurrentTime());
                 }
             } else {
                 oEvent.getSource().setValue(null);
@@ -865,6 +936,17 @@ sap.ui.define([
 
             if (bRandgeIsDefined) {
                 this._onChangeEventHandler(oEvent, "/datbi");
+
+                var oView = this.getView();
+                var oModel = oView.getModel("detailModel");
+                var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+                var bIsNew = oModel.getProperty(sPath+"/isNew");
+
+                // If is an update then store date and time of last modify
+                if (!bIsNew) {
+                    oModel.setProperty(sPath+"/aedat", this._getCurrentDate());
+                    oModel.setProperty(sPath+"/aezet", this._getCurrentTime());
+                }
             } else {
                 oEvent.getSource().setValue(null);
                 MessageBox.error(oBundle.getText("noRangeDefined"));
@@ -906,6 +988,18 @@ sap.ui.define([
         onChangeTurno: function (oEvent) {
             this._onChangeEventHandler(oEvent, "/turno");
             this._changeDaysValueOnChangingTurno(oEvent);
+
+            var oView = this.getView();
+            var oModel = oView.getModel("detailModel");
+            var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+            var bIsNew = oModel.getProperty(sPath+"/isNew");
+
+            // If is an update then store date and time of last modify
+            if (!bIsNew) {
+                oModel.setProperty(sPath+"/aedat", this._getCurrentDate());
+                oModel.setProperty(sPath+"/aezet", this._getCurrentTime());
+                oModel.setProperty(sPath+"/aenam", sLogonName);
+            }
         },
 
         _changeDaysValueOnChangingTurno: function (oEvent) {
@@ -927,7 +1021,7 @@ sap.ui.define([
                 aDetails = this.getView().getModel("detailModel").getProperty("/detail/details"),
                 aSortedDetails = JSON.parse(JSON.stringify(aDetails)).sort((a, b) => a.vppos - b.vppos);
             for(let i = 0; i <= nRowIndex; i++) {
-                if (aSortedDetails[i].isKunwe) {
+                if (aDetails[i].isKunwe) {
                     nKunweIndex++;
                 }
             }
@@ -994,6 +1088,18 @@ sap.ui.define([
             this._padSequAndDayValue(oEvent);
             this._onChangeEventHandler(oEvent, "/sequ");
             this._changeDaysValueOnChangingSequ(oEvent);
+
+            var oView = this.getView();
+            var oModel = oView.getModel("detailModel");
+            var sPath = oEvent.getSource().getBindingContext("detailModel").getPath();
+            var bIsNew = oModel.getProperty(sPath+"/isNew");
+
+            // If is an update then store date and time of last modify
+            if (!bIsNew) {
+                oModel.setProperty(sPath+"/aedat", this._getCurrentDate());
+                oModel.setProperty(sPath+"/aezet", this._getCurrentTime());
+                oModel.setProperty(sPath+"/aenam", sLogonName);
+            }
         },
 
         _changeDaysValueOnChangingSequ: function (oEvent) {
@@ -1074,11 +1180,14 @@ sap.ui.define([
                 this._setDatbiIfLoevm(oDetail);
                 oDetail = this._convertBoolToString(oDetail);
 
+                oDetail.ernam = sLogonName;
+                oDetail.aenam = sLogonName;
                 oDetail.aedat = sDate;
                 oDetail.aezet = sTime;
                 oDetail.erdat = sDate;
                 oDetail.erzet = sTime;
                 oDetail.details = oDetail.details.map(detail => {
+                    detail.ernam = sLogonName;
                     delete detail.isKunnr;
                     delete detail.isKunwe;
                     delete detail.isNew;
@@ -1125,9 +1234,13 @@ sap.ui.define([
                 this._setDatbiIfLoevm(oDetail);
                 oDetail = this._convertBoolToString(oDetail);
 
+                oDetail.aenam = sLogonName;
                 oDetail.aedat = sDate;
                 oDetail.aezet = sTime;
                 oDetail.details = oDetail.details.map(detail => {
+                    if ( detail.aedat === sDate ) {
+                        detail.aenam = sLogonName;
+                    }
                     delete detail.isKunnr;
                     delete detail.isKunwe;
                     delete detail.isNew;

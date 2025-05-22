@@ -7,6 +7,7 @@ service girovisiteService @(requires: 'authenticated-user') @(path: '/girovisite
   entity HeaderWithDetails as projection on my.HeaderWithDetails;
   
   // Functions
+  function getLogonName()            returns array of String;
   function getWerks()            returns array of String;
   function getVkorg()            returns array of String;
   function getVtweg()            returns array of String;

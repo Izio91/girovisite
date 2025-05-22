@@ -290,6 +290,42 @@
 										<m:DatePicker value="{path: 'detailModel>dtfine', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
 									</table:template>
 								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>ernam}"/>
+									<table:template>
+										<m:DatePicker value="{detailModel>ernam}" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>erdat}"/>
+									<table:template>
+										<m:DatePicker value="{path: 'detailModel>erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>erzet}"/>
+									<table:template>
+										<m:DatePicker value="{detailModel>erzet}" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>aenam}"/>
+									<table:template>
+										<m:DatePicker value="{detailModel>aenam}" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>aedat}"/>
+									<table:template>
+										<m:DatePicker value="{path: 'detailModel>aedat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"  displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" enabled="false" />
+									</table:template>
+								</table:Column>
+								<table:Column width="8rem" >
+									<m:Label text="{i18n>aezet}"/>
+									<table:template>
+										<m:DatePicker value="{detailModel>aezet}" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" enabled="false" />
+									</table:template>
+								</table:Column>
 							</table:columns>
 						</table:Table>
 					</ObjectPageSubSection>

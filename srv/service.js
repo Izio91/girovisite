@@ -32,11 +32,7 @@ module.exports = function (srv) {
         // Fetch the next value from the sequence
         const result = await db.run(`SELECT "HEADER_VPID".NEXTVAL FROM DUMMY`);
         const nVpid = result[0][`HEADER_VPID.NEXTVAL`];
-        var sLogonName = request.req.authInfo.getLogonName();
-        sLogonName = !sLogonName ? '' : sLogonName.substring(0, 12);
         request.data.vpid = nVpid;
-        request.data.ernam = sLogonName;
-        request.data.aenam = sLogonName;
 
         // Assign the same vpid to all associated Details
         if (request.data.details) {
@@ -45,6 +41,10 @@ module.exports = function (srv) {
                 detail.vppos = parseInt(detail.vppos);  // Ensure vppos is an integer;
             });
         }
+    });
+
+    srv.on('getLogonName', '*', async request => {
+        await performRequest(srv, request, './func/getLogonName');
     });
 
     srv.on('getWerks', '*', async request => {
