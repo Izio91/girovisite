@@ -1277,7 +1277,6 @@ sap.ui.define([
                 aErrorMessage = aErrorMessage.concat(await this._checkDriver(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
-                aErrorMessage = aErrorMessage.concat(this._checkEachKunweHasDifferentOrder(oDetail));
 
                 sErrorMessage = [...new Set(aErrorMessage)].join(" ");
 
@@ -1477,26 +1476,6 @@ sap.ui.define([
             if (!bAtLeastOneKunweIsPresent) {
                 aErrorMessage.push(oBundle.getText("noKunweForCurrentPlan") + "\n");
             }
-            return aErrorMessage;
-        },
-
-        _checkEachKunweHasDifferentOrder: function (oDetail) {
-            var aErrorMessage = [],
-                aKunwe = oDetail.details.filter(detail => detail.isKunwe),
-                nRows = aKunwe.length,
-                aDays = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-
-            aDays.forEach(sDay => {
-                let seen = new Set();
-                for (let row = 0; row < nRows; row++) {
-                    if (aKunwe[row][sDay] && aKunwe[row][sDay] !== '') {
-                        if (seen.has(aKunwe[row][sDay])) {
-                            aErrorMessage.push(oBundle.getText("duplicateDaysFound") + "\n"); // Duplicate value found in the column
-                        } 
-                        seen.add(aKunwe[row][sDay]);
-                    }
-                }
-            });
             return aErrorMessage;
         },
 
