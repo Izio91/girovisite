@@ -391,7 +391,7 @@ sap.ui.define([
                 sKunweAddressPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweAddress",
                 sKunweCompanyNamePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweCompanyName",
                 sDtfinePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/dtfine",
-                sIsNewPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/isNew",
+                sIsNewPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/isNew",
                 oDetailModel = this.getView().getModel("detailModel");
             oDetailModel.setProperty(sKunwePath, sCustomerValue);
             oDetailModel.setProperty(sKunweAddressPath, sAddressValue);
@@ -402,7 +402,7 @@ sap.ui.define([
             if (!oDetailModel.getProperty(sIsNewPath)) {
                 let sAedatPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/aedat",
                     sAezetPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/aezet",
-                    sAenamPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/aenam";
+                    sAenamPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/aenam";
                 oDetailModel.setProperty(sAedatPath, this._getCurrentDate());
                 oDetailModel.setProperty(sAezetPath, this._getCurrentTime());
                 oDetailModel.setProperty(sAenamPath, sLogonName);
