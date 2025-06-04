@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = async (request, tx) => {
-    var sLogonName = request.req.authInfo.getLogonName();
+    var sLogonName = request.req.authInfo.getEmail();
     sLogonName = !sLogonName ? '' : sLogonName.substring(0, 12);
     return { status: 200, result: sLogonName, message: 'Executed' };
 };

@@ -10,14 +10,14 @@ module.exports = async (request, tx) => {
     if (data.length === 0) {
         return {
             status: 400,
-            currentUser: request.req.authInfo.getLogonName(),
+            currentUser: request.req.authInfo.getEmail(),
             message: "No data found for current vpid"
         };
     }
 
     return {
         status: 200,
-        currentUser: request.req.authInfo.getLogonName(),
+        currentUser: request.req.authInfo.getEmail(),
         result: data
     };
         

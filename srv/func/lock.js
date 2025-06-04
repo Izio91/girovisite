@@ -4,7 +4,7 @@ module.exports = async (request, tx) => {
     let {
         vpid
     } = request.data,
-        sLockedBy = request.req.authInfo.getLogonName();
+        sLockedBy = request.req.authInfo.getEmail();
     
     sLockedBy = !sLockedBy ? '' : sLockedBy.substring(0,12);
     let updateQuery = UPDATE('Header')
