@@ -2,11 +2,11 @@ namespace girovisite;
 
 entity Header {
     key vpid        : Integer;
-    key vctext      : String(30);
     key werks       : String(4);
     key vkorg       : String(4);
     key vtweg       : String(2);
     key spart       : String(2);
+        vctext      : String(30);
         werksDescr  : String;
         driver1     : String(10);
         driverDescr : String;
@@ -32,7 +32,6 @@ entity Header {
 
 annotate Header with @assert.unique: {uniqueKey: [
     vpid,
-    vctext,
     werks,
     vkorg,
     vtweg,

@@ -44,7 +44,6 @@ sap.ui.define([
 
         _onDetailMatched: function (oEvent) {
             this._vpid = oEvent.getParameter("arguments").vpid;
-            this._vctext = oEvent.getParameter("arguments").vctext;
             this._werks = oEvent.getParameter("arguments").werks;
             this._vkorg = oEvent.getParameter("arguments").vkorg;
             this._vtweg = oEvent.getParameter("arguments").vtweg;
@@ -62,7 +61,7 @@ sap.ui.define([
             if (this._oAddRowMenuFragment) {
                 this.getView().byId("idAddRowMenuFragment").getItems()[0].setEnabled(true);
             }
-            this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
+            this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
         },
 
         _onCreateMatched: function (oEvent) {
@@ -452,7 +451,7 @@ sap.ui.define([
                     details: error
                 });
             } finally {
-                oDetail = await that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
+                oDetail = await that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
             }
 
             try {
@@ -508,12 +507,12 @@ sap.ui.define([
                 return detail;
             });
 
-            const sUrl = baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`;
+            const sUrl = baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`;
 
             try {
                 const oResult = await this.executeRequest(sUrl, 'PUT', JSON.stringify(oDetail));
                 oDetail = this._convertStringToBool(oDetail);
-                await this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
+                await this._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`);
             } catch (error) {
                 console.error(error);
                 this.getView().getModel("detailModel").setProperty("/detail", oRecoveryDetail);
@@ -539,7 +538,7 @@ sap.ui.define([
                     details: error
                 });
             } finally {
-                that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
+                that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`);
                 sap.ui.core.BusyIndicator.hide();
             }
         },
@@ -1247,7 +1246,7 @@ sap.ui.define([
                     return detail;
                 });
 
-                const sUrl = baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',vctext='${this._vctext}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`;
+                const sUrl = baseManifestUrl + `/girovisiteService/Header(vpid='${this._vpid}',werks='${this._werks}',vkorg='${this._vkorg}',vtweg='${this._vtweg}',spart='${this._spart}')?$expand=details`;
 
                 try {
                     const oResult = await this.executeRequest(sUrl, 'PUT', JSON.stringify(oDetail));
@@ -1255,7 +1254,7 @@ sap.ui.define([
                     var that = this;
                     MessageBox.success(oBundle.getText("updateSucceded"), {
                         onClose: function () {
-                            that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',vctext='${that._vctext}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`).then(that._unlockDocument());
+                            that._fetchData(baseManifestUrl + `/girovisiteService/Header(vpid='${that._vpid}',werks='${that._werks}',vkorg='${that._vkorg}',vtweg='${that._vtweg}',spart='${that._spart}')?$expand=details`).then(that._unlockDocument());
                         }
                     });
                 } catch (error) {

@@ -1,7 +1,7 @@
 {
     "_version": "1.65.0",
     "sap.app": {
-        "id": "girovisitefrontend",
+        "id": "frontend",
         "type": "application",
         "i18n": "i18n/i18n.properties",
         "applicationVersion": {
@@ -81,6 +81,8 @@
                 "preload": true,
                 "settings": {
                     "operationMode": "Server",
+                    "groupId": "$auto",
+                    "updateGroupId": "entitiesUpdate",
                     "autoExpandSelect": true,
                     "earlyRequests": true
                 }
@@ -105,17 +107,35 @@
             },
             "routes": [
                 {
-                    "name": "RouteMain",
+                    "name": "main",
                     "pattern": ":?query:",
                     "target": [
-                        "TargetMain"
+                        "main"
+                    ]
+                },
+                {
+                    "name": "detail",
+                    "pattern": "detail/{vpid}/{werks}/{vkorg}/{vtweg}/{spart}",
+                    "target": [
+                        "detail"
+                    ]
+                },
+                {
+                    "name": "create",
+                    "pattern": "create",
+                    "target": [
+                        "detail"
                     ]
                 }
             ],
             "targets": {
-                "TargetMain": {
-                    "id": "Main",
+                "main": {
+                    "id": "main",
                     "name": "Main"
+                },
+                "detail": {
+                    "id": "detail",
+                    "name": "Detail"
                 }
             }
         },

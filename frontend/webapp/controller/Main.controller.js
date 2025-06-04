@@ -475,13 +475,12 @@ sap.ui.define([
         onListItemPress: function (oEvent) {
             var oObject = oEvent.getSource().getBindingContext("masterModel").getObject(),
                 sVpid = oObject.vpid,
-                sVctext = oObject.vctext,
                 sWerks = oObject.werks,
                 sVkorg = oObject.vkorg,
                 sVtweg = oObject.vtweg,
                 sSpart = oObject.spart;
 
-            this.getOwnerComponent().getRouter().navTo("detail", { vpid: sVpid, vctext: sVctext, werks: sWerks, vkorg: sVkorg, vtweg: sVtweg, spart: sSpart });
+            this.getOwnerComponent().getRouter().navTo("detail", { vpid: sVpid, werks: sWerks, vkorg: sVkorg, vtweg: sVtweg, spart: sSpart });
         },
 
         /**

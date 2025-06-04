@@ -1,6 +1,322 @@
 <mvc:View controllerName="frontend.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-    </Page>
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:dnd="sap.ui.core.dnd"
+    xmlns:columnmenu="sap.m.table.columnmenu"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:sap.ui.fl="sap.ui.fl"
+    xmlns:sap.ui.dt="sap.ui.dt"
+    xmlns:vm="sap.ui.fl.variants"
+    xmlns:plugins="sap.m.plugins">
+    <f:DynamicPage toggleHeaderOnTitleClick="true" headerExpanded="true" >
+        
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>DynamicPageTitle}" textAlign="Center" />
+                </f:heading>
+                <f:actions>
+                    <Button text="{i18n>createDetail}" press="onCreateDetail" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <!-- Filter Bar for search and filters -->
+                    <fb:FilterBar id="filterbar" reset="onReset" search="onGoPress" useToolbar="false" showGoOnFB="true" showClearOnFB="true" clear="onClearFilterBar" >
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vpid" label="{i18n>vpid}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputVpid" maxLength="10" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="werks" label="{i18n>werks}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputWerks" maxLength="4"  showValueHelp="true" valueHelpRequest="onWerksVH" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vkorg" label="{i18n>vkorg}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputVkorg" maxLength="4" showValueHelp="true" valueHelpRequest="onVkorgVH" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="vtweg" label="{i18n>vtweg}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputVtweg" maxLength="2" showValueHelp="true" valueHelpRequest="onVtwegVH" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="driver1" label="{i18n>driver1}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox id="multiComboDriver1" 
+                                        items="{
+                                            path: 'masterModel>/valuehelps/driver',
+				                            length: 10000,
+                                            sorter: {
+                                                path: 'Customer',
+                                                descending: false
+                                            },
+                                            groupHeaderFactory: '.getGroupHeader'
+                                        }">
+                                        <core:Item key="{masterModel>Customer}" text="{masterModel>Customer}" />
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="kunnr" label="{i18n>kunnr}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputKunnr" maxLength="10"  showValueHelp="true" valueHelpRequest="onKunnrVH" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="kunwe" label="{i18n>kunwe}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inputKunwe" maxLength="10"  showValueHelp="true" valueHelpRequest="onKunweVH" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="datfr" label="{i18n>datfr}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DatePicker id="datePickerDatfr" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="datto" label="{i18n>datto}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DatePicker id="datePickerDatto" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="active" label="{i18n>active}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox id="comboBoxActive" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyActive}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotActive}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="loevm" label="{i18n>loevm}" visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox id="comboBoxLoevm" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyCancelled}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotCancelled}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="ianctive" label="{i18n>inactive}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <ComboBox id="comboBoxInactive" selectedKey="default" >
+                                        <core:Item key="default" text="" />
+                                        <core:Item key="X" text="{i18n>comboBoxKeyInactive}" />
+                                        <core:Item key="" text="{i18n>comboBoxKeyNotInactive}" />
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="spart" label="{i18n>spart}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputSpart" maxLength="2" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="termCode" label="{i18n>termCode}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputTermCode" maxLength="3" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="erdat" label="{i18n>erdat}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <DatePicker id="datePickerErdat" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="erzet" label="{i18n>erzet}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <TimePicker id="timePickerErzet" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="ernam" label="{i18n>ernam}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputErnam" maxLength="12" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aedat" label="{i18n>aedat}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <DatePicker id="datePickerAedat" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aezet" label="{i18n>aezet}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <TimePicker id="timePickerAezet" support2400="true" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem groupName="DefaultGroup" name="aenam" label="{i18n>aenam}" visibleInFilterBar="false">
+                                <fb:control>
+                                    <Input id="inputAenam" maxLength="12" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table id="mainTable" items="{
+                    path: 'masterModel>/HeaderWithDetails'
+                }"
+                autoPopinMode="false" 
+                sticky="ColumnHeaders,HeaderToolbar" 
+                popinLayout="GridSmall"
+                growing="true"
+                growingScrollToLoad="true"
+                growingThreshold="50"
+                updateFinished="onTableGrowing"
+                ariaLabelledBy="title" 
+                fixedLayout="Strict">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer/>
+                        <Button text="{i18n>ExportButton}" icon="sap-icon://excel-attachment" press="onExportCSV" tooltip="{i18n>ExportTooltip}"/>
+                        <Button icon="sap-icon://action-settings" press="openPersonalizationDialog" tooltip="Settings"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <infoToolbar>
+                    <OverflowToolbar id="filterInfo" visible="false" design="Info" active="true" press="onFilterInfoPress" >
+                        <Text id="filterInfoText" wrapping="false" text="Table filter active" />
+                        <ToolbarSpacer />
+                        <Button tooltip="Remove All Filters" icon="sap-icon://decline" type="Transparent" press="onClearFilterPress" />
+                    </OverflowToolbar>
+                </infoToolbar>
+                <dependents>
+                    <plugins:ColumnResizer columnResize="onColumnResize"/>
+                    <columnmenu:Menu id="menu" beforeOpen="beforeOpenColumnMenu">
+                        <columnmenu:QuickSort change="onSort">
+                            <columnmenu:items>
+                                <columnmenu:QuickSortItem></columnmenu:QuickSortItem>
+                            </columnmenu:items>
+                        </columnmenu:QuickSort>
+                        <columnmenu:QuickGroup change="onGroup">
+                            <columnmenu:items>
+                                <columnmenu:QuickGroupItem></columnmenu:QuickGroupItem>
+                            </columnmenu:items>
+                        </columnmenu:QuickGroup>
+                        <columnmenu:items>
+                            <columnmenu:ActionItem icon="sap-icon://sort" label="Sort" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://group-2" label="Group" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://filter" label="Filter" press="onColumnHeaderItemPress"/>
+                            <columnmenu:ActionItem icon="sap-icon://table-column" label="Columns" press="onColumnHeaderItemPress"/>
+                        </columnmenu:items>
+                    </columnmenu:Menu>
+                </dependents>
+
+                <dragDropConfig>
+                    <dnd:DragDropInfo sourceAggregation="columns" targetAggregation="columns" dropPosition="Between" drop="onColumnMove"/>
+                </dragDropConfig>
+
+                <noData>
+                    <IllustratedMessage/>
+                </noData>
+
+                <columns>
+                    <Column app:p13nKey="vpid_col" headerMenu="menu">
+                        <header>
+                            <Text text="{i18n>vpid}"/>
+                        </header>
+                    </Column>
+                    <Column app:p13nKey="vctext_col" headerMenu="menu">
+                        <Text text="{i18n>vctext}"/>
+                    </Column>
+                    <Column app:p13nKey="werks_col" headerMenu="menu">
+                        <Text text="{i18n>werks}"/>
+                    </Column>
+                    <Column app:p13nKey="vkorg_col" headerMenu="menu">
+                        <Text text="{i18n>vkorg}"/>
+                    </Column>
+                    <Column app:p13nKey="vtweg_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>vtweg}"/>
+                    </Column>
+                    <Column app:p13nKey="spart_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>spart}"/>
+                    </Column>
+                    <Column app:p13nKey="driver1_col" headerMenu="menu">
+                        <Text text="{i18n>driver1}"/>
+                    </Column>
+                    <Column app:p13nKey="termCode_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>termCode}"/>
+                    </Column>
+                    <Column app:p13nKey="datfr_col" headerMenu="menu">
+                        <Text text="{i18n>datfr}"/>
+                    </Column>
+                    <Column app:p13nKey="datto_col" headerMenu="menu">
+                        <Text text="{i18n>datto}"/>
+                    </Column>
+                    <Column app:p13nKey="kunnr_col" headerMenu="menu">
+                        <Text text="{i18n>kunnr}"/>
+                    </Column>
+                    <Column app:p13nKey="inactive_col" headerMenu="menu">
+                        <Text text="{i18n>inactive}"/>
+                    </Column>
+                    <Column app:p13nKey="active_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>active}"/>
+                    </Column>
+                    <Column app:p13nKey="loevm_col" headerMenu="menu">
+                        <Text text="{i18n>loevm}"/>
+                    </Column>
+                    <Column app:p13nKey="erdat_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>erdat}"/>
+                    </Column>
+                    <Column app:p13nKey="erzet_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>erzet}"/>
+                    </Column>
+                    <Column app:p13nKey="ernam_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>ernam}"/>
+                    </Column>
+                    <Column app:p13nKey="aedat_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aedat}"/>
+                    </Column>
+                    <Column app:p13nKey="aezet_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aezet}"/>
+                    </Column>
+                    <Column app:p13nKey="aenam_col" visible="false" headerMenu="menu">
+                        <Text text="{i18n>aenam}"/>
+                    </Column>
+                    <Column app:p13nKey="kunwe_col" headerMenu="menu">
+                        <Text text="{i18n>kunwe}"/>
+                    </Column>
+                    <Column app:p13nKey="locked_col" headerMenu="menu">
+                        <Text text="{i18n>locked}"/>
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem
+                        type="Navigation"
+                        press="onListItemPress"
+                        highlight="{= ${masterModel>locked} ? 'Information' : 'None' }" >
+                        <ObjectIdentifier title="{masterModel>vpid}"/>
+                        <Text text="{masterModel>vctext}"/>
+                        <Text text="{masterModel>werks}"/>
+                        <Text text="{masterModel>vkorg}"/>
+                        <Text text="{masterModel>vtweg}"/>
+                        <Text text="{masterModel>spart}"/>
+                        <Text text="{masterModel>driver1}"/>
+                        <Text text="{masterModel>termCode}"/>
+                        <Text text="{path: 'masterModel>datfr', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
+                        <Text text="{path: 'masterModel>datto', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
+                        <Text text="{masterModel>kunnr}"/>
+                        <Text text="{masterModel>inactive}"/>
+                        <Text text="{masterModel>active}"/>
+                        <Text text="{masterModel>loevm}"/>
+                        <Text text="{path: 'masterModel>erdat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
+                        <Text text="{masterModel>erzet}"/>
+                        <Text text="{masterModel>ernam}"/>
+                        <Text text="{path: 'masterModel>aedat', formatter:'.formatter.formatDateFromyyyymmddToddmmyyyy'}"/>
+                        <Text text="{masterModel>aezet}"/>
+                        <Text text="{masterModel>aenam}"/>
+                        <Text text="{masterModel>kunwe}"/>
+                        <Button press="onOpenUnlockMenuAction" tooltip="{i18n>lockedBy}: {masterModel>lockedBy}" icon="sap-icon://locked" type="Transparent" visible="{= ${masterModel>locked} === true ? true : false }"/>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
 </mvc:View>
