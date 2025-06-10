@@ -1277,6 +1277,7 @@ sap.ui.define([
                 aErrorMessage = aErrorMessage.concat(await this._checkDriver(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
+                aErrorMessage = aErrorMessage.concat(this._checkKunweDuplicates(oDetail));
 
                 sErrorMessage = [...new Set(aErrorMessage)].join(" ");
 
@@ -1476,6 +1477,34 @@ sap.ui.define([
             if (!bAtLeastOneKunweIsPresent) {
                 aErrorMessage.push(oBundle.getText("noKunweForCurrentPlan") + "\n");
             }
+            return aErrorMessage;
+        },
+
+        /**
+         * Check if there are duplicate kunwe values
+         * @param {*} oDetail 
+         * @returns {string[]} - error message if duplicate kunwe values are found, empty array otherwise
+         */
+        _checkKunweDuplicates: function (oDetail) {
+            var aErrorMessage = [],
+                oSeenKunwe = new Set(),
+                oDuplicateKunwe = new Set();
+
+            oDetail.details.forEach(oItem => {
+                if (oItem.kunwe) {
+                    if (oSeenKunwe.has(oItem.kunwe)) {
+                        oDuplicateKunwe.add(oItem.kunwe);
+                    } else {
+                        oSeenKunwe.add(oItem.kunwe);
+                    }
+                }
+            });
+
+            if (oDuplicateKunwe.size > 0) {
+                var sDuplicates = Array.from(oDuplicateKunwe).join(", ");
+                aErrorMessage.push(oBundle.getText("duplicateKunweFound", sDuplicates) + "\n");
+            }
+
             return aErrorMessage;
         },
 
