@@ -615,6 +615,7 @@ sap.ui.define([
                 aRows = oDetailModel.getProperty("/detail/details"),
                 sDatfr = oDetailModel.getProperty("/detail/datfr"),
                 sDatto = oDetailModel.getProperty("/detail/datto"),
+                sDriver = oDetailModel.getProperty("/detail/driver1"),
                 aCopyRows = (JSON.parse(JSON.stringify(aRows))),
                 bCreateMode = oDetailModel.getProperty("/isNew");
 
@@ -639,7 +640,7 @@ sap.ui.define([
                 "aezet": null,
                 "datab": null,
                 "datbi": null,
-                "driver1": null,
+                "driver1": sDriver,
                 "dtabwe": bIsKunwe ? sDatfr : null,
                 "dtbiwe": bIsKunwe ? sDatto : null,
                 "dtfine": null,
