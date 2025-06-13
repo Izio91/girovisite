@@ -613,11 +613,11 @@ sap.ui.define([
         _addRow: function (bIsKunnr, bIsKunwe) {
             var oDetailModel = this.getView().getModel("detailModel"),
                 aRows = oDetailModel.getProperty("/detail/details"),
-                sDatfr = oDetailModel.getProperty("/detail/datfr"),
                 sDatto = oDetailModel.getProperty("/detail/datto"),
                 sDriver = oDetailModel.getProperty("/detail/driver1"),
                 aCopyRows = (JSON.parse(JSON.stringify(aRows))),
-                bCreateMode = oDetailModel.getProperty("/isNew");
+                bCreateMode = oDetailModel.getProperty("/isNew"),
+                sDtabwe = this._getCurrentDate();
 
                 aCopyRows.sort((a, b) => a.vppos - b.vppos);
             var nVppos = aCopyRows.length > 0 ? aCopyRows[aCopyRows.length - 1].vppos + 1 : 1;
@@ -641,7 +641,7 @@ sap.ui.define([
                 "datab": null,
                 "datbi": null,
                 "driver1": sDriver,
-                "dtabwe": bIsKunwe ? sDatfr : null,
+                "dtabwe": bIsKunwe ? sDtabwe : null,
                 "dtbiwe": bIsKunwe ? sDatto : null,
                 "dtfine": null,
                 "erdat": this._getCurrentDate(),
