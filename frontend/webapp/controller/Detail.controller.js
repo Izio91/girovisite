@@ -1276,7 +1276,6 @@ sap.ui.define([
                 aErrorMessage = aErrorMessage.concat(this._checkRequiredInfo(oDetail));
                 aErrorMessage = aErrorMessage.concat(await this._checkActiveAgent(oDetail));
                 aErrorMessage = aErrorMessage.concat(await this._checkDriver(oDetail));
-                aErrorMessage = aErrorMessage.concat(this._checkAgentsTemporalContinuity(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkKunwePresent(oDetail));
                 aErrorMessage = aErrorMessage.concat(this._checkKunweDuplicates(oDetail));
 
@@ -1425,39 +1424,6 @@ sap.ui.define([
                 aErrorMessage.push(oBundle.getText("ErrorCheckingDriver") + "\n");
             }
 
-            return aErrorMessage;
-        },
-
-        /**
-         * Check if agents have a temporal range with continuity and without overlaps
-         * @param {*} oDetail 
-         * @returns {string} - error message if some agent has no continuity or overlaps, empty string otherwise
-         */
-        _checkAgentsTemporalContinuity: function (oDetail) {
-            var aAgents = oDetail.details.filter(detail => detail.isKunnr),
-                aErrorMessage = [];
-            if (aAgents.length > 1) {
-                // Sort the array by the starting date 'datab'
-                aAgents.sort((a, b) => new Date(a.datab) - new Date(b.datab));
-
-                for (let i = 1; i < aAgents.length; i++) {
-                    let prevEnd = new Date(aAgents[i - 1].datbi); // Previous object's end date
-                    let currStart = new Date(aAgents[i].datab);   // Current object's start date
-
-                    // Check for gaps (if current start is not exactly the next day after previous end)
-                    let expectedNextStart = new Date(prevEnd);
-                    expectedNextStart.setDate(prevEnd.getDate() + 1);
-
-                    if (currStart.getTime() !== expectedNextStart.getTime()) {
-                        aErrorMessage.push(oBundle.getText("errorGapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr]) + "\n");
-                    }
-
-                    // Check for overlaps
-                    if (currStart <= prevEnd) {
-                        aErrorMessage.push(oBundle.getText("errorOverlapDetected", [aAgents[i - 1].kunnr, aAgents[i].kunnr]) + "\n");
-                    }
-                }
-            }
             return aErrorMessage;
         },
 
