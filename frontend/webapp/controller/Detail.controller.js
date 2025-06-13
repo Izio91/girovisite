@@ -158,12 +158,12 @@ sap.ui.define([
                 });
                 let aKunwe = oData.details.filter(a => a.isKunwe);
                 let aKunnr = oData.details.filter(a => a.isKunnr);
-                // Sort by ascendent sequ
+                // Sort by descendent vppos
                 aKunwe.sort((a, b) => {
-                    if (a.sequ > b.sequ ) {
-                        return 1;
-                    } else if (a.sequ < b.sequ) {
+                    if (a.vppos > b.vppos ) {
                         return -1;
+                    } else if (a.vppos < b.vppos) {
+                        return 1;
                     }
                     return 0;
                 });
@@ -671,10 +671,13 @@ sap.ui.define([
             if (bIsKunnr) {
                 // If agent, add to first position
                 aRows.unshift(oNewInsert)
+                oDetailModel.setProperty("/detail/details", aRows);
             } else {
-                aRows.push(oNewInsert);
+                let aKunwe = aRows.filter(a => a.isKunwe);
+                let aKunnr = aRows.filter(a => a.isKunnr);
+                aKunwe.unshift(oNewInsert);
+                oDetailModel.setProperty("/detail/details", aKunnr.concat(aKunwe));
             }
-            oDetailModel.setProperty("/detail/details", aRows);
 
             // In create mode only one agent must be present, for this reason addKunnr button is disabled
             if (bCreateMode && bIsKunnr) {
