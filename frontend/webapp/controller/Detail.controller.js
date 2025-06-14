@@ -4,8 +4,10 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/m/MessageToast",
     "sap/ui/core/Fragment",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
     "frontend/utils/formatter"
-], (BaseController, JSONModel, MessageBox, MessageToast, Fragment, formatter) => {
+], (BaseController, JSONModel, MessageBox, MessageToast, Fragment, Filter, FilterOperator, formatter) => {
     "use strict";
 
     var baseManifestUrl;
@@ -184,7 +186,10 @@ sap.ui.define([
                 });
 
                 oData.details = aKunnr.concat(aKunwe);
-
+                let oSuggestionKunwe = {
+                    suggestionKunwe: aKunwe
+                }
+                oDetailModel.setProperty("/suggestions", oSuggestionKunwe)
                 oDetailModel.setProperty("/detail", oData);
                 if (oData.loevm) {
                     bReadOnly = true;
@@ -202,6 +207,35 @@ sap.ui.define([
             }
             return oData;
         },
+
+		onFilterKunwe: function (oEvent) {
+			var sKunwe = this.getView().byId("searchField").getValue(),
+                aFilters = [];
+			if (sKunwe !== '') {
+				aFilters = [
+					new Filter("kunwe", FilterOperator.Contains, sKunwe)
+				];
+			}
+
+            this.getView().byId("idDetailTable").getBinding("rows").filter(aFilters);
+		},
+
+		onSuggestKunwe: function (oEvent) {
+			var sValue = oEvent.getParameter("suggestValue"),
+				aFilters = [];
+			if (sValue) {
+				aFilters = [
+					new Filter([
+						new Filter("kunwe", function (sDes) {
+							return (sDes || "").toUpperCase().indexOf(sValue.toUpperCase()) > -1;
+						})
+					], false)
+				];
+			}
+
+			this.getView().byId("searchField").getBinding("suggestionItems").filter(aFilters);
+			this.getView().byId("searchField").suggest();
+		},
 
         onGoBack: function () {
             var that = this;

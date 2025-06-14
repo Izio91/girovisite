@@ -137,6 +137,24 @@
 			<ObjectPageSection titleUppercase="false" title="{i18n>detailData}">
 				<subSections>
 					<ObjectPageSubSection title="{i18n>detailData}" titleUppercase="false">
+						<actions>
+							<m:Label text="{i18n>filterKunwe}" id="idSuggestionsSearch" />
+							<m:SearchField
+								id="searchField"
+								class="sapUiTinyMarginBottom"
+								enableSuggestions="true"
+								search=".onFilterKunwe"
+								suggest=".onSuggestKunwe"
+								suggestionItems="{
+									path: 'detailModel>/suggestions/suggestionKunwe',
+									sorter: { 
+                                                path: 'vppos',
+                                                descending: true
+											}
+								}">
+								<m:SuggestionItem text="{detailModel>kunwe}" key="{detailModel>vppos}" />
+							</m:SearchField>
+						</actions>
 						<table:Table id="idDetailTable" rows="{
 								path: 'detailModel>/detail/details'}" class="sapUiSmallMargin"
 								rowSelectionChange="onSelectionDetailChange"

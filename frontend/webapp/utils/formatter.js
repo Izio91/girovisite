@@ -47,10 +47,10 @@ sap.ui.define([
 
         getMinDateDatfr: function (sDate) {
             const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = today.getMonth(); // Months are zero-based
+            const yyyy = today.getFullYear();
+            const mm = today.getMonth(); // Months are zero-based
 
-            return UI5Date.getInstance(yyyy, mm, 1);
+            return UI5Date.getInstance(yyyy, mm, 1);
         },
 
         handleInactiveAgentSelectedKey: function (bIsNew, bInactive, bIsKunnr) {
