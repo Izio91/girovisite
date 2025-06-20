@@ -368,14 +368,9 @@ sap.ui.define([
         },
 
         onConfirmKunnr: function (oEvent) {
-            var sPath = oEvent.getParameter("selectedItem").getBindingContextPath(),
-                sCustomerValue = this.getView().getModel("detailModel").getProperty(sPath + "/Customer"),
-                sCustomerNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CustomerName"),
-                sStreetNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/StreetName"),
-                sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
-                sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
-                sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
-                sAddressValue = sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue,
+            var sCustomerValue = oEvent.getParameter("selectedItem").getProperty("title"),
+                oItem = oEvent.getSource().getModel().getProperty("/valuehelps/kunnr").find( oItem => oItem.Customer === sCustomerValue),
+                sAddressValue = oItem.StreetName + " " + oItem.CityName + " " + oItem.Region + " " + oItem.PostalCode,
                 sKunnrPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnr",
                 sKunnrAddressPath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrAddress",
                 sKunnrCompanyNamePath = this.oInputKunnr.getBindingContext("detailModel").getPath() + "/kunnrCompanyName",
@@ -383,7 +378,7 @@ sap.ui.define([
                 oDetailModel = this.getView().getModel("detailModel");
             oDetailModel.setProperty(sKunnrPath, sCustomerValue);
             oDetailModel.setProperty(sKunnrAddressPath, sAddressValue);
-            oDetailModel.setProperty(sKunnrCompanyNamePath, sCustomerNameValue);
+            oDetailModel.setProperty(sKunnrCompanyNamePath, oItem.CustomerName);
 
             // If is an update then store date and time of last modify
             if (!oDetailModel.getProperty(sIsNewPath)) {
@@ -412,15 +407,9 @@ sap.ui.define([
         },
 
         onConfirmKunwe: function (oEvent) {
-            var sPath = oEvent.getParameter("selectedItem").getBindingContextPath(),
-                sCustomerValue = this.getView().getModel("detailModel").getProperty(sPath + "/Customer"),
-                sCustomerNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CustomerName"),
-                sStreetNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/StreetName"),
-                sCityNameValue = this.getView().getModel("detailModel").getProperty(sPath + "/CityName"),
-                sRegionValue = this.getView().getModel("detailModel").getProperty(sPath + "/Region"),
-                sPostalCodeValue = this.getView().getModel("detailModel").getProperty(sPath + "/PostalCode"),
-                sDataCessazione = this.getView().getModel("detailModel").getProperty(sPath + "/DataCessazione"),
-                sAddressValue = sStreetNameValue + " " + sCityNameValue + " " + sRegionValue + " " + sPostalCodeValue,
+            var sCustomerValue = oEvent.getParameter("selectedItem").getProperty("title"),
+                oItem = oEvent.getSource().getModel().getProperty("/valuehelps/kunwe").find( oItem => oItem.Customer === sCustomerValue),
+                sAddressValue = oItem.StreetName + " " + oItem.CityName + " " + oItem.Region + " " + oItem.PostalCode,
                 sKunwePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunwe",
                 sKunweAddressPath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweAddress",
                 sKunweCompanyNamePath = this.oInputKunwe.getBindingContext("detailModel").getPath() + "/kunweCompanyName",
@@ -429,8 +418,8 @@ sap.ui.define([
                 oDetailModel = this.getView().getModel("detailModel");
             oDetailModel.setProperty(sKunwePath, sCustomerValue);
             oDetailModel.setProperty(sKunweAddressPath, sAddressValue);
-            oDetailModel.setProperty(sKunweCompanyNamePath, sCustomerNameValue);
-            oDetailModel.setProperty(sDtfinePath, sDataCessazione);
+            oDetailModel.setProperty(sKunweCompanyNamePath, oItem.CustomerName);
+            oDetailModel.setProperty(sDtfinePath, oItem.DataCessazione);
 
             // If is an update then store date and time of last modify
             if (!oDetailModel.getProperty(sIsNewPath)) {
