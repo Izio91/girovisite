@@ -109,11 +109,11 @@ sap.ui.define([
         },
 
         // Utility function to open value help 
-        _onValueHelp : function (that, oModel, sUrl, sPropertyPath, sIdControl, sFragmentName) {
+        _onValueHelp : function (that, oModel, sUrl, sMethod, sPropertyPath, sIdControl, sFragmentName) {
             var oView = that.getView();
             sap.ui.core.BusyIndicator.show(); 
             
-            that.executeRequest(sUrl, 'GET')    
+            that.executeRequest(sUrl, sMethod)    
             .then(function (oData) {
                 oModel.setProperty(sPropertyPath, oData.value[0].result);
                 sap.ui.core.BusyIndicator.hide();

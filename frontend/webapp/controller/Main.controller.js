@@ -515,7 +515,7 @@ sap.ui.define([
 
         _fetchDrivers: async function () {
             var oMasterModel = this.getView().getModel("masterModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
+                sUrl = baseManifestUrl + '/girovisiteService/getDriver',
                 sPropertyPath = "/valuehelps/driver",
                 that = this;
 
@@ -523,7 +523,7 @@ sap.ui.define([
                 sap.ui.core.BusyIndicator.show();
 
                 // Execute the request
-                var oData = await this.executeRequest(sUrl, 'GET');
+                var oData = await this.executeRequest(sUrl, 'POST');
                 oMasterModel.setProperty(sPropertyPath, oData.value[0].result);
                 sap.ui.core.BusyIndicator.hide();
             } catch (error) {
@@ -820,7 +820,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/werks",
                 sIdControl = "idWerksDialog_VH",
                 sFragmentName = "frontend.view.fragments.WerksVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'GET', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchWerks: function (oEvent) {
@@ -838,7 +838,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/vkorg",
                 sIdControl = "idVkorgDialog_VH",
                 sFragmentName = "frontend.view.fragments.VkorgVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'GET', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchVkorg: function (oEvent) {
@@ -856,7 +856,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/vtweg",
                 sIdControl = "idVtwegDialog_VH",
                 sFragmentName = "frontend.view.fragments.VtwegVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'GET', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchVtweg: function (oEvent) {
@@ -870,11 +870,11 @@ sap.ui.define([
         // Driver value help
         onDriverVH: function (oEvent) {
             var oMasterModel = this.getView().getModel("masterModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
+                sUrl = baseManifestUrl + '/girovisiteService/getDriver',
                 sPropertyPath = "/valuehelps/driver",
                 sIdControl = "idDriverDialog_VH",
                 sFragmentName = "frontend.view.fragments.DriverVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchDriver: function (oEvent) {
@@ -884,11 +884,11 @@ sap.ui.define([
         // Kunnr value help
         onKunnrVH: function (oEvent) {
             var oMasterModel = this.getView().getModel("masterModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
+                sUrl = baseManifestUrl + '/girovisiteService/getKunnr',
                 sPropertyPath = "/valuehelps/kunnr",
                 sIdControl = "idKunnrDialog_VH",
                 sFragmentName = "frontend.view.fragments.KunnrVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunnr: function (oEvent) {
@@ -902,11 +902,11 @@ sap.ui.define([
         // Kunwe value help
         onKunweVH: function (oEvent) {
             var oMasterModel = this.getView().getModel("masterModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
+                sUrl = baseManifestUrl + '/girovisiteService/getKunwe',
                 sPropertyPath = "/valuehelps/kunwe",
                 sIdControl = "idKunweDialog_VH",
                 sFragmentName = "frontend.view.fragments.KunweVH";
-            this._onValueHelp(this, oMasterModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oMasterModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunwe: function (oEvent) {
@@ -1013,8 +1013,103 @@ sap.ui.define([
             sap.ui.core.BusyIndicator.show();
 
             this.executeRequest(sUrl, 'GET')
-                .then(function (oData) {
+                .then(async function (oData) {
                     let aResult = oData.value[0].result;
+                    // Extract unique drivers, customers (kunnr), and ship-to parties (kunwe)
+                    const extractUnique = (field) => [...new Set(aResult.map(item => item[field]).filter(val => val !== null))];
+
+                    const aDriver = extractUnique('driver1');
+                    const aKunnr = extractUnique('kunnr');
+                    const aKunwe = extractUnique('kunwe');
+                    const oDriver = {"Customers": aDriver};
+                    const oKunnr = {"Customers": aKunnr};
+                    const oKunwe = {"Customers": aKunwe};
+
+                    if (aDriver.length > 0) {
+                        try {
+                            const oDriversResult = await that.executeRequest(baseManifestUrl + '/girovisiteService/getDriver', 'POST', JSON.stringify(oDriver));
+                            const oResultDriver = oDriversResult.value[0].result;
+                            aResult = aResult.map(item => ({
+                                ...item,
+                                SortField: oResultDriver.find(customer => customer.Customer === item.driver1)?.SortField || null
+                            }));
+                        } catch (error) {
+                            throw error;
+                        }
+                    }
+
+                    if (aKunnr.length > 0) {
+                        try {
+                            const oKunnrResult = await that.executeRequest(baseManifestUrl + '/girovisiteService/getKunnr', 'POST', JSON.stringify(oKunnr));
+                            const oResultKunnr = oKunnrResult.value[0].result;
+                            aResult = aResult.map(item => ({
+                                ...item,
+                                KunnrCustomerName: oResultKunnr.find(customer => customer.Customer === item.kunnr)?.CustomerName || null
+                            }));
+                        } catch (error) {
+                            throw error;
+                        }
+                    }
+
+                    const chunkArray = (array, size) => {
+                        const result = [];
+                        for (let i = 0; i < array.length; i += size) {
+                            result.push(array.slice(i, i + size));
+                        }
+                        return result;
+                    };
+
+                    if (aKunwe.length > 0) {
+                        try {
+                            const chunkSize = 50; // Adjust based on backend limits
+                            const chunks = chunkArray(aKunwe, chunkSize);
+                            let oResultKunwe = [];
+
+                            for (const chunk of chunks) {
+                                const oChunkPayload = { "Customers": chunk };
+                                const oChunkResult = await that.executeRequest(
+                                    baseManifestUrl + '/girovisiteService/getKunwe',
+                                    'POST',
+                                    JSON.stringify(oChunkPayload)
+                                );
+                                oResultKunwe = oResultKunwe.concat(oChunkResult.value[0].result);
+                            }
+
+                            aResult = aResult.map(item => {
+                                const customer = oResultKunwe.find(c => c.Customer === item.kunwe) || {};
+                                return {
+                                    ...item,
+                                    KunweCustomerName: customer?.CustomerName || null,
+                                    StreetName: customer?.StreetName || null,
+                                    PostalCode: customer?.PostalCode || null,
+                                    CityName: customer?.CityName || null,
+                                    BusinessPartnerGrouping: customer?.BusinessPartnerGrouping || null,
+                                    CustomerGroup: customer?.CustomerGroup || null,
+                                    CustomerConditionGroup2: customer?.CustomerConditionGroup2 || null
+                                };
+                            });
+                        } catch (error) {
+                            throw error;
+                        }
+                    }
+
+                    // Convert date format from "yyyy-mm-dd" to "dd/mm/yyyy"
+                    const formatDate = (dateString) => {
+                        if (!dateString) return null;
+                        const [year, month, day] = dateString.split("-");
+                        return `${day}/${month}/${year}`;
+                    };
+
+                    aResult = aResult.map(item => ({
+                        ...item,
+                        datfr: formatDate(item.datfr),
+                        datto: formatDate(item.datto),
+                        datab: formatDate(item.datab),
+                        datbi: formatDate(item.datbi),
+                        dtabwe: formatDate(item.dtabwe),
+                        dtbiwe: formatDate(item.dtbiwe),
+                        dtfine: formatDate(item.dtfine)
+                    }));
                     sap.ui.core.BusyIndicator.hide();
                     if (aResult.length > 0) {
                         // Reorder each object based on the specified order

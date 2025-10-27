@@ -258,7 +258,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/werks",
                 sIdControl = "idWerksDialog_VH",
                 sFragmentName = "frontend.view.fragments.WerksVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'GET', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchWerks: function (oEvent) {
@@ -279,7 +279,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/vkorg",
                 sIdControl = "idVkorgDialog_VH",
                 sFragmentName = "frontend.view.fragments.VkorgVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'GET',  sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchVkorg: function (oEvent) {
@@ -299,7 +299,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/vtweg",
                 sIdControl = "idVtwegDialog_VH",
                 sFragmentName = "frontend.view.fragments.VtwegVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'GET',  sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchVtweg: function (oEvent) {
@@ -319,7 +319,7 @@ sap.ui.define([
                 sPropertyPath = "/valuehelps/spart",
                 sIdControl = "idSpartDialog_VH",
                 sFragmentName = "frontend.view.fragments.SpartVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'GET', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchSpart: function (oEvent) {
@@ -335,11 +335,11 @@ sap.ui.define([
         onDriverVH: function (oEvent) {
             this.oInputDriverDetail = oEvent.getSource();
             var oDetailModel = this.getView().getModel("detailModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getDriver()',
+                sUrl = baseManifestUrl + '/girovisiteService/getDriver',
                 sPropertyPath = "/valuehelps/driver",
                 sIdControl = "idDriverDialog_VH",
                 sFragmentName = "frontend.view.fragments.DriverVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchDriver: function (oEvent) {
@@ -356,11 +356,11 @@ sap.ui.define([
         onKunnrVH: function (oEvent) {
             this.oInputKunnr = oEvent.getSource();
             var oDetailModel = this.getView().getModel("detailModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
+                sUrl = baseManifestUrl + '/girovisiteService/getKunnr',
                 sPropertyPath = "/valuehelps/kunnr",
                 sIdControl = "idKunnrDialog_VH",
                 sFragmentName = "frontend.view.fragments.KunnrVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunnr: function (oEvent) {
@@ -395,11 +395,11 @@ sap.ui.define([
         onKunweVH: function (oEvent) {
             this.oInputKunwe = oEvent.getSource();
             var oDetailModel = this.getView().getModel("detailModel"),
-                sUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
+                sUrl = baseManifestUrl + '/girovisiteService/getKunwe',
                 sPropertyPath = "/valuehelps/kunwe",
                 sIdControl = "idKunweDialog_VH",
                 sFragmentName = "frontend.view.fragments.KunweVH";
-            this._onValueHelp(this, oDetailModel, sUrl, sPropertyPath, sIdControl, sFragmentName);
+            this._onValueHelp(this, oDetailModel, sUrl, 'POST', sPropertyPath, sIdControl, sFragmentName);
         },
 
         onSearchKunwe: function (oEvent) {
@@ -479,8 +479,8 @@ sap.ui.define([
             }
 
             try {
-                let sKunnrUrl = baseManifestUrl + '/girovisiteService/getKunnr()',
-                    oKunnrResult = await this.executeRequest(sKunnrUrl, 'GET');
+                let sKunnrUrl = baseManifestUrl + '/girovisiteService/getKunnr',
+                    oKunnrResult = await this.executeRequest(sKunnrUrl, 'POST');
                 aKunnr = oKunnrResult.value[0].result;
                 oDetail.details.forEach(detail => {
                     if (detail.isKunnr) {
@@ -498,8 +498,8 @@ sap.ui.define([
 
 
             try {
-                let sKunweUrl = baseManifestUrl + '/girovisiteService/getKunwe()',
-                    oKunweResult = await this.executeRequest(sKunweUrl, 'GET');
+                let sKunweUrl = baseManifestUrl + '/girovisiteService/getKunwe',
+                    oKunweResult = await this.executeRequest(sKunweUrl, 'POST');
                 aKunwe = oKunweResult.value[0].result;
                 oDetail.details.forEach(detail => {
                     if (detail.isKunwe) {
