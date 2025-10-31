@@ -30,8 +30,8 @@ module.exports = function (srv) {
         const db = cds.transaction(request);
 
         // Fetch the next value from the sequence
-        const result = await db.run(`SELECT "HEADER_VPID".NEXTVAL FROM DUMMY`);
-        const nVpid = result[0][`HEADER_VPID.NEXTVAL`];
+        const result = await db.run(`SELECT MAX("VPID") FROM GIROVISITE_HEADER`);
+        const nVpid = result[0][`MAX(VPID)`] + 1;
         request.data.vpid = nVpid;
 
         // Assign the same vpid to all associated Details
@@ -89,5 +89,9 @@ module.exports = function (srv) {
 
     srv.on('getLockStatus', '*', async request => {
         await performRequest(srv, request, './func/getLockStatus');
+    });
+
+    srv.on('massiveImport', '*', async request => {
+        await performRequest(srv, request, './func/massiveImport');
     });
 }
