@@ -94,4 +94,8 @@ module.exports = function (srv) {
     srv.on('massiveImport', '*', async request => {
         await performRequest(srv, request, './func/massiveImport');
     });
+
+    srv.on('checkErrorsBeforeMassiveImport', '*', async request => {
+        await performRequest(srv, request, './func/checkErrorsBeforeMassiveImport');
+    });
 }

@@ -176,7 +176,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <ToolbarSpacer/>
-                        <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="xls,xlsx,csv" placeholder="{i18n>importPlaceholder}" />
+                        <!-- <u:FileUploader width="600px" id="fileUploader2" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="xls,xlsx,csv" placeholder="{i18n>importPlaceholder}" /> -->
                         <Button text="{i18n>ImportButton}" icon="sap-icon://add-document" press="onImport" tooltip="{i18n>ImportTooltip}"/>
                         <Button text="{i18n>ExportButton}" icon="sap-icon://excel-attachment" press="onExportCSV" tooltip="{i18n>ExportTooltip}"/>
                         <Button icon="sap-icon://action-settings" press="openPersonalizationDialog" tooltip="Settings"/>

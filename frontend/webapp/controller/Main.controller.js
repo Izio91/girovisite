@@ -1195,7 +1195,9 @@ sap.ui.define([
     
             if (aFiles && aFiles.length) {
                 var oFile = aFiles[0],    
-                    oReader = new FileReader();
+                    oReader = new FileReader(),
+                    sExtension = oFile.name.split(".")[1].toUpperCase(),
+                    that = this;
 
                 // Define what to do when file is successfully read
                 oReader.onload = function (oEvent) {
@@ -1204,17 +1206,51 @@ sap.ui.define([
                     var sBase64Content = sBase64.split(",")[1];
                     // Set property model NewUploadedFile
                     oMasterModel.setProperty("/MassiveImportFile", {
+                        "extension": sExtension,
                         "attachment": sBase64Content
                     });
+                    that.onCheckErrors();
                 };
     
                 // Read the file as Data URL to get Base64
                 oReader.readAsDataURL(oFile);
-            
             }
         },
 
         onImport: function () {
+            var oMasterModel = this.getView().getModel("masterModel"),
+                sIdControl = "idImportDialog",
+                sFragmentName = "frontend.view.fragments.importDialog";
+            this.openFragment(sIdControl,sFragmentName,this.getView(),oMasterModel,this,this.onDialogAfterOpen);
+        },
+
+		onDialogAfterOpen: function () {
+            this.getView().getModel("masterModel").setProperty("/finishButtonEnabled", false);
+		},
+
+        onCloseImportDialog: function (oEvent) {
+            this.getView().byId("fileUploader").clear();
+            this.getView().byId("idImportDialog").close();
+            this.getView().getModel("masterModel").setProperty("/MassiveImportFile", null);
+            this.getView().getModel("masterModel").setProperty("/RetrievedErrors", null);
+            this.getView().getModel("masterModel").setProperty("/RetrievedSuccessfulData", null);
+            this.getView().getModel("masterModel").setProperty("/finishButtonEnabled", false);
+        },
+
+        onCheckErrors: function () {
+            var oFileUploader = this.getView().byId("fileUploader"),
+                oMassiveImportFile = this.getView().getModel("masterModel").getProperty("/MassiveImportFile"),
+                sUrl = baseManifestUrl + `/girovisiteService/checkErrorsBeforeMassiveImport`,
+                bIsMassiveImportAction = false;
+
+            if (!oFileUploader.getValue()) {
+                MessageBox.warning(oBundle.getText("noFileSelected"));
+                return;
+            }
+            this._uploadFile(oFileUploader, sUrl, oMassiveImportFile, bIsMassiveImportAction);
+        },
+
+        onConfirmImport: function () {
             var that = this;
             MessageBox.information(oBundle.getText("ImportAlert"), {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -1230,17 +1266,18 @@ sap.ui.define([
         _confirmImport: function () {
             var oFileUploader = this.getView().byId("fileUploader"),
                 oMassiveImportFile = this.getView().getModel("masterModel").getProperty("/MassiveImportFile"),
-                sUrl = baseManifestUrl + `/girovisiteService/massiveImport`;
+                sUrl = baseManifestUrl + `/girovisiteService/massiveImport`,
+                bIsMassiveImportAction = true;
 
             if (!oFileUploader.getValue()) {
                 MessageBox.warning(oBundle.getText("noFileSelected"));
                 return;
             }
 
-            this._uploadFile(oFileUploader, sUrl, oMassiveImportFile);
+            this._uploadFile(oFileUploader, sUrl, oMassiveImportFile, bIsMassiveImportAction);
         },
 
-        _uploadFile: function (oFileUploader, sUrl, oMassiveImportFile) {
+        _uploadFile: function (oFileUploader, sUrl, oMassiveImportFile, bIsMassiveImportAction) {
             var that = this;
 
             oFileUploader.checkFileReadable()
@@ -1248,25 +1285,79 @@ sap.ui.define([
                     sap.ui.core.BusyIndicator.show();
                     return that.executeRequest(sUrl, 'POST', JSON.stringify(oMassiveImportFile));
                 })
-                .then(function () {
-                    that._handleUploadSuccess(oFileUploader);
+                .then(function (oResponse) {
+                    if (bIsMassiveImportAction) {
+                        if (oResponse.value[0].status !== 200) {
+                            throw new Error(oResponse.value[0].result);
+                        }
+                        that._handleMassiveImportSuccess(oFileUploader);
+                    } else {
+                        let oData = oResponse.value[0].result; 
+                        // Convert object to array with key property
+                        let aErrorData = Object.keys(oData).map(function (key) {
+                            // No errors
+                            if (oData[key].missingNodes.length === 0 && !oData[key].missingKunwe && oData[key].duplicateKunwe.length === 0 && (oData[key].driverAlreadyAssigned == null || oData[key].driverAlreadyAssigned == undefined) && (oData[key].kunnrAlreadyActive == null || oData[key].kunnrAlreadyActive == undefined)) {
+                                return null;
+                            }
+                            return Object.assign({ key: key }, oData[key]);
+                        });
+                        aErrorData = aErrorData.filter(oItem => oItem !== null);
+
+                        
+                        let aSuccessfulData = Object.keys(oData).map(function (key) {
+                            // No errors
+                            if (oData[key].missingNodes.length === 0 && !oData[key].missingKunwe && oData[key].duplicateKunwe.length === 0 && (oData[key].driverAlreadyAssigned == null || oData[key].driverAlreadyAssigned == undefined) && (oData[key].kunnrAlreadyActive == null || oData[key].kunnrAlreadyActive == undefined)) {
+                                return Object.assign({ key: key }, oData[key]);
+                            }
+                            return null;
+                        });
+                        aSuccessfulData = aSuccessfulData.filter(oItem => oItem !== null);
+
+                        that.getView().getModel("masterModel").setProperty("/RetrievedErrors", aErrorData);
+                        that.getView().getModel("masterModel").setProperty("/RetrievedSuccessfulData", aSuccessfulData);
+                        sap.ui.core.BusyIndicator.hide();
+                        let oModel = that.getView().getModel("masterModel");
+					    oModel.setProperty("/finishButtonEnabled", true);
+                    }
                 })
                 .catch(function (error) {
-                    that._handleUploadError(error);
+                    that._handleMassiveImportError(error);
                 });
         },
 
-        _handleUploadSuccess: function (oFileUploader) {
+        _handleMassiveImportSuccess: function (oFileUploader) {
             var that = this;
             
             sap.ui.core.BusyIndicator.hide();
-            oFileUploader.clear();
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
 
             MessageBox.success(oBundle.getText("successImport"), {
                 actions: [MessageBox.Action.CLOSE],
                 title: "Success",
                 onClose: function () {
                     that.onGoPress();
+                    that.onCloseImportDialog();
+                }
+            });
+        },
+
+        _handleMassiveImportError: function (oError) {
+            var that = this;
+            var oFileUploader = this.getView().byId("fileUploader");
+
+            sap.ui.core.BusyIndicator.hide();
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
+
+            MessageBox.error(oBundle.getText("errorImport"), {
+                actions: [MessageBox.Action.CLOSE],
+                title: "Errore",
+                onClose: function () {
+                    that.onGoPress();
+                    that.onCloseImportDialog();
                 }
             });
         },

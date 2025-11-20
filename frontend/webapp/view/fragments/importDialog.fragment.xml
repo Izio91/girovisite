@@ -1,0 +1,76 @@
+<core:FragmentDefinition xmlns="sap.m" 
+	xmlns:f="sap.f"
+		xmlns:form="sap.ui.layout.form" xmlns:u="sap.ui.unified" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+    <Dialog
+		id="idImportDialog" 
+		title="{i18n>TitleImportWizard}"
+		showHeader="false"
+		verticalScrolling="false"
+		contentHeight="70%"
+		contentWidth="80%"
+        resizable="true"
+        draggable="true">
+		<f:DynamicPage
+			stickySubheaderProvider="importDialog"
+			toggleHeaderOnTitleClick="false"
+			showFooter="true">
+			<f:title>
+				<f:DynamicPageTitle>
+					<f:heading>
+						<Title text="{i18n>MassiveImport}"/>
+					</f:heading>
+				</f:DynamicPageTitle>
+			</f:title>
+			<f:content>
+                <VBox>
+                    <MessageStrip class="sapUiSmallMarginBottom"
+                                text="{i18n>FileSelectingText}"
+                                showIcon="true"/>
+                    <HBox>
+                        <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="xls,xlsx,csv" placeholder="{i18n>importPlaceholder}" />
+                        <!-- <Button text="{i18n>ImportTemplate}" class="sapUiSmallMarginBegin" icon="sap-icon://validate" press="onDownloadTemplate" /> -->
+                    </HBox>
+                    <List 
+                        visible="{path: 'masterModel>/RetrievedErrors', formatter:'.formatter.setVisibleList'}"
+                        headerText="{i18n>ShowErrors}"
+                        headerLevel="H1" items="{masterModel>/RetrievedErrors}">
+                        <CustomListItem>
+                            <VBox>
+                                <!-- Header with expandable toggle -->
+                                <Panel expandable="true" expanded="false" headerText="{path: 'masterModel>key'}">
+                                    <VBox>
+                                        <Text visible="{= ${masterModel>missingNodes}.length !== 0 }" text="Missing Nodes: {masterModel>missingNodes}" />
+                                        <Text visible="{= ${masterModel>missingKunwe} === true }" text="Missing Kunwe: {masterModel>missingKunwe}" />
+                                        <Text visible="{= ${masterModel>duplicateKunwe}.length !== 0 }" text="Duplicate Kunwe: {masterModel>duplicateKunwe}" />
+                                        <Text visible="{= ${masterModel>driverAlreadyAssigned} !== null }" text="Driver already assigned: {masterModel>driverAlreadyAssigned}" />
+                                        <Text visible="{path: 'masterModel>kunnrAlreadyActive', formatter:'.formatter.setVisibleKunnrError'}" text="Kunnr already active: {masterModel>kunnrAlreadyActive}" />
+                                    </VBox>
+                                </Panel>
+                            </VBox>
+                        </CustomListItem>
+                    </List>
+                    <List 
+                       visible="{path: 'masterModel>/RetrievedSuccessfulData', formatter:'.formatter.setVisibleList'}"
+                        headerText="{i18n>ShowNoErrors}"
+                        headerLevel="H1" items="{masterModel>/RetrievedSuccessfulData}">
+                        <CustomListItem>
+                            <VBox>
+                                <!-- Header with expandable toggle -->
+                                <Panel expandable="true" expanded="false" headerText="{path: 'masterModel>key'}"/>
+                            </VBox>
+                        </CustomListItem>
+                    </List>
+                </VBox>
+            </f:content>
+
+			<f:footer>
+				<OverflowToolbar>
+					<ToolbarSpacer/>
+					<Button text="{i18n>Import}" type="Emphasized" enabled="{masterModel>/finishButtonEnabled}" press="onConfirmImport" />
+					<Button text="{i18n>Close}" press="onCloseImportDialog" />
+				</OverflowToolbar>
+			</f:footer>
+		</f:DynamicPage>
+    </Dialog>
+</core:FragmentDefinition>
+

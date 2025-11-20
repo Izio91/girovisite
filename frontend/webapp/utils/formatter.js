@@ -67,6 +67,14 @@ sap.ui.define([
 
         enableSundayControl: function (bIsNew, bEditMode, sTurno, bIsKunwe) {
             return (bIsNew || bEditMode) && (sTurno === "2" || sTurno === "3") && bIsKunwe;
+        },
+
+        setVisibleKunnrError: function (oKunnr) {
+            return oKunnr !== null && oKunnr !== undefined
+        },
+
+        setVisibleList: function (aRetrievedData) {
+            return aRetrievedData !== null && aRetrievedData !== undefined && aRetrievedData.length > 0;
         }
     };
 });

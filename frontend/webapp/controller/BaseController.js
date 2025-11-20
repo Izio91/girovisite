@@ -85,7 +85,7 @@ sap.ui.define([
          * @param {sap.ui.core.mvc.Model} oModel - The model binded to the dialog.
          * @param {sap.ui.core.mvc.Controller} oController - The controller associated with the fragment.
          */
-        openFragment: function (sIdControl, sFragmentName, oView, oModel, oController) {
+        openFragment: function (sIdControl, sFragmentName, oView, oModel, oController, onAfterOpen) {
             // Check if the fragment is already created
             if (!oView.byId(sIdControl)) {
                 // Load the fragment dynamically
@@ -94,6 +94,9 @@ sap.ui.define([
                     name: sFragmentName, // Specify the fragment name to be loaded
                     controller: oController // Pass the controller to handle fragment events
                 }).then(function (oDialog) {
+                    if (onAfterOpen) {
+					    oDialog.attachAfterOpen(onAfterOpen, oController);
+                    }
                     // Add the fragment as a dependent of the view
                     oView.addDependent(oDialog);
                     // Set model
@@ -102,7 +105,10 @@ sap.ui.define([
                     oDialog.open();
                 });
             } else {
-                oView.byId(sIdControl).getBinding("items").filter([]);
+                let aItems = oView.byId(sIdControl).getBinding("items");
+                if (aItems) {
+                    aItems.filter([]);
+                }
                 // If the fragment already exists, open it directly
                 oView.byId(sIdControl).open();
             }

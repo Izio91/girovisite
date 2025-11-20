@@ -19,7 +19,7 @@ module.exports = async (request, tx) => {
     const service = await cds.connect.to(process.env['Destination_CloudIntegration']),
           serviceRequest = service.tx(request);
     // Perform request
-    let oResult = await serviceRequest.post(process.env['Path_MASSIVE_IMPORT'], {"Attachment": attachment, "Extension": extension, "Ernam": sLogonName, "Aedat": sDate, "Aezet": sTime});
+    let oResult = await serviceRequest.post(process.env['Path_CHECKERRORS_MASSIVE_IMPORT'], {"Attachment": attachment, "Extension": extension, "Ernam": sLogonName, "Aedat": sDate, "Aezet": sTime});
     
     return {
         status: 200,
