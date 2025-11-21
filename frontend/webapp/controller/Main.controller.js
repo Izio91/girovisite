@@ -1217,6 +1217,14 @@ sap.ui.define([
             }
         },
 
+        onDownloadTemplate: function () {
+            // Path to the static file inside the webapp folder
+            const sFilePath = sap.ui.require.toUrl("frontend/files/Template_MassiveImport.xlsx");
+
+            // Trigger download
+            sap.m.URLHelper.redirect(sFilePath, true);
+        },
+
         onImport: function () {
             var oMasterModel = this.getView().getModel("masterModel"),
                 sIdControl = "idImportDialog",
@@ -1228,9 +1236,13 @@ sap.ui.define([
             this.getView().getModel("masterModel").setProperty("/finishButtonEnabled", false);
 		},
 
-        onCloseImportDialog: function (oEvent) {
-            this.getView().byId("fileUploader").clear();
+        onCloseImportDialog: function () {
+            this.resetImportDialog();
             this.getView().byId("idImportDialog").close();
+        },
+
+        resetImportDialog: function () {
+            this.getView().byId("fileUploader").clear();
             this.getView().getModel("masterModel").setProperty("/MassiveImportFile", null);
             this.getView().getModel("masterModel").setProperty("/RetrievedErrors", null);
             this.getView().getModel("masterModel").setProperty("/RetrievedSuccessfulData", null);

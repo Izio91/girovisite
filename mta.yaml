@@ -9,6 +9,7 @@ modules:
     properties:
       OPTIMIZE_MEMORY: "true"
       Path_MASSIVE_IMPORT: "/api/import"
+      Path_CHECKERRORS_MASSIVE_IMPORT: "/api/checkErrors"
       Path_API_WERKS: "/sap/opu/odata/sap/YY1_GIRI_WERKS_CDS/YY1_GIRI_WERKS?$format=json"
       Path_API_VKORG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=SalesOrganization"
       Path_API_VTWEG: "/sap/opu/odata/sap/YY1_GIRI_VKORG_CDS/YY1_GIRI_VKORG?$format=json&$select=DistributionChannel"

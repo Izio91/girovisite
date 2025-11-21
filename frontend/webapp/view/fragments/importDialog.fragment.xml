@@ -28,7 +28,9 @@
                                 showIcon="true"/>
                     <HBox>
                         <u:FileUploader width="600px" id="fileUploader" change="handleFileChange" style="Emphasized" name="file" sendXHR="true" fileType="xls,xlsx,csv" placeholder="{i18n>importPlaceholder}" />
-                        <!-- <Button text="{i18n>ImportTemplate}" class="sapUiSmallMarginBegin" icon="sap-icon://validate" press="onDownloadTemplate" /> -->
+                        <Button text="{i18n>Reset}" class="sapUiSmallMarginBegin" icon="sap-icon://reset" press="resetImportDialog" />
+                        <ToolbarSpacer/>
+                        <Button text="{i18n>DownloadImportTemplate}" class="sapUiSmallMarginBegin" icon="sap-icon://download" press="onDownloadTemplate" />
                     </HBox>
                     <List 
                         visible="{path: 'masterModel>/RetrievedErrors', formatter:'.formatter.setVisibleList'}"
@@ -39,11 +41,11 @@
                                 <!-- Header with expandable toggle -->
                                 <Panel expandable="true" expanded="false" headerText="{path: 'masterModel>key'}">
                                     <VBox>
-                                        <Text visible="{= ${masterModel>missingNodes}.length !== 0 }" text="Missing Nodes: {masterModel>missingNodes}" />
-                                        <Text visible="{= ${masterModel>missingKunwe} === true }" text="Missing Kunwe: {masterModel>missingKunwe}" />
-                                        <Text visible="{= ${masterModel>duplicateKunwe}.length !== 0 }" text="Duplicate Kunwe: {masterModel>duplicateKunwe}" />
-                                        <Text visible="{= ${masterModel>driverAlreadyAssigned} !== null }" text="Driver already assigned: {masterModel>driverAlreadyAssigned}" />
-                                        <Text visible="{path: 'masterModel>kunnrAlreadyActive', formatter:'.formatter.setVisibleKunnrError'}" text="Kunnr already active: {masterModel>kunnrAlreadyActive}" />
+                                        <Text visible="{= ${masterModel>missingNodes}.length !== 0 }" text="{i18n>missingFields}: {masterModel>missingNodes}" />
+                                        <Text visible="{= ${masterModel>missingKunwe} === true }" text="{i18n>missingKunwe} (KUNWE)" />
+                                        <Text visible="{= ${masterModel>duplicateKunwe}.length !== 0 }" text="{i18n>duplicatesKunwe}: {masterModel>duplicateKunwe}" />
+                                        <Text visible="{= ${masterModel>driverAlreadyAssigned} !== null }" text="{i18n>driverAlreadyAssigned}: {masterModel>driverAlreadyAssigned}" />
+                                        <Text visible="{path: 'masterModel>kunnrAlreadyActive', formatter:'.formatter.setVisibleKunnrError'}" text="{i18n>kunnrAlreadyActive}: {masterModel>kunnrAlreadyActive}" />
                                     </VBox>
                                 </Panel>
                             </VBox>
