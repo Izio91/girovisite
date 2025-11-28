@@ -8,7 +8,7 @@ module.exports = async (request, tx) => {
     let offset = 0;
     let batchData;
 
-    let query = SELECT('vpid,vctext,driver1,termCode,datfr,datto,kunnr,datab,datbi,kunwe,dtabwe,dtbiwe,turno,monday,tuesday,wednesday,thursday,friday,saturday,sunday,vkorg,vtweg,spart,dtfine,active,loevm').from('HeaderWithDetails');
+    let query = SELECT('vpid,vctext,driver1,termCode,datfr,datto,vppos,kunnr,datab,datbi,kunwe,dtabwe,dtbiwe,turno,monday,tuesday,wednesday,thursday,friday,saturday,sunday,vkorg,vtweg,spart,dtfine,active,loevm').from('HeaderWithDetails');
 
     // Apply filters if available
     if (sFilters) {
@@ -39,8 +39,8 @@ module.exports = async (request, tx) => {
 
     return {
         status: 200,
-        currentUser: request.req.authInfo.getEmail(),
-        result: data
-    };
-        
-};
+                currentUser: request.req.authInfo.getEmail(),
+                        result: data
+                            };
+                                    
+                                    };

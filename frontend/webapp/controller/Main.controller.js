@@ -40,34 +40,35 @@ sap.ui.define([
                 termCode: 4,
                 datfr: 5,
                 datto: 6,
-                kunnr: 7,
-                KunnrCustomerName: 8,
-                datab: 9,
-                datbi: 10,
-                kunwe: 11,
-                KunweCustomerName: 12,
-                StreetName: 13,
-                PostalCode: 14,
-                CustomerGroup: 15,
-                CustomerConditionGroup2: 16,
-                CityName: 17,
-                dtabwe: 18,
-                dtbiwe: 19,
-                turno: 20,
-                monday: 21,
-                tuesday: 22,
-                wednesday: 23,
-                thursday: 24,
-                friday: 25,
-                saturday: 26,
-                sunday: 27,
-                BusinessPartnerGrouping: 28,
-                vkorg: 29,
-                vtweg: 30,
-                spart: 31,
-                dtfine: 32,
-                active: 33,
-                loevm: 34
+                vppos: 7,
+                kunnr: 8,
+                KunnrCustomerName: 9,
+                datab: 10,
+                datbi: 11,
+                kunwe: 12,
+                KunweCustomerName: 13,
+                StreetName: 14,
+                PostalCode: 15,
+                CustomerGroup: 16,
+                CustomerConditionGroup2: 17,
+                CityName: 18,
+                dtabwe: 19,
+                dtbiwe: 20,
+                turno: 21,
+                monday: 22,
+                tuesday: 23,
+                wednesday: 24,
+                thursday: 25,
+                friday: 26,
+                saturday: 27,
+                sunday: 28,
+                BusinessPartnerGrouping: 29,
+                vkorg: 30,
+                vtweg: 31,
+                spart: 32,
+                dtfine: 33,
+                active: 34,
+                loevm: 35
             };
 
             var oRouter = this.getOwnerComponent().getRouter();
@@ -1299,7 +1300,7 @@ sap.ui.define([
                 })
                 .then(function (oResponse) {
                     if (bIsMassiveImportAction) {
-                        if (oResponse.value[0].status !== 200) {
+                        if (oResponse.value[0].result.status === '400') {
                             throw new Error(oResponse.value[0].result);
                         }
                         that._handleMassiveImportSuccess(oFileUploader);
